@@ -1,0 +1,23 @@
+{
+    "name": "@suzu/tailwind-config",
+    "version": "1.0.0",
+    "description": "TailwindCSS shared configurations",
+    "main": "index.ts",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "devDependencies": {
+        "tailwindcss": "latest"
+    },
+    "dependencies": {
+        "@tailwindcss/forms": "latest",
+        "@tailwindcss/typography": "latest",
+        "tailwind-scrollbar-hide": "latest",
+        "tailwindcss-radix": "latest"
+    },
+    "keywords": [
+        "tailwindcss"
+    ],
+    "author": "dinhkhanh",
+    "license": "ISC"
+}

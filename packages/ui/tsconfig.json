@@ -1,0 +1,16 @@
+{
+  "extends": "@suzu/typescript-config/react-library.json",
+  "compilerOptions": {
+    // "outDir": "dist",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "baseUrl": "./"
+  },
+  "include": [
+    ".",
+    "../../apps/supabase/src/components/master-layout/input/base-common-IHL.tsx",
+    "../../apps/supabase/src/components/master-layout/input/input-hidden-label.tsx"
+  ],
+  "exclude": ["node_modules", "dist", "build"]
+}

@@ -1,0 +1,3 @@
+const ChipsTextOnly = () => {};
+
+export { ChipsTextOnly };

@@ -1,0 +1,18 @@
+/* Tiptap.css */
+.tiptap .is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.custom-editor .ProseMirror:focus {
+  outline: none;
+}
+.custom-editor .ProseMirror {
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 155%;
+  color: #6b7280;
+}
