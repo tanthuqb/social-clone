@@ -918,8 +918,6 @@ CREATE TRIGGER on_notifications_actions_created AFTER INSERT ON public.feed_enga
 
 CREATE TRIGGER on_notifications_actions_feeds_comments_created AFTER INSERT ON public.feeds FOR EACH ROW EXECUTE FUNCTION public.handle_notifications();
 
-CREATE TRIGGER "push-notifications" AFTER INSERT ON public.notifications FOR EACH ROW EXECUTE FUNCTION supabase_functions.http_request('https://wtuxkawucgrqepemujjf.supabase.co/functions/v1/push-notifications', 'POST', '{"Content-type":"application/json"}', '{}', '1000');
-
 CREATE TRIGGER on_notifications_actions_user_follows_created AFTER INSERT ON public.user_follows FOR EACH ROW EXECUTE FUNCTION public.handle_notifications();
 
 CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
