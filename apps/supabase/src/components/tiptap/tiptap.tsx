@@ -5,7 +5,7 @@ import { useEditor, EditorContent, Editor, EditorOptions } from "@tiptap/react";
 import "@/components/tiptap/Tiptap.css";
 import { memo, useEffect } from "react";
 import { CustomLink, tiptapExtensions } from "./tiptap-config";
-import FileHandler from "@tiptap-pro/extension-file-handler";
+
 import { EditorProps, EditorView } from "@tiptap/pm/view";
 import { useContentTiptap } from "./providers/content-provider";
 import { useCountCharacters } from "./providers/count-character-provider";
@@ -20,31 +20,14 @@ const Tiptap = memo((props: TiptapProps) => {
   const { content, setContent } = useContentTiptap();
   const { countCharacters, setCountCharacters } = useCountCharacters();
 
-  /**
-   * Handle image file for tiptap when copy and paste
-   */
-  function fileHandlerForTiptap() {
-    return FileHandler.configure({
-      onDrop: (currentEditor, files, pos) => {
-        handleValidateImageFiles(files);
-      },
 
-      onPaste: (currentEditor, files, htmlContent) => {
-        if (htmlContent) {
-          htmlContent = "";
-          return false;
-        }
-        handleValidateImageFiles(files);
-      },
-    });
-  }
 
   /**
    * tiptap config
    */
   let tiptapConfig: Partial<EditorOptions> = {
     // @ts-ignore
-    extensions: [...tiptapExtensions, fileHandlerForTiptap()],
+    extensions: [...tiptapExtensions],
     autofocus: true,
     content: content,
   };
@@ -89,7 +72,7 @@ const Tiptap = memo((props: TiptapProps) => {
         editor.setOptions({
           extensions: [
             ...tiptapExtensions,
-            fileHandlerForTiptap(),
+
             CustomLink(href),
           ],
           editorProps: tiptapProps,
