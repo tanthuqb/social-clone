@@ -11,7 +11,7 @@ type ContentDrawerProps = {
   user: Session;
 };
 
-const ContentDrawer = React.forwardRef<HTMLDivElement, ContentDrawerProps>(({ user }) => {
+const ContentDrawer = React.forwardRef<HTMLDivElement, ContentDrawerProps>(({ user }, ref) => {
   const { notificationsArray, session } =  NotificationAction().GetNotifications(user);
 
   return (
