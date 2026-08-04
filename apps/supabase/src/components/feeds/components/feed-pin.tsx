@@ -43,7 +43,7 @@ function FeedPin({
           .update({
             pin: true,
           })
-          .eq("id", feed?.id)
+          .eq("id", feed?.id as string)
           .single();
 
         if (errorFeed_pin) {

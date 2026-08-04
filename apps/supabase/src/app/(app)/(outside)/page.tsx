@@ -29,7 +29,7 @@ export default async function HomePage() {
       <HeaderSectionCommon
         text={"Dành cho bạn"}
         session={session}
-        user={user! ? user : null}
+        user={user!}
       />
       <ScrollArea className="h-custom shadow-common-sm flex flex-col items-center sm:rounded-3xl">
         <div className="mb-10 bg-neutral-50 sm:mb-0 sm:p-4">
@@ -39,7 +39,7 @@ export default async function HomePage() {
           <FeedList
             feeds={feeds!}
             inFeed
-            user={user}
+            user={user ?? undefined}
             session={session}
             type="feed"
           />

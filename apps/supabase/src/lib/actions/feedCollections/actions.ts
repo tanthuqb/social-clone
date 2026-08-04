@@ -36,7 +36,7 @@ export const getFeedCollectionsAction = async (offset: number, limit: number, us
       if (error) {
         throw new Error(`An error happened: ${error}`)
       }
-      return feed_collections as Comment_Detail_Full[];
+      return feed_collections as unknown as Comment_Detail_Full[];
     } catch (error) {
       console.log(error)
       throw new Error(`An error happened: ${error}`)

@@ -22,6 +22,6 @@ export default async function  MainFooter() {
   return <NavbarMobile
       user={user}
       notifications={notifications!}
-      profile={profile}
+      profile={profile!}
   />;
 }

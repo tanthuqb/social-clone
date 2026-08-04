@@ -81,7 +81,7 @@ export async function GET(req: Request) {
     const { data: feedReaction } = await supabase
         .from("feed_engagement")
         .select("*,user_id!left(*)")
-        .eq("feed_id", id)
+        .eq("feed_id", id as string)
         .eq("user_id", session?.user?.id as string)
         .maybeSingle();
     return NextResponse.json(feedReaction, { status: 200 });

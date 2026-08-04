@@ -27,7 +27,7 @@ export default async function MainSidebar() {
     <DrawerCommon
       session={user}
       notifications={notification!}
-      profile={profile}
+      profile={profile!}
     />
 
   );

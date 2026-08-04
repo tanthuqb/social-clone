@@ -39,3 +39,11 @@ yarn-error.log*
 .DS_Store
 *.pem
 .env*.local
+.env*
+!.env.example
+
+# Supabase CLI local state
+supabase/.temp/
+
+# TypeScript incremental build info
+*.tsbuildinfo

@@ -67,7 +67,7 @@ function Profile({ user, session }: { user: Profile; session: Session }) {
                 "/avatars/" +
                 url?.path,
             })
-            .eq("id", session?.user?.id)
+            .eq("id", session?.user?.id as string)
             .select();
           if (!updateError) {
             toast.success("Successfully updated profile!");
@@ -85,7 +85,7 @@ function Profile({ user, session }: { user: Profile; session: Session }) {
             description: description,
             gender: gender,
           })
-          .eq("id", session?.user?.id)
+          .eq("id", session?.user?.id as string)
           .select();
         if (!error) {
           toast.success("Successfully updated profile!");

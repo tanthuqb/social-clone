@@ -45,21 +45,21 @@ export const InteractiveWidget = ({
       const { count: countLike } = await supabase
         .from("feed_engagement")
         .select("*", { count: "exact" })
-        .eq("feed_id", feed?.id)
+        .eq("feed_id", feed?.id as string)
         .eq("state", ReactionState.LIKE);
       const { count: countDisLike } = await supabase
         .from("feed_engagement")
         .select("*", { count: "exact" })
-        .eq("feed_id", feed?.id)
+        .eq("feed_id", feed?.id as string)
         .eq("state", ReactionState.DISLIKE);
       if (userId) {
         const { data } = await supabase
           .from("feed_engagement")
           .select("*")
-          .eq("feed_id", feed?.id)
+          .eq("feed_id", feed?.id as string)
           .eq("user_id", userId)
           .maybeSingle();
-        if (data) setStateReaction(data?.state!);
+        if (data) setStateReaction(data?.state! as ReactionState);
       }
       const responeFeedRactionUser = await fetch(
         `/api/feedReactionUser?ID=${feed?.id}`,
@@ -198,7 +198,7 @@ export const InteractiveWidget = ({
             // If the current action is different from the existing reaction state, update the row
             const { data: update, error } = await supabase
               .from("feed_engagement")
-              .update({ state: action })
+              .update({ state: action as "like" | "dislike" | "neutral" })
               .eq("user_id", session?.user?.id as string)
               .eq("feed_id", params.feed_id)
               .select();

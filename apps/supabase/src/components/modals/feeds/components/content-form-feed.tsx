@@ -160,7 +160,7 @@ const ContentForm = memo(
             "Chỉnh sửa thành công",
             "checkIcon",
             "Xem",
-            `/p/${data.id}`,
+            `/p/${data?.id}`,
           );
         setLoading(false);
         router.refresh();
@@ -215,7 +215,7 @@ const ContentForm = memo(
             "Đăng bài thành công",
             "checkIcon",
             "Xem",
-            `/p/${data.id}`,
+            `/p/${data?.id}`,
           );
         setLoading(false);
         router.refresh();

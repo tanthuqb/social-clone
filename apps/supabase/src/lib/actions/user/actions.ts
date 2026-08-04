@@ -33,7 +33,7 @@ export const getFeaturedUserAction = async (userId : Profile['id'] | null , offs
         query = query.neq("id", userId);
       }   
       const { data : userFeatured, error } = await query;
-      await Promise.all(userFeatured.map(async (user: UserFeatured) => {
+      await Promise.all(userFeatured!.map(async (user: UserFeatured) => {
         const {count, error } = await supabase
         .from("user_follows")
         .select("*", { count: "exact" })
@@ -41,11 +41,11 @@ export const getFeaturedUserAction = async (userId : Profile['id'] | null , offs
         const { data: rows } = await supabase
         .from("user_follows")
         .select("*")
-        .eq("user_id",  userId)
+        .eq("user_id",  userId as string)
         .eq("following_id", user?.id)
         .maybeSingle();
         user.countFollowing = count!;
-        user.user_follower = rows;
+        user.user_follower = rows ?? undefined;
       }));
       if(error) throw error;
       return userFeatured;

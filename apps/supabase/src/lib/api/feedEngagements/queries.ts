@@ -103,7 +103,7 @@ export const getFeedReactionsNoti = async () => {
   if (error) throw { error: error }
   // console.log(rows);
 
-  const f: FeedReactionsNoti[] = rows.map((r) => ({ ...r, feed: r.feed_id, users: r.user_id! }));
+  const f: FeedReactionsNoti[] = rows.map((r) => ({ ...r, feed: r.feed_id, users: r.user_id! })) as unknown as FeedReactionsNoti[];
   return { feedReactions: f };
 };
 export const countFeedDisLikeByFeedId = async (feedId: FeedId) => {

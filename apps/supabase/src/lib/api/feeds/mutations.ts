@@ -20,7 +20,7 @@ export const createFeed = async (feed: NewFeedParams) => {
             user_id: session?.user?.id!,
         });
         // const [f] = await db.insert(feeds).values(newFeed).returning();
-        const { data: f, error } = await supabase.from('feeds').insert([newFeed]).select().maybeSingle();
+        const { data: f, error } = await supabase.from('feeds').insert([newFeed] as any).select().maybeSingle();
         if (error) throw { error: error }
         // adminClient
         //   .collections("feeds")

@@ -5,7 +5,7 @@ import plugin from "tailwindcss/plugin";
 const path = require("path");
 
 const config: Config = {
-  presets: [sharedConfig],
+  presets: [sharedConfig as any],
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",

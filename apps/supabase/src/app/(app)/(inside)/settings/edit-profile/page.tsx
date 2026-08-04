@@ -1,6 +1,7 @@
 import Profile from "@/components/settings/profile";
 import { HeaderCommonSettings } from "@/components/shared/header/local/header-common-settings";
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
 export default async function EditProfile() {
   const supabase = createClient();
@@ -21,6 +22,8 @@ export default async function EditProfile() {
       return;
     }
     user = data;
+  } else {
+    redirect("/");
   }
 
   return (

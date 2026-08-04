@@ -10,7 +10,7 @@ export async function GET(req: Request) {
     const { data: FeedReactionUser } = await supabase
         .from("feed_engagement")
         .select("*,user_id!left(*)")
-        .eq("feed_id", feedId);
+        .eq("feed_id", feedId as string);
     return NextResponse.json(FeedReactionUser, { status: 200 });
   } catch (err) {
       return NextResponse.json(err, { status: 500 });

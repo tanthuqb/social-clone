@@ -21,9 +21,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .eq("id", params.feedId)
     .maybeSingle();
 
+  if (!feed) return notFound();
+
   const metadata = constructMetadata({
-    title: stripHtml(feed.content),
-    description: stripHtml(feed.content),
+    title: stripHtml(feed.content ?? ""),
+    description: stripHtml(feed.content ?? ""),
     image: feed?.feed_images?.length > 0 ? feed.feed_images[0].image : ``,
     noIndex: false,
   });
@@ -48,7 +50,7 @@ const FeedDetailPage = async ({ params }: { params: { feedId: string } }) => {
       <HeaderCommonIcon
         text={"Chi tiết bài viết"}
         session={session}
-        user={user! ? user : null}
+        user={user ?? undefined}
         feed={feed! ? feed : null}
       />
       <ScrollArea className="h-custom shadow-common-sm overflow-hidden bg-neutral-50 sm:rounded-3xl">
@@ -56,7 +58,7 @@ const FeedDetailPage = async ({ params }: { params: { feedId: string } }) => {
           inFeed={false}
           feed={feeds!}
           session={session}
-          profiles={user}
+          profiles={user ?? undefined}
         />
       </ScrollArea>
       {/* <MainFooter /> */}

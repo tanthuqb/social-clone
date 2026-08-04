@@ -63,7 +63,7 @@ export default async function Page({
       <HeaderSectionCommon
         text={`@${user?.full_name ?? "full_name"}`}
         session={session}
-        user={user! ? user : null}
+        user={user!}
       />
       <ScrollArea className="shadow-common-sm [:>*]:h-full h-[calc(100dvh_-_64px_-_16px)] overflow-hidden bg-neutral-50 sm:rounded-3xl">
         <div className="flex flex-col bg-white p-4">
@@ -94,7 +94,7 @@ export default async function Page({
 
           <UserTimeline
             feeds={feeds || undefined}
-            user={user}
+            user={user ?? undefined}
             session={session}
           />
         </div>

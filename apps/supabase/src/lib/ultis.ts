@@ -65,7 +65,7 @@ type SlugifyOptions = {
 export const slugify = (
   string: string,
   options?: SlugifyOptions,
-  args?: customSlugify.ExtendArgs | { [key: string]: any },
+  args?: { [key: string]: any },
 ): string => {
   const defaultOptions: SlugifyOptions = {
     replacement: "-",

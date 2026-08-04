@@ -36,10 +36,10 @@ const NotiDetail = ({ notification, session }: NotiDetailProps) => {
       const { data: following_userData } = await supabase
         .from("user_follows")
         .select("*")
-        .eq("user_id", notification?.user_noti_id)
-        .eq("following_id", notification?.user_id?.id)
+        .eq("user_id", notification?.user_noti_id as string)
+        .eq("following_id", notification?.user_id?.id as string)
         .maybeSingle();
-      setFollowingUser(following_userData);
+      setFollowingUser(following_userData as any);
       //lấy thông tin người được theo dõi
       if (notification?.following_id) {
         const { data: rows } = await supabase
@@ -55,7 +55,7 @@ const NotiDetail = ({ notification, session }: NotiDetailProps) => {
             .eq("id", rows?.following_id as string)
             .single();
           if (userFollowData) {
-            setUserFollow(userFollowData);
+            setUserFollow(userFollowData as any);
           }
         }
       }
@@ -88,7 +88,7 @@ const NotiDetail = ({ notification, session }: NotiDetailProps) => {
     const { data, error } = await supabase
       .from("notifications")
       .update({ read: true })
-      .eq("id", notification?.id);
+      .eq("id", notification?.id as string);
     setIndicator(false);
     if (error) {
       toast.error(error.message);

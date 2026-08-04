@@ -33,7 +33,7 @@ const ContentDrawer = React.forwardRef<HTMLDivElement, ContentDrawerProps>(
         if (valueInput === "") {
           const userFeatured = await getFeaturedUserAction(profile?.id!, 0, 20);
           if (userFeatured) {
-            setSearchUser(userFeatured);
+            setSearchUser(userFeatured as UserFeatured[]);
             setIsLoading(true);
           }
         } else {
@@ -57,11 +57,11 @@ const ContentDrawer = React.forwardRef<HTMLDivElement, ContentDrawerProps>(
               const { data: rows } = await supabase
                 .from("user_follows")
                 .select("*")
-                .eq("user_id", profile?.id)
+                .eq("user_id", profile?.id as string)
                 .eq("following_id", user?.id)
                 .maybeSingle();
               user.countFollowing = count!;
-              user.user_follower = rows;
+              user.user_follower = rows ?? undefined;
             }),
           );
           if (error) {

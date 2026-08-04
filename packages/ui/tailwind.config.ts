@@ -2,7 +2,7 @@ import sharedConfig from "@suzu/tailwind-config/tailwind.config.ts";
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
 const config = {
-  presets: [sharedConfig],
+  presets: [sharedConfig as any],
   darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",

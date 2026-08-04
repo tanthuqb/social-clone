@@ -24,7 +24,7 @@ export const createFeedReaction = async (
   });
   try {
     const {data:f,error} = await supabase.from('feed_engagement')
-    .upsert([newFeedReaction]).select()    
+    .upsert([newFeedReaction] as any).select()
     if(error){
       throw {error:error}
     }
@@ -61,7 +61,7 @@ export const updateFeedReaction = async (
     //   .returning();
       const {data:f,error} = await supabase.from('feed_engagement').update([feedReaction])
       .eq('feed_id',feedReactionId)
-      .eq('user_id',session?.user?.id)
+      .eq('user_id',session?.user?.id as string)
       .select()
       if(error){
         throw {error:error}
@@ -90,7 +90,7 @@ export const deleteFeedReaction = async (id: FeedReactionId) => {
     //   .returning();
     const {data:f,error} = await supabase.from('feed_engagement').delete()
     .eq('feed_id',feedReactionId)
-    .eq('user_id',session?.user?.id)
+    .eq('user_id',session?.user?.id as string)
     .select()
     if(error){
       throw {error:error}

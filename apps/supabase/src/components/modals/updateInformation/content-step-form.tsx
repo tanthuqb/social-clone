@@ -92,7 +92,7 @@ function ContentStepForm() {
       .from("profiles")
       .select("full_name")
       .ilike("full_name", `${slugDisplayName}%`)
-      .neq("id", session?.user?.id)
+      .neq("id", session?.user?.id as string)
       .order("full_name", { ascending: false });
 
     if (search && search.length > 0) {
@@ -100,7 +100,7 @@ function ContentStepForm() {
       let maxLength = 0;
       const existingNumbers = new Set();
       search.forEach((profile) => {
-        const match = profile.full_name.match(
+        const match = profile.full_name?.match(
           new RegExp(`${slugDisplayName}(\\d+)$`),
         );
         if (match) {
@@ -164,7 +164,7 @@ function ContentStepForm() {
         .update({
           avatar_url: path,
         })
-        .eq("id", session?.user?.id);
+        .eq("id", session?.user?.id as string);
     }
     setCheckNameAccount(true);
   };

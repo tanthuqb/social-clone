@@ -47,7 +47,7 @@ export const getCommentReactionByCommentId = async (id: CommentId) => {
   //   );
   const { data: row, error } = await supabase.from('comment_engagement')
     .select()
-    .eq('parent_id', CommentId)
+    .eq('parent_id' as any, CommentId)
   if (error) throw { error: error }
   return { commentReaction: row };
 };
@@ -61,7 +61,7 @@ export const getCountCommentReactionByCommentId = async (id: CommentId) => {
   //     eq(commentReactions.commentId, CommentId),
   //   );
   const { data: row, error } = await supabase.from('comment_engagement')
-    .select('*').eq('parent_id', CommentId)
+    .select('*').eq('parent_id' as any, CommentId)
   if (error) throw { error: error }
   if (row === undefined) return 0;
   return row.length;

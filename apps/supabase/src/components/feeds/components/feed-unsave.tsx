@@ -19,7 +19,7 @@ function FeedSave({ feed }: { className?: string; feed?: any }) {
       await supabase
         .from("feed_collections")
         .delete()
-        .eq("user_id", session?.user?.id)
+        .eq("user_id", session?.user?.id as string)
         .eq("feed_id", feed.id)
         .single();
     // console.log(feed_collections);

@@ -10,11 +10,20 @@
   "devDependencies": {
     "@suzu/eslint-config": "workspace:*",
     "@suzu/typescript-config": "workspace:*",
-    "prettier": "^3.7.4",
-    "turbo": "^2.6.3"
+    "prettier": "^3.9.6",
+    "turbo": "^2.10.8"
   },
   "packageManager": "pnpm@10.26.0",
   "engines": {
     "node": ">=20"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@swc/core",
+      "bcrypt",
+      "bufferutil",
+      "esbuild",
+      "utf-8-validate"
+    ]
   }
 }

@@ -83,7 +83,7 @@ const FooterCard = ({
           .eq("user_id", userId)
           // .eq("id", id)
           .maybeSingle();
-        if (data) setReactionState(data?.state);
+        if (data) setReactionState(data?.state as ReactionState);
       }
       const { count: totalCount } = await supabase
         .from("feed_engagement")
@@ -176,7 +176,7 @@ const FooterCard = ({
             // If the current action is different from the existing reaction state, update the row
             const { data: update, error } = await supabase
               .from("feed_engagement")
-              .update({ state: action })
+              .update({ state: action as "like" | "dislike" | "neutral" })
               .eq("user_id", session?.user?.id as string)
               .eq("feed_id", params.feed_id)
               .select()
@@ -191,7 +191,7 @@ const FooterCard = ({
                 {
                   user_id: session?.user?.id as string,
                   feed_id: params.feed_id,
-                  state: action,
+                  state: action as "like" | "dislike" | "neutral",
                 },
               ]);
             setReactionState(action);

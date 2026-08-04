@@ -41,9 +41,9 @@ export const updateComment = async (
     userId: session?.user?.id!,
   });
   try {
-    const { data, error } = await supabase.from('comments').update({ comment })
+    const { data, error } = await supabase.from('comments').update({ comment } as any)
       .eq('id', newComment.id)
-      .eq('user_id', session?.user?.id)
+      .eq('user_id', session?.user?.id as string)
       .select()
     if (error) {
       return { error: error }
@@ -63,7 +63,7 @@ export const deleteComment = async (id: CommentId) => {
   try {
     const { data, error } = await supabase.from('comments')
       .delete().eq('id', commentId)
-      .eq('user_id', session?.user?.id).select()
+      .eq('user_id', session?.user?.id as string).select()
       if (error) {
         return { error: error }
       } else

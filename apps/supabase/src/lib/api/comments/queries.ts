@@ -48,7 +48,7 @@ export const getCommentById = async (id: CommentId) => {
     .from("comments")
     .select("*,feed_id!left(*)")
     .eq("id", commentId)
-    .eq("userId", session?.user?.id!);
+    .eq("userId" as any, session?.user?.id!);
   if (error) {
     return { error: error };
   }
@@ -238,5 +238,5 @@ export const getCountCommentsById = async (
     throw feedError;
   }
 
-  return count;
+  return count as unknown as string;
 };
