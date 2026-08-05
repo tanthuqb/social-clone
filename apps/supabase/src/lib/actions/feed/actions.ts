@@ -126,12 +126,14 @@ export const getFeedsAction = async (offset: number, limit: number) => {
     .range(offset, offset + limit - 1)
     .order("created_at", { ascending: false })
     if (error) {
-      throw new Error(`An error happened: ${error}`)
+      throw new Error(`An error happened: ${JSON.stringify(error)}`)
     }
     return feeds as Comment_Detail_Full[];
   } catch (error) {
     console.log(error)
-    throw new Error(`An error happened: ${error}`)
+    throw error instanceof Error
+      ? error
+      : new Error(`An error happened: ${JSON.stringify(error)}`)
   }
 };
 
@@ -146,11 +148,13 @@ export const getFeedsProfileAction = async (offset: number, limit: number, user_
       .range(offset, offset + limit - 1)
       .order("created_at", { ascending: false })
       if (error) {
-        throw new Error(`An error happened: ${error}`)
+        throw new Error(`An error happened: ${JSON.stringify(error)}`)
       }
       return feeds as Comment_Detail_Full[];
     } catch (error) {
       console.log(error)
-      throw new Error(`An error happened: ${error}`)
+      throw error instanceof Error
+        ? error
+        : new Error(`An error happened: ${JSON.stringify(error)}`)
     }
   };
