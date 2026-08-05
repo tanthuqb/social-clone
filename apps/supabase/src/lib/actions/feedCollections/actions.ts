@@ -24,6 +24,36 @@ const handleErrors = (e: unknown) => {
 
 const revalidateFeeds = () => revalidatePath("/");
 
+export const saveFeedAction = async (feedId: string) => {
+    const supabase = await createClient();
+    const { data: session } = await supabase.auth.getUser();
+    if (!session?.user) return { data: null, error: "Not authenticated" };
+
+    const { error } = await supabase
+        .from("feed_collections")
+        .insert({ user_id: session.user.id, feed_id: feedId });
+    if (error) return { data: null, error: error.message };
+
+    revalidateFeeds();
+    return { data: null, error: null };
+};
+
+export const unsaveFeedAction = async (feedId: string) => {
+    const supabase = await createClient();
+    const { data: session } = await supabase.auth.getUser();
+    if (!session?.user) return { data: null, error: "Not authenticated" };
+
+    const { error } = await supabase
+        .from("feed_collections")
+        .delete()
+        .eq("user_id", session.user.id)
+        .eq("feed_id", feedId);
+    if (error) return { data: null, error: error.message };
+
+    revalidateFeeds();
+    return { data: null, error: null };
+};
+
 export const getFeedCollectionsAction = async (offset: number, limit: number, user_id: string) => {
     try {
       const supabase = await createClient();

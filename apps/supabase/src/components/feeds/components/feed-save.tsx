@@ -3,6 +3,7 @@ import { DropdownMenuItem, toast } from "@suzu/ui";
 import { useContext } from "react";
 import { ModalContext } from "@/components/modals/provider";
 import { createClient } from "@/lib/supabase/client";
+import { saveFeedAction } from "@/lib/actions/feedCollections/actions";
 
 function FeedSave({ feed }: { className?: string; feed?: any }) {
   //   const { setShowFeedDeleteModal, setFeedDelete } = useContext(ModalContext);
@@ -15,18 +16,10 @@ function FeedSave({ feed }: { className?: string; feed?: any }) {
     if (error) {
       toast.error(error.message);
     }
-    const { data: feed_collections, error: errorFeedCollections } =
-      await supabase
-        .from("feed_collections")
-        .insert({
-          user_id: session?.user?.id,
-          feed_id: feed.id,
-        })
-        .single();
-    // console.log(feed_collections);
+    const { error: errorFeedCollections } = await saveFeedAction(feed.id);
 
     if (errorFeedCollections) {
-      toast.error(errorFeedCollections.message);
+      toast.error(errorFeedCollections);
     } else {
       toast.success("Lưu bài viết thành công");
     }

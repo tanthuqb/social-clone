@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ReactionState } from "@/lib/supabase/database.types";
 import { BaseUserInfo } from "../master-layout";
 import { createClient } from "@/lib/supabase/client";
+import { markNotificationReadAction } from "@/lib/actions/notifications/actions";
 import { Suspense, useEffect, useState } from "react";
 import { Avatar } from "../shared/avatar";
 import { BaseText } from "../master-layout/base-text";
@@ -85,13 +86,12 @@ const NotiDetail = ({ notification, session }: NotiDetailProps) => {
   }, [notification]);
 
   async function handleClickNoti() {
-    const { data, error } = await supabase
-      .from("notifications")
-      .update({ read: true })
-      .eq("id", notification?.id as string);
+    const { error } = await markNotificationReadAction(
+      notification?.id as string,
+    );
     setIndicator(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(error);
     } else {
       toast.success("Đang chuyển hướng");
       window.location.href = `${href}`;

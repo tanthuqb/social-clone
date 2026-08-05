@@ -25,6 +25,7 @@ import {
   AvatarFallback,
 } from "@suzu/ui";
 import { createClient } from "@/lib/supabase/client";
+import { updateProfileAction } from "@/lib/actions/user/actions";
 import { slugify } from "@/lib/ultis";
 
 const formSchema = z.object({
@@ -77,14 +78,11 @@ function ContentStepForm() {
     // Lấy value tên hiển thị là displayNameValue để gửi lên API
     const { data: session } = await supabase.auth.getUser();
     if (session && session.user) {
-      const { data: update, error } = await supabase
-        .from("profiles")
-        .update({
-          display_name: displayNameValue,
-        })
-        .eq("id", session.user.id);
+      const { error } = await updateProfileAction({
+        display_name: displayNameValue,
+      });
       if (error) {
-        toast.error(error.message);
+        toast.error(error);
       }
     }
     let slugDisplayName = slugify(displayNameValue, { replacement: "." });
@@ -159,12 +157,7 @@ function ContentStepForm() {
         "storage/v1/object/public" +
         "/avatars/" +
         data.path;
-      const { data: updateAvatar, error: errorUpdateAvatar } = await supabase
-        .from("profiles")
-        .update({
-          avatar_url: path,
-        })
-        .eq("id", session?.user?.id as string);
+      await updateProfileAction({ avatar_url: path });
     }
     setCheckNameAccount(true);
   };
@@ -173,14 +166,11 @@ function ContentStepForm() {
     // Lấy value tên cá nhân là accountPersonal để gửi lên API
     const { data: session } = await supabase.auth.getUser();
     if (session && session.user) {
-      const { data: update, error } = await supabase
-        .from("profiles")
-        .update({
-          full_name: slugify(accountPersonal, { replacement: "." }),
-        })
-        .eq("id", session.user.id);
+      const { error } = await updateProfileAction({
+        full_name: slugify(accountPersonal, { replacement: "." }),
+      });
       if (error) {
-        toast.error(error.message);
+        toast.error(error);
       }
     }
     setCheckNameAccount(false);
@@ -212,14 +202,11 @@ function ContentStepForm() {
     setShowUpdateInfoUserModal(false);
     const { data: session } = await supabase.auth.getUser();
     if (session && session.user) {
-      const { data: update, error } = await supabase
-        .from("profiles")
-        .update({
-          gender: data.gender,
-        })
-        .eq("id", session.user.id);
+      const { error } = await updateProfileAction({
+        gender: data.gender,
+      });
       if (error) {
-        toast.error(error.message);
+        toast.error(error);
       } else {
         window.location.reload();
       }

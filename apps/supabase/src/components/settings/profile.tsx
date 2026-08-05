@@ -12,6 +12,7 @@ import {
 import { useEffect, useState, useTransition } from "react";
 import UpdateUserUName from "./UpdateUserUName";
 import { createClient } from "@/lib/supabase/client";
+import { updateProfileAction } from "@/lib/actions/user/actions";
 import { UserRound } from "lucide-react";
 import slugify from "slugify";
 import { redirect } from "next/navigation";
@@ -54,21 +55,17 @@ function Profile({ user, session }: { user: Profile; session: Session }) {
           .from("avatars")
           .upload(filePath + `_${Date.now()}`, fileAvatar);
         if (!uploadError) {
-          const { data, error: updateError } = await supabase
-            .from("profiles")
-            .update({
-              display_name: display_name,
-              full_name: slugify(full_name, { replacement: "." }),
-              description: description,
-              gender: gender,
-              avatar_url:
-                process.env.NEXT_PUBLIC_SUPABASE_URL +
-                "storage/v1/object/public" +
-                "/avatars/" +
-                url?.path,
-            })
-            .eq("id", session?.user?.id as string)
-            .select();
+          const { error: updateError } = await updateProfileAction({
+            display_name: display_name,
+            full_name: slugify(full_name, { replacement: "." }),
+            description: description,
+            gender: gender,
+            avatar_url:
+              process.env.NEXT_PUBLIC_SUPABASE_URL +
+              "storage/v1/object/public" +
+              "/avatars/" +
+              url?.path,
+          });
           if (!updateError) {
             toast.success("Successfully updated profile!");
             window.location.reload();
@@ -77,16 +74,12 @@ function Profile({ user, session }: { user: Profile; session: Session }) {
           toast.error("Failed to update profile!");
         }
       } else {
-        const { error } = await supabase
-          .from("profiles")
-          .update({
-            display_name: display_name,
-            full_name: slugify(full_name, { replacement: "." }),
-            description: description,
-            gender: gender,
-          })
-          .eq("id", session?.user?.id as string)
-          .select();
+        const { error } = await updateProfileAction({
+          display_name: display_name,
+          full_name: slugify(full_name, { replacement: "." }),
+          description: description,
+          gender: gender,
+        });
         if (!error) {
           toast.success("Successfully updated profile!");
           window.location.reload();

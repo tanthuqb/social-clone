@@ -14,6 +14,7 @@ import { BaseIconBTN } from "../master-layout";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { followAction } from "@/lib/actions/userFollows/actions";
 import { FollowButton } from "../userFollows/follow-btn";
 import Link from "next/link";
 
@@ -72,13 +73,7 @@ const Avatar = ({
   const followHandler = async (user: Profile) => {
     if (session?.user?.id && user?.id && user?.id !== session?.user?.id) {
       if (!followingUser) {
-        const { data, error } = await supabase
-          .from("user_follows")
-          .insert({
-            user_id: session?.user?.id,
-            following_id: user?.id,
-          })
-          .select();
+        const { error } = await followAction(user?.id);
         if (error) {
           console.log(error);
           toast.error("Theo dõi thất bại");

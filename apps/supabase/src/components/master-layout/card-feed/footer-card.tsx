@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useContext } from "react";
 import { ModalContext } from "@/components/modals/provider";
 import { UpsertFeedReactionParams } from "@/lib/db/schema/feedReactions";
+import { upsertFeedReactionAction } from "@/lib/actions/feedEngagements/actions";
 
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -156,48 +157,14 @@ const FooterCard = ({
             ...{ id: id },
           };
         }
-        const { data: session } = await supabase.auth.getUser();
-        const { data: reaction, error: reactionError } = await supabase
-          .from("feed_engagement")
-          .select("*")
-          .eq("user_id", session?.user?.id as string)
-          .eq("feed_id", params.feed_id)
-          .maybeSingle();
-        if (reaction && !reactionError) {
-          if (reaction.state === action) {
-            // If the current action is the same as the existing reaction state, delete the row
-            const { data, error } = await supabase
-              .from("feed_engagement")
-              .delete()
-              .eq("user_id", session?.user?.id as string)
-              .eq("feed_id", params.feed_id);
-            setReactionState(ReactionState.NEUTRAL);
-          } else {
-            // If the current action is different from the existing reaction state, update the row
-            const { data: update, error } = await supabase
-              .from("feed_engagement")
-              .update({ state: action as "like" | "dislike" | "neutral" })
-              .eq("user_id", session?.user?.id as string)
-              .eq("feed_id", params.feed_id)
-              .select()
-              .maybeSingle();
-            setReactionState(action);
-          }
+        const { error } = await upsertFeedReactionAction(
+          feedId,
+          params.state as "like" | "dislike" | "neutral",
+        );
+        if (error) {
+          toast.error(error);
         } else {
-          try {
-            const { data: insertData, error: insertError } = await supabase
-              .from("feed_engagement")
-              .insert([
-                {
-                  user_id: session?.user?.id as string,
-                  feed_id: params.feed_id,
-                  state: action as "like" | "dislike" | "neutral",
-                },
-              ]);
-            setReactionState(action);
-          } catch (error) {
-            console.log("Error creating feed reaction", error);
-          }
+          setReactionState(params.state as ReactionState);
         }
         router.refresh();
       } catch (error) {

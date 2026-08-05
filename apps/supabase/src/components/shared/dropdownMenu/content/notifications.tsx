@@ -1,7 +1,10 @@
 "use client";
 import { DropdownMenuItem, DropdownMenuSeparator, cn, toast } from "@suzu/ui";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import {
+  deleteNotificationAction,
+  markNotificationReadAction,
+} from "@/lib/actions/notifications/actions";
 import { useState, useEffect } from "react";
 
 function Notifications({
@@ -35,26 +38,17 @@ function Notifications({
     }
   });
   const handleDeleteNoti = async () => {
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from("notifications")
-      .delete()
-      .eq("id", notificationData?.id);
+    const { error } = await deleteNotificationAction(notificationData?.id);
     if (error) {
-      toast.error(error.message);
+      toast.error(error);
     } else {
       toast.success("deleted successfully");
     }
   };
   const handleWatchNoti = async () => {
-    const supabase = createClient();
-
-    const { data, error } = await supabase
-      .from("notifications")
-      .update({ read: true })
-      .eq("id", notificationData?.id);
+    const { error } = await markNotificationReadAction(notificationData?.id);
     if (error) {
-      toast.error(error.message);
+      toast.error(error);
     } else {
       toast.success("update successfully");
     }

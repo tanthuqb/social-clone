@@ -1,4 +1,5 @@
 "use server"
+import { revalidatePath } from "next/cache";
 import { updateUser } from "@/lib/api/user/mutations";
 import { UpdateProfileParams, updateProfileParams } from "@/lib/db/schema/profile";
 import { createClient } from "@/lib/supabase/server";
@@ -13,6 +14,31 @@ const handleErrors = (e: unknown) => {
     return errMsg;
   };
   
+export const updateProfileAction = async (input: {
+  display_name?: string;
+  full_name?: string;
+  description?: string;
+  gender?: string;
+  avatar_url?: string;
+  birthday?: string;
+  website?: string;
+}) => {
+  const supabase = await createClient();
+  const { data: session } = await supabase.auth.getUser();
+  if (!session?.user) return { data: null, error: "Not authenticated" };
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .update(input)
+    .eq("id", session.user.id)
+    .select()
+    .single();
+  if (error) return { data: null, error: error.message };
+
+  revalidatePath("/");
+  return { data, error: null };
+};
+
 export const updateUserAction = async (input: UpdateProfileParams) => {
     try {
 

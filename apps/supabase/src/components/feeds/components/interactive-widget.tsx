@@ -6,7 +6,7 @@ import React, { useContext, useEffect, useState, useTransition } from "react";
 import { ModalContext } from "@/components/modals/provider";
 import Progress from "./progress";
 import { createClient } from "@/lib/supabase/client";
-import { createFeedReactionAction } from "@/lib/actions/feedEngagements/actions";
+import { upsertFeedReactionAction } from "@/lib/actions/feedEngagements/actions";
 import { useRouter } from "next/navigation";
 import { InteractiveBTN } from "@/components/master-layout";
 import { ReactionState } from "@/lib/supabase/database.types";
@@ -170,47 +170,12 @@ export const InteractiveWidget = ({
             ...{ id: id },
           };
         }
-        const { data: session } = await supabase.auth.getUser();
-        if (!session) {
-          toast.error("chưa đăng nhập");
-        }
-        const { data: reaction, error: reactionError } = await supabase
-          .from("feed_engagement")
-          .select("*")
-          .eq("user_id", session?.user?.id as string)
-          .eq("feed_id", params.feed_id)
-          .maybeSingle();
-        if (reaction && !reactionError) {
-          if (reaction.state === action) {
-            // If the current action is the same as the existing reaction state, delete the row
-            const { data: deleteData, error: deleteError } = await supabase
-              .from("feed_engagement")
-              .delete()
-              .eq("user_id", session?.user?.id as string)
-              .eq("feed_id", params.feed_id);
-            // if (action === ReactionState.LIKE) {
-            //   setCountLikeState(countLikeState - 1);
-            // }
-            // if (action === ReactionState.DISLIKE) {
-            //   setCountDisLikeState(countDisLikeState - 1);
-            // }
-          } else {
-            // If the current action is different from the existing reaction state, update the row
-            const { data: update, error } = await supabase
-              .from("feed_engagement")
-              .update({ state: action as "like" | "dislike" | "neutral" })
-              .eq("user_id", session?.user?.id as string)
-              .eq("feed_id", params.feed_id)
-              .select();
-          }
-        } else {
-          await createFeedReactionAction(params);
-          // if (action === ReactionState.LIKE) {
-          //   setCountLikeState(countLikeState + 1);
-          // }
-          // if (action === ReactionState.DISLIKE) {
-          //   setCountDisLikeState(countDisLikeState + 1);
-          // }
+        const { error } = await upsertFeedReactionAction(
+          feed.id,
+          params.state as "like" | "dislike" | "neutral",
+        );
+        if (error) {
+          toast.error(error);
         }
       } catch (error) {
         console.error("Error creating feed reaction", error);

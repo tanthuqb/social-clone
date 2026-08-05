@@ -1,7 +1,7 @@
 "use client";
 
 import { Dispatch, SetStateAction, useOptimistic } from "react";
-import { insertUserFollowSchema } from "@/lib/db/schema/userFollows";
+import { followAction, unfollowAction } from "@/lib/actions/userFollows/actions";
 import { Button, CheckIcon, cn, toast } from "@suzu/ui";
 import { useState, useTransition } from "react";
 import { useContext } from "react";
@@ -44,11 +44,7 @@ export const FollowButton = ({
       try {
         startMutation(async () => {
           if (following) {
-            const { data, error } = await supabase
-              .from("user_follows")
-              .delete()
-              .eq("user_id", userId)
-              .eq("following_id", followingId);
+            const { error } = await unfollowAction(followingId);
             updateOptimisticState(false);
             setFollowing(false);
             if(setFollowingState){
@@ -65,16 +61,9 @@ export const FollowButton = ({
             // unfollow
           } else {
             // follow
-            const newUserFollow = insertUserFollowSchema.parse({
-              user_id: userId,
-              following_id: followingId,
-            });
-            const { data, error } = await supabase
-              .from("user_follows")
-              .insert([newUserFollow])
-              .select();
+            const { error } = await followAction(followingId);
             if (error) {
-              toast.error(error?.message);
+              toast.error(error);
             } else {
               toast("theo dõi thành công", {
                 icon: <CheckIcon />,

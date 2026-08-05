@@ -3,32 +3,29 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-export const followAction = async (followingId: string) => {
+export const markNotificationReadAction = async (id: string) => {
   const supabase = await createClient();
   const { data: session } = await supabase.auth.getUser();
   if (!session?.user) return { data: null, error: "Not authenticated" };
 
   const { error } = await supabase
-    .from("user_follows")
-    .insert({ user_id: session.user.id, following_id: followingId });
+    .from("notifications")
+    .update({ read: true })
+    .eq("id", id);
   if (error) return { data: null, error: error.message };
 
-  revalidatePath("/");
+  revalidatePath("/notifications");
   return { data: null, error: null };
 };
 
-export const unfollowAction = async (followingId: string) => {
+export const deleteNotificationAction = async (id: string) => {
   const supabase = await createClient();
   const { data: session } = await supabase.auth.getUser();
   if (!session?.user) return { data: null, error: "Not authenticated" };
 
-  const { error } = await supabase
-    .from("user_follows")
-    .delete()
-    .eq("user_id", session.user.id)
-    .eq("following_id", followingId);
+  const { error } = await supabase.from("notifications").delete().eq("id", id);
   if (error) return { data: null, error: error.message };
 
-  revalidatePath("/");
+  revalidatePath("/notifications");
   return { data: null, error: null };
 };
