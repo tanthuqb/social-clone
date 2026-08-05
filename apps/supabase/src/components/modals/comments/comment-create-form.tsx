@@ -24,7 +24,10 @@ import {
 
 import { createFeedImageAction } from "@/lib/actions/feedImages/actions";
 import { createClient } from "@/lib/supabase/client";
-import { insertCommentAction } from "@/lib/actions/comments/actions";
+import {
+  createCommentAction,
+  updateCommentAction,
+} from "@/lib/actions/comments/actions";
 
 export const CommentCreateForm = ({
   commentId,
@@ -63,15 +66,10 @@ export const CommentCreateForm = ({
     }
     setErrors(null);
     if (editing && !comment) {
-      const updateComment = {
-        feed_id: feedId as string,
-        content: FormData.get("content") as string,
-        user_id: user?.id,
-      };
-      const { data, error } = await supabase
-        .from("comments")
-        .update(updateComment)
-        .eq("id", commentId as string);
+      const { error } = await updateCommentAction(
+        commentId as string,
+        FormData.get("content") as string,
+      );
       if (error) {
         toast.error("Đăng bình luận thất bại");
         return;
@@ -81,14 +79,10 @@ export const CommentCreateForm = ({
       router.refresh();
     } else {
       if (!comment) {
-        const newComment = {
+        const { error } = await createCommentAction({
           feed_id: feedId as string,
           content: FormData.get("content") as string,
-          user_id: user?.id,
-        };
-        const { data, error } = await supabase
-          .from("comments")
-          .insert(newComment);
+        });
         if (error) {
           toast.error("Đăng bình luận thất bại");
           return;
@@ -100,17 +94,11 @@ export const CommentCreateForm = ({
     }
 
     if (comment) {
-      const CommentReply = {
+      const { error } = await createCommentAction({
         feed_id: feedId as string,
         content: FormData.get("content") as string,
-        user_id: comment.user_id.id,
         parent_id: comment.id,
-      };
-
-      const { data, error } = await supabase
-        .from("comments")
-        .insert(CommentReply)
-        .select("*");
+      });
       if (error) {
         toast.error("Trả lời bình luận thất bại");
         return;
@@ -120,15 +108,10 @@ export const CommentCreateForm = ({
       router.refresh();
     } else {
       if (!!comment.id) {
-        const updateCommentreply = {
-          feed_id: feedId as string,
-          content: FormData.get("content") as string,
-          user_id: user.id,
-        };
-        const { data, error } = await supabase
-          .from("comments")
-          .update(updateCommentreply)
-          .eq("id", commentId as string);
+        const { error } = await updateCommentAction(
+          commentId as string,
+          FormData.get("content") as string,
+        );
         if (error) {
           toast.error("Chỉnh sửa reply thất bại");
           return;

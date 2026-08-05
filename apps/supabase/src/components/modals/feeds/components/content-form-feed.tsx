@@ -29,7 +29,14 @@ import { BaseText } from "@/components/master-layout/base-text";
 import { useParams, useRouter } from "next/navigation";
 import { ModalContext } from "../../provider";
 import { createClient } from "@/lib/supabase/client";
-import { createFeedImageAction } from "@/lib/actions/feedImages/actions";
+import {
+  createFeedImageAction,
+  deleteFeedImageAction,
+} from "@/lib/actions/feedImages/actions";
+import {
+  createFeedEntryAction,
+  updateFeedEntryAction,
+} from "@/lib/actions/feed/actions";
 import { FeedPrivacy, FeedStatus } from "@/lib/supabase/database.types";
 import { useContentTiptap } from "@/components/tiptap/providers/content-provider";
 import { toastFeed } from "@/app/(app)/(outside)/toast/toast";
@@ -85,17 +92,10 @@ const ContentForm = memo(
        * Editing or Create a new feed
        */
       if (editing) {
-        const { data, error } = await supabase
-          .from("feeds")
-          .update({
-            // ...payload,
-            content: content,
-            type: type ? "comment" : "feed",
-            user_id: session?.user?.id!,
-          })
-          .eq("id", feed.id)
-          .select(`*, feed_images(*)`)
-          .single();
+        const { data, error } = await updateFeedEntryAction(feed.id, {
+          content: content,
+          type: type ? "comment" : "feed",
+        });
 
         if (typeof data === "object" && data !== null && files?.length > 0) {
           /**
@@ -133,11 +133,7 @@ const ContentForm = memo(
             const deleteImage = await Promise.all(
               feedImage?.map(async (imageUrl) => {
                 const url: string = imageUrl?.image!;
-                const { data: image } = await supabase
-                  .from("feed_images")
-                  .delete()
-                  .eq("image", url)
-                  .select();
+                await deleteFeedImageAction(imageUrl?.id!);
                 const parts: string[] = url?.split("/");
                 if (url && parts.length > 0) {
                   const filename: string = parts[parts?.length - 1];
@@ -165,18 +161,13 @@ const ContentForm = memo(
         setLoading(false);
         router.refresh();
       } else {
-        const { data, error } = await supabase
-          .from("feeds")
-          .insert({
-            content: content,
-            type: type ? "comment" : "feed",
-            user_id: session?.user?.id!,
-            privacy: FeedPrivacy.PUBLIC,
-            status: FeedStatus.ACTIVE,
-            parent_id: parentFeedId! ? parentFeedId! : (feedId! as string),
-          })
-          .select(`*`)
-          .single();
+        const { data, error } = await createFeedEntryAction({
+          content: content,
+          type: type ? "comment" : "feed",
+          privacy: FeedPrivacy.PUBLIC,
+          status: FeedStatus.ACTIVE,
+          parent_id: parentFeedId! ? parentFeedId! : (feedId! as string),
+        });
 
         if (typeof data === "object" && data !== null) {
           /**

@@ -11,6 +11,7 @@ import {
     updateFeedParams,
 } from "@/lib/db/schema/feeds";
 import { createClient } from "@/lib/supabase/server";
+import { FeedPrivacy, FeedStatus } from "@/lib/supabase/database.types";
 
 const handleErrors = (e: unknown) => {
     const errMsg = "Error, please try again.";
@@ -56,6 +57,64 @@ export const deleteFeedAction = async (input: FeedId) => {
       console.log('error',e);
         return handleErrors(e);
     }
+};
+
+export const togglePinAction = async (feedId: string, pin: boolean) => {
+    const supabase = await createClient();
+    const { data: session } = await supabase.auth.getUser();
+    if (!session?.user) return { data: null, error: "Not authenticated" };
+
+    const { error } = await supabase
+        .from("feeds")
+        .update({ pin })
+        .eq("id", feedId);
+    if (error) return { data: null, error: error.message };
+
+    revalidateFeeds();
+    return { data: null, error: null };
+};
+
+export const createFeedEntryAction = async (input: {
+    content: string | null;
+    type: "feed" | "comment";
+    parent_id?: string | null;
+    privacy?: FeedPrivacy;
+    status?: FeedStatus;
+}) => {
+    const supabase = await createClient();
+    const { data: session } = await supabase.auth.getUser();
+    if (!session?.user) return { data: null, error: "Not authenticated" };
+
+    const { data, error } = await supabase
+        .from("feeds")
+        .insert({ ...input, user_id: session.user.id })
+        .select("*")
+        .single();
+    if (error) return { data: null, error: error.message };
+
+    revalidateFeeds();
+    return { data, error: null };
+};
+
+export const updateFeedEntryAction = async (
+    id: string,
+    input: { content: string | null; type?: "feed" | "comment" },
+) => {
+    const supabase = await createClient();
+    const { data: session } = await supabase.auth.getUser();
+    if (!session?.user) return { data: null, error: "Not authenticated" };
+
+    const { data, error } = await supabase
+        .from("feeds")
+        .update(input)
+        .eq("id", id)
+        .eq("user_id", session.user.id)
+        .select("*, feed_images(*)")
+        .single();
+    if (error) return { data: null, error: error.message };
+
+    revalidateFeeds();
+    return { data, error: null };
 };
 
 export const getFeedsAction = async (offset: number, limit: number) => {

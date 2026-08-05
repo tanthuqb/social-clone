@@ -3,7 +3,7 @@ import { DropdownMenuItem, toast } from "@suzu/ui";
 import { useContext } from "react";
 import { ModalContext } from "@/components/modals/provider";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/router";
+import { togglePinAction } from "@/lib/actions/feed/actions";
 
 function FeedUnpin({
   feed,
@@ -30,15 +30,12 @@ function FeedUnpin({
       .eq("pin", true)
       .single();
     if (pinned) {
-      const { data: feed_unpin, error: errorFeed_unpin } = await supabase
-        .from("feeds")
-        .update({
-          pin: false,
-        })
-        .eq("id", pinned.id)
-        .single();
+      const { error: errorFeed_unpin } = await togglePinAction(
+        pinned.id,
+        false,
+      );
       if (errorFeed_unpin) {
-        toast.error(errorFeed_unpin.message);
+        toast.error(errorFeed_unpin);
       } else {
         toast.success("Bỏ ghim bài viết thành công");
         window.location.reload();

@@ -1,106 +1,53 @@
-import { NextResponse } from "next/server";
+"use server";
+
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
+import { createClient } from "@/lib/supabase/server";
 
-import {
-  createComment,
-  deleteComment,
-  updateComment,
-} from "@/lib/api/comments/mutations";
-import { 
-  NewComment,
-  NewCommentParams,
-  UpdateCommentParams,
-  commentIdSchema,
-  insertCommentParams,
-  updateCommentParams 
-} from "@/lib/db/schema/comments";
-import { getCommentByFeedId } from "@/lib/api/comments/queries";
+export async function createCommentAction(input: {
+  feed_id: string;
+  content: string;
+  parent_id?: string | null;
+}) {
+  const supabase = await createClient();
+  const { data: session } = await supabase.auth.getUser();
+  if (!session?.user) return { data: null, error: "Not authenticated" };
 
-export async function POST(req: Request) {
-  try {
-    const validatedData = insertCommentParams.parse(await req.json());
-    const { comment } = await createComment(validatedData);
+  const { data, error } = await supabase
+    .from("comments")
+    .insert({ ...input, user_id: session.user.id })
+    .select()
+    .single();
+  if (error) return { data: null, error: error.message };
 
-    revalidatePath("/comments"); // optional - assumes you will have named route same as entity
-
-    return NextResponse.json(comment, { status: 201 });
-  } catch (err) {
-    if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: err.issues }, { status: 400 });
-    } else {
-      return NextResponse.json({ error: err }, { status: 500 });
-    }
-  }
+  revalidatePath(`/p/${input.feed_id}`);
+  return { data, error: null };
 }
 
+export async function updateCommentAction(id: string, content: string) {
+  const supabase = await createClient();
+  const { data: session } = await supabase.auth.getUser();
+  if (!session?.user) return { data: null, error: "Not authenticated" };
 
-export async function PUT(req: Request) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+  const { data, error } = await supabase
+    .from("comments")
+    .update({ content })
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) return { data: null, error: error.message };
 
-    const validatedData = updateCommentParams.parse(await req.json());
-    const validatedParams = commentIdSchema.parse({ id });
-
-    const { comment } = await updateComment(validatedParams.id, validatedData);
-
-    return NextResponse.json(comment, { status: 200 });
-  } catch (err) {
-    if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: err.issues }, { status: 400 });
-    } else {
-      return NextResponse.json(err, { status: 500 });
-    }
-  }
+  if (data?.feed_id) revalidatePath(`/p/${data.feed_id}`);
+  return { data, error: null };
 }
 
-export async function DELETE(req: Request) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+export async function deleteCommentAction(id: string) {
+  const supabase = await createClient();
+  const { data: session } = await supabase.auth.getUser();
+  if (!session?.user) return { data: null, error: "Not authenticated" };
 
-    const validatedParams = commentIdSchema.parse({ id });
-    const { comment } = await deleteComment(validatedParams.id);
+  const { error } = await supabase.from("comments").delete().eq("id", id);
+  if (error) return { data: null, error: error.message };
 
-    return NextResponse.json(comment, { status: 200 });
-  } catch (err) {
-    if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: err.issues }, { status: 400 });
-    } else {
-      return NextResponse.json(err, { status: 500 });
-    }
-  }
-}
-
-
-export const updateCommentAction = async (input: UpdateCommentParams) => {
-  try {
-      const payload = updateCommentParams.parse(input);
-      const { comment } = await updateComment(input.id, input);
-      // revalidatePath("/");
-      return { comment, error: null };
-  } catch (e) {
-      return handleErrors(e);
-  }
-};
-
-export const insertCommentAction = async (input: NewCommentParams) => {
-  try {
-      const payload = insertCommentParams.parse(input);
-      const { comment , error } = await createComment(payload);
-      // revalidatePath("/");
-      return { comment:  comment, error: error };
-  } catch (e) {
-      return handleErrors(e);
-  }
-};
-
-export const getFullCommentWithFeedIdAction = async ( offset: number, limit: number , feedId: Feed['id']) => {
-  try {
-      const { commentUser , totalComments  } = await getCommentByFeedId(offset, limit, feedId );
-      return { commentUser: commentUser, totalComments: totalComments };
-  } catch (error) {
-      return { error: error };
-  }
+  revalidatePath("/");
+  return { data: null, error: null };
 }

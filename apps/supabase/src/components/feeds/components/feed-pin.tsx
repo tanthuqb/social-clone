@@ -3,6 +3,7 @@ import { CheckIcon, DropdownMenuItem, toast } from "@suzu/ui";
 import { useContext, useState } from "react";
 import { ModalContext } from "@/components/modals/provider";
 import { createClient } from "@/lib/supabase/client";
+import { togglePinAction } from "@/lib/actions/feed/actions";
 
 function FeedPin({
   feed,
@@ -29,25 +30,16 @@ function FeedPin({
         .eq("pin", true)
         .single();
       if (pinned) {
-        const { data: feed_unpin, error: errorFeed_unpin } = await supabase
-          .from("feeds")
-          .update({
-            pin: false,
-          })
-          .eq("id", pinned.id)
-          .single();
+        await togglePinAction(pinned.id, false);
       }
       if (pinned?.id !== feed?.id) {
-        const { data: feed_pin, error: errorFeed_pin } = await supabase
-          .from("feeds")
-          .update({
-            pin: true,
-          })
-          .eq("id", feed?.id as string)
-          .single();
+        const { error: errorFeed_pin } = await togglePinAction(
+          feed?.id as string,
+          true,
+        );
 
         if (errorFeed_pin) {
-          toast.error(errorFeed_pin.message);
+          toast.error(errorFeed_pin);
         } else {
           toast("Ghim bài viết thành công", {
             icon: <CheckIcon />,
