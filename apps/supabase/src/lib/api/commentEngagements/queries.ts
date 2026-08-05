@@ -13,7 +13,7 @@ export const getCommentReactions = async () => {
   // leftJoin(comments, eq(commentReactions.commentId, comments.id))
   // .where(eq(commentReactions.userId, session?.user.id!));
   const { data: rows, error } = await supabase.from('comment_engagement')
-    .select('*,parent_id!left(*)')
+    .select('*,comment_id!left(*)')
     .eq('user_id', session?.user?.id!)
   if (error) throw { error: error }
   const c = rows.map((r: any) => ({ ...r, commentReaction: r.commentReactions, comment: r.comments }));
@@ -29,7 +29,7 @@ export const getCommentReactionById = async (id: CommentReactionId) => {
   //   .leftJoin(comments, eq(commentReactions.commentId, comments.id))
   //   .where(and(eq(commentReactions.id, commentReactionId), eq(commentReactions.userId, session?.user.id!)))
   const { data: row, error } = await supabase.from('comment_engagement')
-    .select('*,parent_id!left(*)')
+    .select('*,comment_id!left(*)')
     .eq('id', commentReactionId)
     .eq('user_id', session?.user?.id!)
     .maybeSingle()
@@ -47,7 +47,7 @@ export const getCommentReactionByCommentId = async (id: CommentId) => {
   //   );
   const { data: row, error } = await supabase.from('comment_engagement')
     .select()
-    .eq('parent_id' as any, CommentId)
+    .eq('comment_id', CommentId)
   if (error) throw { error: error }
   return { commentReaction: row };
 };
@@ -61,7 +61,7 @@ export const getCountCommentReactionByCommentId = async (id: CommentId) => {
   //     eq(commentReactions.commentId, CommentId),
   //   );
   const { data: row, error } = await supabase.from('comment_engagement')
-    .select('*').eq('parent_id' as any, CommentId)
+    .select('*').eq('comment_id', CommentId)
   if (error) throw { error: error }
   if (row === undefined) return 0;
   return row.length;

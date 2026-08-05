@@ -41,7 +41,7 @@ export const updateComment = async (
     userId: session?.user?.id!,
   });
   try {
-    const { data, error } = await supabase.from('comments').update({ comment } as any)
+    const { data, error } = await supabase.from('comments').update({ content: newComment.content })
       .eq('id', newComment.id)
       .eq('user_id', session?.user?.id as string)
       .select()

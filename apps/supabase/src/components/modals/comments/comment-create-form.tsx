@@ -71,7 +71,7 @@ export const CommentCreateForm = ({
       const { data, error } = await supabase
         .from("comments")
         .update(updateComment)
-        .eq("id", editing as any);
+        .eq("id", commentId as string);
       if (error) {
         toast.error("Đăng bình luận thất bại");
         return;
@@ -128,7 +128,7 @@ export const CommentCreateForm = ({
         const { data, error } = await supabase
           .from("comments")
           .update(updateCommentreply)
-          .eq("id", editing as any);
+          .eq("id", commentId as string);
         if (error) {
           toast.error("Chỉnh sửa reply thất bại");
           return;
