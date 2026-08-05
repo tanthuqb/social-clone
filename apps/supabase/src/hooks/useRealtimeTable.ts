@@ -4,6 +4,12 @@ import { useEffect, useRef } from "react";
 import type { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 
+// The browser Supabase client is shared and supabase.channel() returns the SAME
+// channel object for an existing topic; calling .on() after subscribe() throws.
+// removeChannel() is also async, so a topic can linger after cleanup. A fresh
+// suffix per effect run guarantees every subscription gets its own channel.
+let channelSeq = 0;
+
 export function useRealtimeTable({
   table,
   filter,
@@ -31,7 +37,7 @@ export function useRealtimeTable({
   useEffect(() => {
     const supabase = createClient();
     const channel = supabase
-      .channel(`rt_${table}_${filter ?? "all"}`)
+      .channel(`rt_${table}_${filter ?? "all"}_${++channelSeq}`)
       .on(
         "postgres_changes",
         { event: event as any, schema: "public", table, ...(filter ? { filter } : {}) },

@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 import { rewritesConfig } from "../supabase/src/constants/constants.mjs";
 const nextConfig = {
+  transpilePackages: ["@suzu/ui"],
   experimental: {},
   typescript: {
     ignoreBuildErrors: false,
