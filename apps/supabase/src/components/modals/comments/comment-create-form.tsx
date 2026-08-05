@@ -16,13 +16,6 @@ import { Avatar } from "@/components/shared/avatar";
 
 import { type Feed, insertFeedParams } from "@/lib/db/schema/feeds";
 import { useParams } from "next/navigation";
-import {
-  createFeedAction,
-  deleteFeedAction,
-  updateFeedAction,
-} from "@/lib/actions/feed/actions";
-
-import { createFeedImageAction } from "@/lib/actions/feedImages/actions";
 import { createClient } from "@/lib/supabase/client";
 import {
   createCommentAction,
