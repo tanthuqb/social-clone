@@ -1,7 +1,6 @@
 "use client";
 
 import { CommonButton, Textarea, cn, toast } from "@suzu/ui";
-// import { useSession } from "next-auth/react";
 import { useContext, useState } from "react";
 import { ModalContext } from "../modals/provider";
 import { createClient } from "@/lib/supabase/client";

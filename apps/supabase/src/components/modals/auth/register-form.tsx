@@ -1,6 +1,5 @@
 "use client";
 
-// import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Provider } from "@supabase/supabase-js";
