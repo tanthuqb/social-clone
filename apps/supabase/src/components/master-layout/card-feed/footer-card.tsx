@@ -6,6 +6,7 @@ import { useContext } from "react";
 import { ModalContext } from "@/components/modals/provider";
 import { UpsertFeedReactionParams } from "@/lib/db/schema/feedReactions";
 import { upsertFeedReactionAction } from "@/lib/actions/feedEngagements/actions";
+import { useRealtimeTable } from "@/hooks/useRealtimeTable";
 
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -69,6 +70,7 @@ const FooterCard = ({
   const [newComment, setNewComment] = useState<any>(null);
   const [countComment, setCountComment] = useState<number>(countComments!);
   const [isDelete, setIsDelete] = useState<boolean>(false);
+  const [refreshTick, setRefreshTick] = useState(0);
 
   useEffect(() => {
     setTotalCount(totalReactions!);
@@ -98,47 +100,16 @@ const FooterCard = ({
       }
     };
     fetchFeedReaction();
-  }, [newComment, isDelete]);
+  }, [newComment, isDelete, refreshTick]);
 
-  useEffect(() => {
-    const channel = supabase.channel(`feed_engagement_infeed_${feedId}`);
-    channel
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "feed_engagement" },
-        (payload) => {
-          switch (payload.eventType) {
-            case "INSERT":
-              if (payload && payload.new && payload.new.feed_id == feedId) {
-                if (payload.new.user_id == userId) {
-                  setReactionState(payload.new.state);
-                  setNewComment(payload.new);
-                }
-                setTotalCount((count: number) => count + 1);
-                setIsDelete(false);
-              }
-              break;
-            case "DELETE":
-              if (payload && payload.old && payload.old.feed_id == feedId) {
-                if (payload.old.user_id == userId) {
-                  setReactionState(ReactionState.NEUTRAL);
-                }
-                if (totalCount > 0) {
-                  setTotalCount((count: number) => count - 1);
-                }
-                setIsDelete(true);
-              }
-              router.refresh();
-            default:
-              break;
-          }
-        },
-      )
-      .subscribe();
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [supabase, feedId]);
+  useRealtimeTable({
+    table: "feed_engagement",
+    filter: `feed_id=eq.${feedId}`,
+    onChange: () => {
+      setRefreshTick((t) => t + 1);
+      router.refresh();
+    },
+  });
 
   const handleClap = async ({ action }: { action: ReactionState }) => {
     if (!userId) {

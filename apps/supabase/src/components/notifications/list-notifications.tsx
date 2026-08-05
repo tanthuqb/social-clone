@@ -10,6 +10,7 @@ import React, {
 import { NotiDetail } from "./noti-detail";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useRealtimeTable } from "@/hooks/useRealtimeTable";
 import { BaseText } from "../master-layout/base-text";
 import { BaseIconBTN } from "../master-layout";
 import { NotificationAction } from "@/modules/notifications/notifications.action";
@@ -27,34 +28,17 @@ export const ListNotifications = ({
   const supabase = createClient();
   const { datas, setData, scrollTrigger, loading } = NotificationAction().PagingNotifications(session,notifications);
 
-  useEffect(() => {
-    const channel = supabase.channel(
-      `notifications_${notifications?.[0]?.user_noti_id}`,
-    );
-    channel
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "notifications" },
-        (payload: any) => {
-          switch (payload.eventType) {
-            case "DELETE":
-              setData(
-                (prev: any) =>
-                  prev?.filter((noti: any) => noti?.id !== payload.old.id) ||
-                  [],
-              );
-              router.refresh();
-              break;
-            default:
-              break;
-          }
-        },
-      )
-      .subscribe();
-    return () => {
-      supabase.realtime.removeChannel(channel);
-    };
-  }, [datas]);
+  useRealtimeTable({
+    table: "notifications",
+    event: "DELETE",
+    onChange: (payload: any) => {
+      setData(
+        (prev: any) =>
+          prev?.filter((noti: any) => noti?.id !== payload.old.id) || [],
+      );
+      router.refresh();
+    },
+  });
   return (
     <ScrollArea className="border-l-trans-black-10 h-custom relative flex flex-1 flex-col items-start self-stretch overflow-hidden border-l sm:ml-[82px]">
       {datas?.map((notification: Notifications_Detail) => {

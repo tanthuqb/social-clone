@@ -4,6 +4,7 @@ import { ModalContext } from "@/components/modals/provider";
 import { Divider, cn, toast } from "@suzu/ui";
 import React, { memo, useContext, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useRealtimeTable } from "@/hooks/useRealtimeTable";
 import { useRouter } from "next/navigation";
 import FeedCreateCommon from "../modals/feeds/feed-create-common";
 import {
@@ -218,48 +219,36 @@ function CommentForm({
     }
   };
 
-  useEffect(() => {
-    const channel = supabase.channel(`feed_${feedId}`);
-    channel
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "feeds" },
-        (payload: any) => {
-          switch (payload?.eventType) {
-            case "INSERT":
-              if (payload && payload?.new) {
-                setIsDelete(false);
-                const newComment = payload.new;
-                setNewComment(newComment);
-                router.refresh();
-              }
-              break;
-            case "UPDATE":
-              if (payload && payload?.new) {
-                setIsDelete(false);
-                const updateComment = payload.new;
-                setNewComment(updateComment);
-                router.refresh();
-              }
-              break;
-            case "DELETE":
-              if (payload && payload?.old.id) {
-                setIsDelete(true);
-                router.refresh();
-              }
-              break;
-            default:
-              toast.error("Có lỗi xảy ra, vui lòng thử lại sau");
-              break;
+  useRealtimeTable({
+    table: "feeds",
+    onChange: (payload: any) => {
+      switch (payload?.eventType) {
+        case "INSERT":
+          if (payload && payload?.new) {
+            setIsDelete(false);
+            setNewComment(payload.new);
+            router.refresh();
           }
-        },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.realtime.removeChannel(channel);
-    };
-  }, [supabase]);
+          break;
+        case "UPDATE":
+          if (payload && payload?.new) {
+            setIsDelete(false);
+            setNewComment(payload.new);
+            router.refresh();
+          }
+          break;
+        case "DELETE":
+          if (payload && payload?.old.id) {
+            setIsDelete(true);
+            router.refresh();
+          }
+          break;
+        default:
+          toast.error("Có lỗi xảy ra, vui lòng thử lại sau");
+          break;
+      }
+    },
+  });
 
   const handleLogin = () => {
     setShowLoginModal(true);

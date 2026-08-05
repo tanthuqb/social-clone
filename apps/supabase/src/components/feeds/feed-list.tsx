@@ -11,6 +11,7 @@ import { useInView } from "react-intersection-observer";
 import { getFeedCollectionsAction } from "@/lib/actions/feedCollections/actions";
 import { fetchSearchDataAction } from "@/lib/actions/user/actions";
 import { createClient } from "@/lib/supabase/client";
+import { useRealtimeTable } from "@/hooks/useRealtimeTable";
 import { useRouter } from "next/navigation";
 const NUMBER_OF_FEEDS_TO_FETCH = 5;
 const NUMBER_OF_FEEDS_TO_USERSEARCH = 5;
@@ -52,15 +53,11 @@ const FeedList = ({
       return data;
     }
   }
-  useEffect(() => {
-    if (session?.user?.id) {
-      const channel = supabase.channel(`feed_home_${session?.user?.id}`);
-      channel
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "feeds" },
-          async (payload: any) => {
-            switch (payload?.eventType) {
+  useRealtimeTable({
+    table: "feeds",
+    onChange: async (payload: any) => {
+      if (!session?.user?.id) return;
+      switch (payload?.eventType) {
               case "INSERT":
                 if (payload && payload?.new && payload?.new?.user_id != session?.user?.id && payload.new?.type === "feed") {
                   const followingName = await getName(
@@ -93,19 +90,13 @@ const FeedList = ({
                     router.refresh();
                   }
                 }, 5000);
-                  
+
                 }
               default:
                 break;
-            }
-          },
-        )
-        .subscribe();
-      return () => {
-        supabase.realtime.removeChannel(channel);
-      };
-    }
-  }, [supabase]);
+      }
+    },
+  });
 
   const loadMoreFeeds = async () => {
     if (type == "feed-collections") {

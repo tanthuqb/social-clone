@@ -15,6 +15,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { followAction } from "@/lib/actions/userFollows/actions";
+import { useRealtimeTable } from "@/hooks/useRealtimeTable";
 import { FollowButton } from "../userFollows/follow-btn";
 import Link from "next/link";
 
@@ -86,36 +87,27 @@ const Avatar = ({
     }
   };
 
-  useEffect(() => {
-    const channel = supabase.channel(`avatar_${user?.id}`);
-    channel
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "user_follows" },
-        (payload: any) => {
-          switch (payload?.eventType) {
-            case "INSERT":
-              if (payload && payload?.new && payload?.new?.following_id == user?.id) {
-                setFollowingState(true);
-                setShowPlus(false);
-              }
-              break;
-            case "DELETE":
-              if (payload && payload?.old && payload?.old?.following_id == user?.id) {
-                setFollowingState(false);
-                setShowPlus(true);
-              }
-              break;
-            default:
-              break;
+  useRealtimeTable({
+    table: "user_follows",
+    onChange: (payload: any) => {
+      switch (payload?.eventType) {
+        case "INSERT":
+          if (payload && payload?.new && payload?.new?.following_id == user?.id) {
+            setFollowingState(true);
+            setShowPlus(false);
           }
-        },
-      )
-      .subscribe();
-      return () => {
-        supabase.realtime.removeChannel(channel);
-      };
-  }, [supabase]);
+          break;
+        case "DELETE":
+          if (payload && payload?.old && payload?.old?.following_id == user?.id) {
+            setFollowingState(false);
+            setShowPlus(true);
+          }
+          break;
+        default:
+          break;
+      }
+    },
+  });
 
   return session?.user?.id === user?.id || isUserPathname ? (
     <AvatarComponent className={className}>

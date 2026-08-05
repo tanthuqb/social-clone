@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn, toast } from "@suzu/ui";
 import { ModalContext } from "@/components/modals/provider";
 import { createClient } from "@/lib/supabase/client";
+import { useRealtimeTable } from "@/hooks/useRealtimeTable";
 import { useRouter } from "next/navigation";
 import { useMediaQuery } from "node_modules/@suzu/ui/src/components/hooks";
 import { BaseIconBTN } from "@/components/master-layout";
@@ -64,27 +65,25 @@ export const NavItem = ({
     }
     getData();
   }, [count]);
-  useEffect(() => {
-    if (user) {
-      async function getName(user_id: string) {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("display_name")
-          .eq("id", user_id)
-          .single();
-        if (error) {
-          console.log(error);
-        } else {
-          return data;
-        }
-      }
-      const channel = supabase.channel(`notifications_${user?.user?.id}`);
-      channel
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "notifications" },
-          async (payload: any) => {
-            switch (payload.eventType) {
+  async function getName(user_id: string) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", user_id)
+      .single();
+    if (error) {
+      console.log(error);
+    } else {
+      return data;
+    }
+  }
+
+  useRealtimeTable({
+    table: "notifications",
+    filter: user?.user?.id ? `user_noti_id=eq.${user.user.id}` : undefined,
+    onChange: async (payload: any) => {
+      if (!user) return;
+      switch (payload.eventType) {
               case "INSERT":
                 if (
                   payload?.new?.user_noti_id == user?.user?.id ||
@@ -118,17 +117,11 @@ export const NavItem = ({
                   setCount((count) => count - 1);
                 router.refresh();
                 break;
-              default:
-                break;
-            }
-          },
-        )
-        .subscribe();
-      return () => {
-        supabase.realtime.removeChannel(channel);
-      };
-    }
-  }, [count]);
+        default:
+          break;
+      }
+    },
+  });
 
   return (
     <div

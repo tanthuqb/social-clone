@@ -7,6 +7,7 @@ import { ModalContext } from "@/components/modals/provider";
 import Progress from "./progress";
 import { createClient } from "@/lib/supabase/client";
 import { upsertFeedReactionAction } from "@/lib/actions/feedEngagements/actions";
+import { useRealtimeTable } from "@/hooks/useRealtimeTable";
 import { useRouter } from "next/navigation";
 import { InteractiveBTN } from "@/components/master-layout";
 import { ReactionState } from "@/lib/supabase/database.types";
@@ -39,6 +40,7 @@ export const InteractiveWidget = ({
   const [countLikeState, setCountLikeState] = useState<number>(0!);
   const [countDisLikeState, setCountDisLikeState] = useState<number>(0!);
   const [state, setStateReaction] = useState<ReactionState | null>(null);
+  const [refreshTick, setRefreshTick] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,85 +74,16 @@ export const InteractiveWidget = ({
       if (countDisLike) setCountDisLikeState(countDisLike);
     };
     fetchData();
-  }, [countLikeState, countDisLikeState]);
+  }, [refreshTick, feed?.id]);
 
-  useEffect(() => {
-    const channel = supabase.channel(`feed_engagement_${feed?.id}_widget`);
-    channel
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "feed_engagement" },
-        (payload) => {
-          switch (payload.eventType) {
-            case "INSERT":
-              if (payload && payload.new && payload.new.feed_id == feed?.id) {
-                // setFeedReactionUser((prev: FeedReaction_Detail[] | null) => [
-                //   ...(prev || []),
-                //   payload.new as FeedReaction,
-                // ]);
-                if (payload.new.state == ReactionState.LIKE) {
-                  setCountLikeState(countLikeState + 1);
-                }
-                if (payload.new.state == ReactionState.DISLIKE) {
-                  setCountDisLikeState(countDisLikeState + 1);
-                }
-                router.refresh();
-              }
-              break;
-            case "UPDATE":
-              if (payload && payload.new && payload.new.feed_id == feed?.id) {
-                if (
-                  payload.new.state == ReactionState.LIKE &&
-                  payload.old.state == ReactionState.DISLIKE
-                ) {
-                  setCountLikeState(countLikeState + 1);
-                  if (countLikeState > 0)
-                    setCountDisLikeState(countDisLikeState - 1);
-                }
-                if (
-                  payload.new.state == ReactionState.DISLIKE &&
-                  payload.old.state == ReactionState.LIKE
-                ) {
-                  setCountDisLikeState(+1);
-                  if (countLikeState > 0)
-                    setCountLikeState(countDisLikeState - 1);
-                }
-                router.refresh();
-              }
-            case "DELETE":
-              if (payload && payload.old && payload.old.feed_id == feed?.id) {
-                setFeedReactionUser(
-                  (prev) =>
-                    prev?.filter(
-                      (reaction) => reaction?.id !== payload.old.id,
-                    ) || [],
-                );
-                if (
-                  payload.old.state == ReactionState.LIKE &&
-                  countLikeState > 0
-                ) {
-                  setCountLikeState(countLikeState - 1);
-                }
-                if (
-                  payload.old.state == ReactionState.DISLIKE &&
-                  countDisLikeState > 0
-                ) {
-                  setCountDisLikeState(countDisLikeState - 1);
-                }
-                setStateReaction(ReactionState.NEUTRAL);
-                router.refresh();
-              }
-
-            default:
-              break;
-          }
-        },
-      )
-      .subscribe();
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [countLikeState, countDisLikeState]);
+  useRealtimeTable({
+    table: "feed_engagement",
+    filter: `feed_id=eq.${feed?.id}`,
+    onChange: () => {
+      setRefreshTick((t) => t + 1);
+      router.refresh();
+    },
+  });
 
   const handleClap = async ({ action }: { action: ReactionState }) => {
     if (!userId) {
