@@ -1,5 +1,5 @@
 import { cn } from "@suzu/ui";
-import React, { SetStateAction, useRef } from "react";
+import React, { SetStateAction } from "react";
 import { BaseIconBTN } from "../button/base-icon-btn";
 
 interface PropsIcon {
@@ -11,7 +11,7 @@ interface PropsIcon {
   onChange: (e: { target: { value: SetStateAction<string> } }) => void;
   onClick: (e: any) => void;
   handleKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  inputRef?: React.RefObject<HTMLInputElement>;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
 export const InputHiddenLabel = ({

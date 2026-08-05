@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 
 
 export const createComment = async (comment: NewCommentParams) => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: session } = await supabase.auth.getUser();
   const newComment = insertCommentSchema.parse({
     ...comment,
@@ -33,7 +33,7 @@ export const updateComment = async (
   comment: UpdateCommentParams,
 ) => {
 
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: session } = await supabase.auth.getUser();
   const { id: commentId } = commentIdSchema.parse({ id });
   const newComment = updateCommentSchema.parse({
@@ -57,7 +57,7 @@ export const updateComment = async (
 };
 
 export const deleteComment = async (id: CommentId) => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: session } = await supabase.auth.getUser();
   const { id: commentId } = commentIdSchema.parse({ id });
   try {

@@ -1,8 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse, NextRequest } from "next/server";
 import _ from 'lodash';
-export async function GET(req: NextRequest, res: NextResponse) {
-  const supabase = createClient();
+export async function GET(req: NextRequest) {
+  const supabase = await createClient();
   const { searchParams } = new URL(req.url);
   const search = searchParams.get("search");
   const offset = parseInt(searchParams.get("offset")!);

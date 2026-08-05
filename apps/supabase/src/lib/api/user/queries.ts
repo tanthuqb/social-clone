@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 
 
 export const getUserById = async (id: User['id'] | undefined) => {
-  const supabase = createClient()
+  const supabase = await createClient()
   if (!id) {
     return { user: null };
   }
@@ -19,7 +19,7 @@ export const getUserById = async (id: User['id'] | undefined) => {
   return { user: data };
 }
 export const getUsers = async (offset : number , limit : number) => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data, error } = await supabase.from('profiles')
   .select('*')
   .range(offset, offset + limit - 1)

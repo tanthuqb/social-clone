@@ -10,7 +10,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 
 export const createFeedImage = async (feedImage: NewFeedImageParams) => {
-    const supabase = createClient()
+    const supabase = await createClient()
     try {
         const newFeedImage = insertFeedImageSchema.parse(feedImage);
         const {data:f,error} = await supabase.from('feed_images').upsert([newFeedImage]).select()
@@ -24,7 +24,7 @@ export const createFeedImage = async (feedImage: NewFeedImageParams) => {
 };
 
 export const updateFeedImage = async (id: FeedImageId, feedImage: UpdateFeedImageParams) => {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { id: feedImageId } = feedImageIdSchema.parse({ id });
     const newFeedImage = updateFeedImageSchema.parse(feedImage);
     try {
@@ -40,7 +40,7 @@ export const updateFeedImage = async (id: FeedImageId, feedImage: UpdateFeedImag
 };
 
 export const deleteFeedImage = async (id: FeedImageId) => {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { id: feedImageId } = feedImageIdSchema.parse({ id });
     try {
         const {data:f,error} = await supabase.from('feed_images').delete().eq('id',id).select()

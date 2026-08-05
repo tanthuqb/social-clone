@@ -12,7 +12,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export const createUserFollow = async (userFollow: NewUserFollowParams) => {
 
-    const supabase = createClient()
+    const supabase = await createClient()
     const newUserFollow = insertUserFollowSchema.parse(
         userFollow,
     );
@@ -32,7 +32,7 @@ export const updateUserFollow = async (
     id: UserFollowId,
     userFollow: UpdateUserFollowParams,
 ) => {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { user_id, following_id } = userFollowIdSchema.parse({ id });
     const newUserFollow = updateUserFollowSchema.parse(userFollow);
     try {
@@ -51,7 +51,7 @@ export const updateUserFollow = async (
 };
 
 export const deleteUserFollow = async (id: UserFollowId) => {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { user_id, following_id } = userFollowIdSchema.parse(id);
     try {
         const { data, error } = await supabase.from('user_follows').delete().eq('user_id', user_id).eq('following_id', following_id)

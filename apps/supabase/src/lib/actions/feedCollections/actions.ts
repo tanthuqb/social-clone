@@ -26,7 +26,7 @@ const revalidateFeeds = () => revalidatePath("/");
 
 export const getFeedCollectionsAction = async (offset: number, limit: number, user_id: string) => {
     try {
-      const supabase = createClient();
+      const supabase = await createClient();
       const { data: feed_collections, error } = await supabase
       .from("feed_collections")
       .select("*, feed_id!left(*,feed_images(*),user_id!left(*))")

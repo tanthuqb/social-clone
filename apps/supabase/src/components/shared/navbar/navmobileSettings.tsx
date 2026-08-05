@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import DropdownMenuComponent from "../dropdownMenu/dropdown-menu";
 
 export default async function NavbarMbSetings({ inFeed }: { inFeed: boolean }) {
-  const supbase = createClient();
+  const supbase = await createClient();
   const { data: user, error } = await supbase.auth.getUser();
   const { data: profile } = await supbase
     .from("profiles")

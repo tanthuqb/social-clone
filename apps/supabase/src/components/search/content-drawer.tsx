@@ -15,7 +15,7 @@ type ContentDrawerProps = {
 const ContentDrawer = React.forwardRef<HTMLDivElement, ContentDrawerProps>(
   ({ profile, user }, ref) => {
     const supbase = createClient();
-    const inputRef = (ref = useRef(null));
+    const inputRef = (ref = useRef<HTMLInputElement>(null));
     const [valueInput, setValueInput] = useState<string>("");
     const [searchUser, setSearchUser] = useState<UserFeatured[]>([]);
     const [isLoading, setIsLoading] = useState(false);

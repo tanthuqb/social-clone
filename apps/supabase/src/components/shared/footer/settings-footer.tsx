@@ -5,7 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function SettingsFooter() {
-  const supbase = createClient();
+  const supbase = await createClient();
   const { data: user, error } = await supbase.auth.getUser();
   const { data: profiles } = await supbase
     .from("profiles")

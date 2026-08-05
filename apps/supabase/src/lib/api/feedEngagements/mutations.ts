@@ -16,7 +16,7 @@ export const createFeedReaction = async (
   feedReaction: UpsertFeedReactionParams,
 ) => {
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const {data:session} = await supabase.auth.getUser()
   const newFeedReaction = upsertFeedReactionSchema.parse({
     ...feedReaction,
@@ -40,7 +40,7 @@ export const updateFeedReaction = async (
   feedId: FeedId,
   feedReaction: UpdateFeedReactionParams,
 ) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {data:session} = await supabase.auth.getUser()
 
   const { id: feedReactionId } = feedReactionIdSchema.parse({ feedId });
@@ -75,7 +75,7 @@ export const updateFeedReaction = async (
 };
 
 export const deleteFeedReaction = async (id: FeedReactionId) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {data:session} = await supabase.auth.getUser()
   const { id: feedReactionId } = feedReactionIdSchema.parse({ id });
   try {

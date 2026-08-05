@@ -11,15 +11,15 @@ class TestProvider extends BaseProvider {
     super("profile");
   }
   async getUser() {
-    return await this.auth.getUser();
+    return await (await this.auth()).getUser();
   }
 
   async signInWithPassword(body: { email: string; password: string }) {
-    return await this.auth.signInWithPassword(body);
+    return await (await this.auth()).signInWithPassword(body);
   }
 
   async signInWithOAuth(provider: Provider, redirectTo: string) {
-    return await this.auth.signInWithOAuth({
+    return await (await this.auth()).signInWithOAuth({
       provider,
       options: {
         skipBrowserRedirect: true,

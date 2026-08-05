@@ -11,7 +11,7 @@ export async function oAuthSignIn(provider: Provider) {
       return redirect('/auth/error')
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const redirectUrl = getURL("/api/auth/callback")
   const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
@@ -28,7 +28,7 @@ export async function oAuthSignIn(provider: Provider) {
 }
 
 export async function logout() {
-    const supabase = createClient()
+    const supabase = await createClient()
   
     await supabase.auth.signOut()
   
@@ -36,7 +36,7 @@ export async function logout() {
   }
 
 export async function checkAuth() {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: session , error } = await supabase.auth.getSession()
   
     if (!session) {

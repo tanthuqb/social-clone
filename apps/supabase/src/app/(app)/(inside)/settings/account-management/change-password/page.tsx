@@ -3,7 +3,7 @@ import ChangePassword from "@/components/settings/change-password";
 import { createClient } from "@/lib/supabase/server";
 
 async function Home() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: session } = await supabase.auth.getUser();
   return (
     <div className="flex h-dvh flex-col">

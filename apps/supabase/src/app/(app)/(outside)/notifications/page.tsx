@@ -4,7 +4,7 @@ import MainFooter from "@/components/shared/footer/main-footer";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function Notifications() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: session } = await supabase.auth.getUser();
   return (
     <div>

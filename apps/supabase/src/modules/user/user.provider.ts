@@ -6,15 +6,15 @@ export class UserProvider extends BaseProvider {
     super("profile");
   }
   async getUser() {
-    return await this.auth.getUser();
+    return await (await this.auth()).getUser();
   }
 
   async signInWithPassword(body: { email: string; password: string }) {
-    return await this.auth.signInWithPassword(body);
+    return await (await this.auth()).signInWithPassword(body);
   }
 
   async signInWithOAuth(provider: Provider, redirectTo: string) {
-    return await this.auth.signInWithOAuth({
+    return await (await this.auth()).signInWithOAuth({
       provider,
       options: {
         skipBrowserRedirect: true,
@@ -24,10 +24,10 @@ export class UserProvider extends BaseProvider {
   }
 
   async signOut() {
-    return await this.auth.signOut();
+    return await (await this.auth()).signOut();
   }
 
   async checkToken() {
-    return await this.auth.getSession();
+    return await (await this.auth()).getSession();
   }
 }

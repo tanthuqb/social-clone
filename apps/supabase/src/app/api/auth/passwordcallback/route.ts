@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? '/resetpassword'
   if(code) {
-    const supbase = createClient();
+    const supbase = await createClient();
     const { data,error } = await supbase.auth.exchangeCodeForSession(code)
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`)

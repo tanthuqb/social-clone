@@ -60,7 +60,7 @@ export const deleteFeedAction = async (input: FeedId) => {
 
 export const getFeedsAction = async (offset: number, limit: number) => {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: feeds, error } = await supabase.from("feeds")
     .select("*,feed_images(*),user_id!left(*)")
     .eq("type", "feed")
@@ -78,7 +78,7 @@ export const getFeedsAction = async (offset: number, limit: number) => {
 
 export const getFeedsProfileAction = async (offset: number, limit: number, user_id: string|null) => {
     try {
-      const supabase = createClient();
+      const supabase = await createClient();
       if(user_id === null) return getFeedsAction(offset, limit)
       const { data: feeds, error } = await supabase.from("feeds")
       .select("*,feed_images(*),user_id!left(*)")

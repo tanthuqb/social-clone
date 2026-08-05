@@ -14,7 +14,7 @@ export const UserTimeline = async ({
   user?: Profile;
   session?: Session;
 }) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: feed_collections, error } = await supabase
     .from("feed_collections")
     .select("*, feed_id!left(*,feed_images(*),user_id!left(*))")

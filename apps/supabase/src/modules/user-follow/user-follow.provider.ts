@@ -6,12 +6,12 @@ export class UserFollowProvider extends BaseProvider {
   }
 
   async findOne(userId: string, followId: string) {
-    return await this.database.select().eq('user_id', userId).eq('following_id', followId).single();
+    return await (await this.database()).select().eq('user_id', userId).eq('following_id', followId).single();
   }
 
 
   async findAll(skip: number = 0, take: number = 10) {
-    const { error: errorCount, count: total } = await this.database.select(
+    const { error: errorCount, count: total } = await (await this.database()).select(
       "*",
       {
         count: "exact",
@@ -20,7 +20,7 @@ export class UserFollowProvider extends BaseProvider {
 
     if (errorCount) return { error: errorCount };
 
-    const result = await this.database
+    const result = await (await this.database())
       .select("*")
       .range(take * skip, (skip + 1) * take - 1);
 
@@ -28,7 +28,7 @@ export class UserFollowProvider extends BaseProvider {
   }
 
   async countFollower(user_id: string) {
-    return await this.database.select(
+    return await (await this.database()).select(
       "*",
       {
         count: "exact",
@@ -37,7 +37,7 @@ export class UserFollowProvider extends BaseProvider {
   }
 
   async countFollowing(user_id: string) {
-    return await this.database.select(
+    return await (await this.database()).select(
       "*",
       {
         count: "exact",
@@ -46,10 +46,10 @@ export class UserFollowProvider extends BaseProvider {
   }
 
   async create(body: { userId: string; followId: string }) {
-    return await this.database.insert(body);
+    return await (await this.database()).insert(body);
   }
 
   async delete(userId: string, followId: string) {
-    return await this.database.delete().eq('user_id', userId).eq('following_id', followId);
+    return await (await this.database()).delete().eq('user_id', userId).eq('following_id', followId);
   }
 }

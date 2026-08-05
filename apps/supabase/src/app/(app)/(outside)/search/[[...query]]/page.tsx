@@ -21,11 +21,12 @@ const fetchUserData = async (id: Profile["id"]) => {
 const SearchPage = async ({
   searchParams,
 }: {
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: session } = await supabase.auth.getUser();
-  const search = searchParams?.search?.toString().trim();
+  const resolvedSearchParams = await searchParams;
+  const search = resolvedSearchParams?.search?.toString().trim();
   const searchData = await fetchSearchDataAction(
     search!,
     0,

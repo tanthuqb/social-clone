@@ -5,7 +5,7 @@ import { DrawerCommon } from "./drawer-common";
 const INITIAL_NUMBER_OF_SEARCH = 20;
 
 export default async function MainSidebar() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: user } = await supabase.auth.getUser();
   const { data: profile } = await supabase
   .from("profiles")

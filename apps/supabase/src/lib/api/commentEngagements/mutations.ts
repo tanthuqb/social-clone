@@ -13,7 +13,7 @@ import { createClient } from "@/lib/supabase/server";
 
 
 export const createCommentReaction = async (commentReaction: any) => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: session } = await supabase.auth.getUser();
   // const newCommentReaction = upsertCommentReactionSchema.parse({ 
   //   ...commentReaction, user_id: session?.user?.id! });
@@ -38,7 +38,7 @@ export const createCommentReaction = async (commentReaction: any) => {
 };
 
 export const updateCommentReaction = async (id: any, commentReaction: any) => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: session } = await supabase.auth.getUser();
   try {
     const { data : c, error } = await supabase
@@ -61,7 +61,7 @@ export const updateCommentReaction = async (id: any, commentReaction: any) => {
 };
 
 export const deleteCommentReaction = async (id: CommentReactionId) => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: session } = await supabase.auth.getUser();
   const { id: commentReactionId } = commentReactionIdSchema.parse({ id });
   try {

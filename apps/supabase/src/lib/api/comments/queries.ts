@@ -7,7 +7,7 @@ import { FeedId } from "@/lib/db/schema/feeds";
 import { createClient } from "@/lib/supabase/server";
 
 export const getComments = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: session } = await supabase.auth.getUser();
 
@@ -19,7 +19,7 @@ export const getComments = async () => {
 };
 
 export const getCountCommentsByFeedId = async (feedId: FeedId) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   // const rows = await db
   //   .select({ comment: comments, feed: feeds })
   //   .from(comments)
@@ -34,7 +34,7 @@ export const getCountCommentsByFeedId = async (feedId: FeedId) => {
 };
 
 export const getCommentById = async (id: CommentId) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: session } = await supabase.auth.getUser();
   const { id: commentId } = commentIdSchema.parse({ id });
   // const [row] = await db
@@ -58,7 +58,7 @@ export const getCommentById = async (id: CommentId) => {
 
 export const getCommentChildren = async (parentId: CommentId) => {
   const { id: commentId } = commentIdSchema.parse({ id: parentId });
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: rows } = await supabase
     .from("comments")
@@ -70,7 +70,7 @@ export const getCommentChildren = async (parentId: CommentId) => {
 
 export const getCountCommentByCommentId = async (id: CommentId) => {
   const { id: commentId } = commentIdSchema.parse({ id: id });
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: rows } = await supabase
     .from("comments")
     .select("*", { count: "exact", head: true })
@@ -80,7 +80,7 @@ export const getCountCommentByCommentId = async (id: CommentId) => {
 };
 
 export const getCommentsNoti = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: session } = await supabase.auth.getUser();
   const { data: rows, error } = await supabase
     .from("comments")
@@ -93,7 +93,7 @@ export const getCommentsNoti = async () => {
 };
 
 export const getCommentsNotiWithParentId = async (parentId: CommentId) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: session } = await supabase.auth.getUser();
 
   const { id: commentId } = commentIdSchema.parse({ id: parentId });
@@ -109,7 +109,7 @@ export const getCommentsNotiWithParentId = async (parentId: CommentId) => {
 export const countFeedsAndReplies = async (
   feedId: Feed["id"],
 ): Promise<number> => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: feedData, error: feedError } = await supabase
     .from("feeds")
     .select("id")
@@ -135,7 +135,7 @@ export const getCommentByFeedId = async (
   PAGE_COUNT: number,
   feedId: Feed["id"],
 ) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const totalCommentsResponse = await supabase
     .from("feeds")
     .select("id", { count: "exact" })
@@ -229,7 +229,7 @@ export const getCommentByFeedId = async (
 export const getCountCommentsById = async (
   feed_id: string,
 ): Promise<string> => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: count, error: feedError } = await supabase
   .rpc('count_descendant_feeds', {
     feed_id

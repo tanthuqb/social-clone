@@ -2,7 +2,7 @@ import { type FeedId, feedIdSchema } from "@/lib/db/schema/feeds";
 import { createClient } from "@/lib/supabase/server";
 
 export const getFeeds = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: rows, error } = await supabase
     .from("feeds")
     .select("*,comments(*),feed_images(*),user_id!left(*)")
@@ -12,7 +12,7 @@ export const getFeeds = async () => {
 };
 
 export const getFeedsWithOutComment = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: rows, error } = await supabase
     .from("feeds")
     .select("*,feed_images(*),user_id!left(*)")
@@ -24,7 +24,7 @@ export const getFeedsWithOutComment = async () => {
 export const getFeedsPrepared = async (
   userId: string | undefined = undefined,
 ) => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   let prepared = supabase
     .from("feeds")
@@ -45,7 +45,7 @@ export const getFeedsPrepared = async (
 };
 
 export const getFeedById = async (id: FeedId) => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { id: feedId } = feedIdSchema.parse({ id });
   const { data: row, error } = await supabase
@@ -61,7 +61,7 @@ export const getFeedById = async (id: FeedId) => {
 
 export const getFeedByIdWithComments = async (id: FeedId) => {
   const { id: feedId } = feedIdSchema.parse({ id });
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: row, error } = await supabase
     .from("feeds")
     .select("*,comments(*),feed_images(*),user_id!left(*)")
@@ -77,7 +77,7 @@ const getCommentByFeedId = async (
   pageSize: number ,
   feedId: Feed["id"],
 ) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const start = (page - 1) * pageSize;
   const end = start + pageSize - 1;
 

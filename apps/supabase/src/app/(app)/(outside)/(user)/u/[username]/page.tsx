@@ -12,14 +12,14 @@ import { redirect } from "next/navigation";
 
 
 type Props = {
-  params: { username: string }
+  params: Promise<{ username: string }>
 }
 
 export async function generateMetadata(
   { params }: Props,
 ): Promise<Metadata> {
-  const supabase = createClient();
-  const username = params.username;
+  const supabase = await createClient();
+  const { username } = await params;
   const { data: profile } = await supabase.from('profiles').select('*').eq('full_name', username).single()
   if (!profile) {
     return redirect('/error')
@@ -37,11 +37,11 @@ export async function generateMetadata(
 export default async function Page({
   params,
 }: {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: session } = await supabase.auth.getUser();
-  const usernameByParams = params.username;
+  const { username: usernameByParams } = await params;
   let feeds;
 
   const { data: user, error } = await supabase

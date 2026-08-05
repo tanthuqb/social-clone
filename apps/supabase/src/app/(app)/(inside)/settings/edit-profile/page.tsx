@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
 export default async function EditProfile() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: session, error } = await supabase.auth.getUser();
   if (error) {
     // đoạn này trả về tramg error hay 404

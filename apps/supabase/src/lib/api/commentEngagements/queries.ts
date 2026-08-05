@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { User } from "@supabase/supabase-js";
 
 export const getCommentReactions = async () => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: session } = await supabase.auth.getUser();
 
   // const rows = await db.select({ commentReaction: commentReactions, comment: comments }).from(commentReactions).
@@ -21,7 +21,7 @@ export const getCommentReactions = async () => {
 };
 
 export const getCommentReactionById = async (id: CommentReactionId) => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: session } = await supabase.auth.getUser();
   const { id: commentReactionId } = commentReactionIdSchema.parse({ id });
   // const [row] = await db.select()
@@ -38,7 +38,7 @@ export const getCommentReactionById = async (id: CommentReactionId) => {
 };
 
 export const getCommentReactionByCommentId = async (id: CommentId) => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { id: CommentId } = commentReactionIdSchema.parse({ id });
   // const [row] = await db.select()
   //   .from(commentReactions)
@@ -54,7 +54,7 @@ export const getCommentReactionByCommentId = async (id: CommentId) => {
 
 export const getCountCommentReactionByCommentId = async (id: CommentId) => {
   const { id: CommentId } = commentReactionIdSchema.parse({ id });
-  const supabase = createClient()
+  const supabase = await createClient()
   // const row = await db.select()
   //   .from(commentReactions)
   //   .where(
@@ -70,7 +70,7 @@ export const getCountCommentReactionByCommentId = async (id: CommentId) => {
 
 
 export const getCommentReactionsNoti = async () => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: session } = await supabase.auth.getUser();
 
   // const rows = await db.select({ commentReaction: commentReactions, comment: comments, users: users })

@@ -2,8 +2,8 @@ import { BaseText } from "@/components/master-layout/base-text";
 import UpdatePasswordForm from "@/components/modals/auth/update-password-form";
 import MainFooter from "@/components/shared/footer/main-footer";
 import { createClient } from "@/lib/supabase/server";
-export default function UpdatePasswordPage() {
-  const supabase = createClient();
+export default async function UpdatePasswordPage() {
+  const supabase = await createClient();
 
   return (
     <div className="flex flex-col md:mt-56">

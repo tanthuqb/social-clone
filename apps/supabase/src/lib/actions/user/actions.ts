@@ -26,7 +26,7 @@ export const updateUserAction = async (input: UpdateProfileParams) => {
   };
 
 export const getFeaturedUserAction = async (userId : Profile['id'] | null , offset: number, limit: number) => {
-    const supabase = createClient();
+    const supabase = await createClient();
     let query = supabase.rpc('get_users_with_most_posts', { limitdata : 30 }).range(offset, offset + limit - 1);
     try {
       if (userId) {

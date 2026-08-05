@@ -10,7 +10,7 @@ import { redirect } from "next/navigation";
 
 const INITIAL_NUMBER_OF_FEEDS = 5;
 export default async function HomePage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: session, error } = await supabase.auth.getUser();
   const { data: user, error: profile } = await supabase
     .from("profiles")

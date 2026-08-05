@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? '/'
   if (code) {
-    const supbase = createClient();
+    const supbase = await createClient();
     const { data, error } = await supbase.auth.exchangeCodeForSession(code)
     if (new Date(data?.user?.confirmed_at as string).getTime() - new Date(data?.user?.created_at as string).getTime() < 1000 * 5) {
       let sameName = false

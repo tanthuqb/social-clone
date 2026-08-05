@@ -7,7 +7,7 @@ export const updateUser = async (
 
   user: UpdateProfileParams,
 ) => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: session, error } = await supabase.auth.getUser();
   if (error) {
     return { error: error.message };

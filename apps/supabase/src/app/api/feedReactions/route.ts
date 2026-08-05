@@ -74,7 +74,7 @@ export async function DELETE(req: Request) {
 
 export async function GET(req: Request) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     const {data : session} = await supabase.auth.getUser();

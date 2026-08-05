@@ -9,16 +9,17 @@ import { constructMetadata, stripHtml } from "@/lib/ultis";
 import type { Metadata } from "next";
 
 type Props = {
-  params: { feedId: string };
+  params: Promise<{ feedId: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const supabase = createClient();
+  const supabase = await createClient();
+  const { feedId } = await params;
 
   const { data: feed } = await supabase
     .from("feeds")
     .select("*, feed_images(*)")
-    .eq("id", params.feedId)
+    .eq("id", feedId)
     .maybeSingle();
 
   if (!feed) return notFound();
@@ -32,10 +33,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return metadata;
 }
 
-const FeedDetailPage = async ({ params }: { params: { feedId: string } }) => {
-  const supabase = createClient();
+const FeedDetailPage = async ({ params }: { params: Promise<{ feedId: string }> }) => {
+  const supabase = await createClient();
   const { data: session } = await supabase.auth.getUser();
-  const feedId = params.feedId;
+  const { feedId } = await params;
   const feeds = await getFeedByIdWithComments(feedId);
   const { feed } = await getFeedById(feedId);
   const { data: user } = await supabase

@@ -10,7 +10,7 @@ import { FeedId } from "@/lib/db/schema/feeds";
 import { createClient } from "@/lib/supabase/server";
 
 export const getFeedReactions = async () => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: session } = await supabase.auth.getUser()
   // const rows = await db
   //   .select({ feedReaction: feedReactions, feed: feeds })
@@ -27,7 +27,7 @@ export const getFeedReactions = async () => {
 };
 
 export const getFeedReactionByReactionId = async (id: FeedReactionId) => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: session } = await supabase.auth.getUser()
   const { id: feedReactionId } = feedReactionIdSchema.parse({ id });
   const { data: row, error } = await supabase.from('feed_engagement')
@@ -42,7 +42,7 @@ export const getFeedReactionByReactionId = async (id: FeedReactionId) => {
 
 export const getFeedReactionByFeedId = async (feedId: FeedId) => {
   
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: session } = await supabase.auth.getUser()
   if(!session?.user?.id){
     return { feedReaction: null}
@@ -72,7 +72,7 @@ export const getFeedReactionByFeedId = async (feedId: FeedId) => {
 
 export const countFeedReactionByFeedId = async (feedId: FeedId, state: ReactionState | undefined) => {
   let rows = [];
-  const supabase = createClient()
+  const supabase = await createClient()
   if (state === null) {
     const { data, error } = await supabase.from('feed_engagement')
       .select('*')
@@ -95,7 +95,7 @@ type FeedReactionsNoti = FeedReaction & {
   users: Session
 }
 export const getFeedReactionsNoti = async () => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: session } = await supabase.auth.getUser()
   const { data: rows, error } = await supabase.from('feed_engagement')
     .select('*,feed_id!left(*),user_id!left(*)')
@@ -107,7 +107,7 @@ export const getFeedReactionsNoti = async () => {
   return { feedReactions: f };
 };
 export const countFeedDisLikeByFeedId = async (feedId: FeedId) => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: rows, error } = await supabase.from('feed_engagement')
     .select('*').eq('feed_id', feedId).eq('state', ReactionState.DISLIKE)
   if (error) throw { error: error }
@@ -116,7 +116,7 @@ export const countFeedDisLikeByFeedId = async (feedId: FeedId) => {
 };
 
 export const countFeedLikeByFeedId = async (feedId: FeedId) => {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: rows, error } = await supabase.from('feed_engagement')
     .select('*').eq('feed_id', feedId).eq('state', ReactionState.LIKE)
   if (error) throw { error: error }

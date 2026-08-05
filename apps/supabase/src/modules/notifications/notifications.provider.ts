@@ -5,19 +5,19 @@ export class NotificationsProvider extends BaseProvider {
         super("notifications");
       }
       async find(userId:string) {
-        return await this.database.select("*,user_id!left(*),comment_id!left(*),feed_id!left(*)")
+        return await (await this.database()).select("*,user_id!left(*),comment_id!left(*),feed_id!left(*)")
         .eq("user_noti_id", userId)
         .neq("user_id", userId)
         .order("created_at", { ascending: false })
       }
       async update(notificationId:string) {
-        return this.database
+        return (await this.database())
         .update({ status: true })
         .eq("id", notificationId)
         .single()
       }
       async paging(userId:string, start:number, end:number){
-        return this.database
+        return (await this.database())
         .select("*,user_id!left(*),feed_id!left(*),comment_id!left(*)")
         .eq("user_noti_id", userId)
         .neq("user_id", userId)

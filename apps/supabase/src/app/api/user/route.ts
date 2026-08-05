@@ -10,7 +10,7 @@ import { updateProfilewSchema } from '@/lib/db/schema/profile';
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
-    const supabase = createClient();
+    const supabase = await createClient();
     const {data,error} = await supabase.from('profiles').select('*').eq('id',userId as string).maybeSingle();
     if (error || !data) return NextResponse.json(error);
     return NextResponse.json(data);

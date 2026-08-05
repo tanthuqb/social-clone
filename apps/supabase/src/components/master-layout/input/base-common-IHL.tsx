@@ -13,7 +13,7 @@ interface PropsBTN {
   type?: string;
   placeholder: string;
   handleKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  inputRef?: React.RefObject<HTMLInputElement>;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
   onChange: (e: { target: { value: SetStateAction<string> } }) => void;
 }
 

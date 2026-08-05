@@ -16,7 +16,7 @@ export const UserHeader = async ({
   userIdByParams: string;
   session: any;
 }) => {
-  const supbase = createClient();
+  const supbase = await createClient();
   // const { data: session } = await supbase.auth.getUser();
   const { count: following, error } = await getUserFollowingCountPrepared(
     user?.id,

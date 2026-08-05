@@ -11,7 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 
 
 export const createFeed = async (feed: NewFeedParams) => {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: session } = await supabase.auth.getUser()
 
     try {
@@ -54,7 +54,7 @@ export const createFeed = async (feed: NewFeedParams) => {
 };
 
 export const updateFeed = async (id: FeedId, feed: UpdateFeedParams) => {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: session } = await supabase.auth.getUser()
 
     try {
@@ -80,7 +80,7 @@ export const updateFeed = async (id: FeedId, feed: UpdateFeedParams) => {
 export const deleteFeed = async (id: FeedId) => {
 
     try {
-        const supabase = createClient();
+        const supabase = await createClient();
         const { data: session } = await supabase.auth.getUser()
         const { id: feedId } = feedIdSchema.parse({ id });
         const { data: f, error } = await supabase.from('feeds').delete()

@@ -7,14 +7,14 @@ import {
 } from "@/lib/db/schema/userFollows";
 import { createClient } from "@/lib/supabase/server";
 export const getUserFollows = async () => {
-    const supabase = createClient();    
+    const supabase = await createClient();    
     let { data: rows, error } = await supabase.from('user_follows').select('*, user_id!left(*),following_id!left(*)')
     return { userFollows: rows };
 
 };
 
 export const getUserFollowsByUserId = async (id: User['id']) => {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { user_id } = userIdParams.parse({ userId: id });
     // const rows = await db
     //     .select()
@@ -30,7 +30,7 @@ export const getUserFollowsByUserId = async (id: User['id']) => {
 
 export const getUserFollowById = async (id: UserFollowId) => {
     const { user_id, following_id } = userFollowIdSchema.parse({ ...id });
-    const supabase = createClient();
+    const supabase = await createClient();
     const {data:rows,error} = await supabase.from('user_follows')
     .select('*')
     .eq('user_id', user_id)
@@ -42,10 +42,10 @@ export const getUserFollowById = async (id: UserFollowId) => {
     return { userFollow: row };
 };
 
-export const getUserFollowingCountPrepared = (
+export const getUserFollowingCountPrepared = async (
     userId: string | undefined = undefined,
 ) => {
-    const supabase = createClient();
+    const supabase = await createClient();
         const prepared =  supabase.from('user_follows')
         .select('*', { count: 'exact', head: true })
 
@@ -55,10 +55,10 @@ export const getUserFollowingCountPrepared = (
     return prepared;
 };
 
-export const getUserFollowsCountPrepared = (
+export const getUserFollowsCountPrepared = async (
     userId: string | undefined = undefined,
 ) => {
-    const supabase = createClient();
+    const supabase = await createClient();
     const prepared = supabase.from('user_follows')
     .select('*!following_id!left(*)', { count: 'exact', head: true })
     if (userId) {
