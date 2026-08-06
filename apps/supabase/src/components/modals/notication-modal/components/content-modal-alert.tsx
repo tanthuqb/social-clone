@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext } from "react";
-import { ModalContext } from "../../provider";
+import { ModalContext } from "@/components/modals/provider";
 import { CommonButton } from "@suzu/ui";
 
 const ContentModalAlert = () => {

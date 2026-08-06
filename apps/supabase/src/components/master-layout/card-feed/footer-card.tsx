@@ -1,5 +1,5 @@
 "use client";
-import { InteractiveBTN } from "../button/interactive-btn";
+import { InteractiveBTN } from "@/components/master-layout/button/interactive-btn";
 
 import { useEffect, useState } from "react";
 import { useContext } from "react";
@@ -20,8 +20,8 @@ import {
   toast,
 } from "@suzu/ui";
 import Link from "next/link";
-import { useMediaQuery } from "node_modules/@suzu/ui/src/components/hooks";
-import { BaseText } from "../base-text";
+import { useMediaQuery } from "@suzu/ui/hooks";
+import { BaseText } from "@/components/master-layout/base-text";
 
 interface FooterCardProps {
   feedId: string;

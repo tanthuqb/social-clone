@@ -5,7 +5,7 @@ import DropdownMenuComponent, {
 } from "@/components/shared/dropdownMenu/dropdown-menu";
 import { cn, timeAgo } from "@suzu/ui";
 import Link from "next/link";
-import { BaseText } from "../base-text";
+import { BaseText } from "@/components/master-layout/base-text";
 
 interface HeaderCardProps {
   feed: Feed_Detail;

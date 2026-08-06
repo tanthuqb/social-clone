@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
-import { Avatar } from "../shared/avatar";
-import { BaseIconBTN, BaseUserInfo } from "../master-layout";
-import { FollowButton } from "../userFollows/follow-btn";
+import { Avatar } from "@/components/shared/avatar";
+import { BaseIconBTN, BaseUserInfo } from "@/components/master-layout";
+import { FollowButton } from "@/components/userFollows/follow-btn";
 import { LoadingSpinner, PlusFollowIcon, ScrollArea, cn } from "@suzu/ui";
-import { BaseText } from "../master-layout/base-text";
+import { BaseText } from "@/components/master-layout/base-text";
 
 type ListUserSuggestProps = {
   searchUser: UserFeatured[];

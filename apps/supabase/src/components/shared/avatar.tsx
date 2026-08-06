@@ -10,13 +10,13 @@ import {
   toast,
 } from "@suzu/ui";
 import { UserRound } from "lucide-react";
-import { BaseIconBTN } from "../master-layout";
+import { BaseIconBTN } from "@/components/master-layout";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { followAction } from "@/lib/actions/userFollows/actions";
 import { useRealtimeTable } from "@/hooks/useRealtimeTable";
-import { FollowButton } from "../userFollows/follow-btn";
+import { FollowButton } from "@/components/userFollows/follow-btn";
 import Link from "next/link";
 
 const Avatar = ({

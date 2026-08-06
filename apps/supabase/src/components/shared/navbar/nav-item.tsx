@@ -7,7 +7,7 @@ import { ModalContext } from "@/components/modals/provider";
 import { createClient } from "@/lib/supabase/client";
 import { useRealtimeTable } from "@/hooks/useRealtimeTable";
 import { useRouter } from "next/navigation";
-import { useMediaQuery } from "node_modules/@suzu/ui/src/components/hooks";
+import { useMediaQuery } from "@suzu/ui/hooks";
 import { BaseIconBTN } from "@/components/master-layout";
 import { toastFeed } from "@/app/(app)/(outside)/toast/toast";
 

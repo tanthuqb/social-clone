@@ -22,7 +22,6 @@
       "@/*": ["./src/*"]
     },
     "target": "esnext",
-    "baseUrl": "./",
     "typeRoots": ["./src/types", "./src/lib/supabase/database.types.ts"]
   },
   "include": [

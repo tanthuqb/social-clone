@@ -4,7 +4,7 @@ import { BackButton } from "@suzu/ui";
 import { Logo } from "@suzu/ui";
 import NavTitleMbSettings from "./navTitleMobileSettings";
 import { createClient } from "@/lib/supabase/server";
-import DropdownMenuComponent from "../dropdownMenu/dropdown-menu";
+import DropdownMenuComponent from "@/components/shared/dropdownMenu/dropdown-menu";
 
 export default async function NavbarMbSetings({ inFeed }: { inFeed: boolean }) {
   const supbase = await createClient();

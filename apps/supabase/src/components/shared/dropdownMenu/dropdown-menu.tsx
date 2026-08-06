@@ -11,7 +11,7 @@ import { Feed } from "./content/feed";
 import { BaseIconBTN } from "@/components/master-layout";
 import { useState } from "react";
 import { ForYou } from "./content/for-you";
-import { useMediaQuery } from "node_modules/@suzu/ui/src/components/hooks";
+import { useMediaQuery } from "@suzu/ui/hooks";
 
 export type DropdownTrigger = "menu" | "dots" | "arrowDown";
 

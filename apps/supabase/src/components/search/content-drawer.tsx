@@ -1,6 +1,6 @@
 "use client";
-import { BaseCommonIHL } from "../master-layout";
-import { BaseText } from "../master-layout/base-text";
+import { BaseCommonIHL } from "@/components/master-layout";
+import { BaseText } from "@/components/master-layout/base-text";
 import React, { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "@suzu/ui";

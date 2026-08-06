@@ -2,7 +2,7 @@
 
 import { BackButton } from "@/components/master-layout/button/back-button";
 import { BaseText } from "@/components/master-layout/base-text";
-import { useMediaQuery } from "node_modules/@suzu/ui/src/components/hooks";
+import { useMediaQuery } from "@suzu/ui/hooks";
 
 interface HeaderSectionCommonProps {
   text: string;

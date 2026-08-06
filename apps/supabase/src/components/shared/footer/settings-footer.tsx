@@ -1,6 +1,6 @@
 import { HomeIcon, SearchIcon, BellIcon, UserIcon } from "@suzu/ui";
 import { NavItem } from "@/components/shared/navbar/nav-item";
-import { FeedCreateButton } from "../feed-create-button";
+import { FeedCreateButton } from "@/components/shared/feed-create-button";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 

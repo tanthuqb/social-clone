@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { BaseCommonBTN } from "../button/base-common-btn";
+import { BaseCommonBTN } from "@/components/master-layout/button/base-common-btn";
 import {
   Carousel,
   CarouselContent,

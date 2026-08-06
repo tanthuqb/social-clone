@@ -1,6 +1,6 @@
 import { cn } from "@suzu/ui";
 import React, { SetStateAction } from "react";
-import { BaseIconBTN } from "../button/base-icon-btn";
+import { BaseIconBTN } from "@/components/master-layout/button/base-icon-btn";
 
 interface PropsIcon {
   className?: string;

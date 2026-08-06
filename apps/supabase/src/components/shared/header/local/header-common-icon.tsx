@@ -2,7 +2,7 @@
 
 import { BackButton } from "@/components/master-layout/button/back-button";
 import { BaseText } from "@/components/master-layout/base-text";
-import DropdownMenuComponent from "../../dropdownMenu/dropdown-menu";
+import DropdownMenuComponent from "@/components/shared/dropdownMenu/dropdown-menu";
 
 interface HeaderSectionCommonProps {
   text: string;

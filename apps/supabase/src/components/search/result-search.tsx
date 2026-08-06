@@ -1,7 +1,7 @@
 "use client";
-import { BaseIconBTN } from "../master-layout";
-import { FeedList } from "../feeds/feed-list";
-import { BaseText } from "../master-layout/base-text";
+import { BaseIconBTN } from "@/components/master-layout";
+import { FeedList } from "@/components/feeds/feed-list";
+import { BaseText } from "@/components/master-layout/base-text";
 import { ScrollArea, cn } from "@suzu/ui";
 
 const ResultSearch = ({

@@ -1,6 +1,6 @@
 "use client"
 import { NavItem } from "@/components/shared/navbar/nav-item";
-import { FeedCreateButton } from "../feed-create-button";;
+import { FeedCreateButton } from "@/components/shared/feed-create-button";;
 import { BgdCommonBadges } from "@/components/master-layout/badges/bgd_commonBadges";
 import { usePathname } from "next/navigation";
 import Link from "next/link";

@@ -20,7 +20,7 @@ export const viewport: Viewport = {
 let Toolbar: React.ComponentType = () => null;
 
 if (process.env.NODE_ENV === "development") {
-  Toolbar = dynamic(() => import("../toolbar"));
+  Toolbar = dynamic(() => import("@/app/toolbar"));
 }
 export default function RootLayout({
   children,

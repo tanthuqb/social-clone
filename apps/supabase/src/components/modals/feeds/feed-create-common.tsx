@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { BaseIconBTN } from "@/components/master-layout";
 import { BaseText } from "@/components/master-layout/base-text";
-import { useMediaQuery } from "node_modules/@suzu/ui/src/components/hooks";
+import { useMediaQuery } from "@suzu/ui/hooks";
 
 const FeedCreateCommon = memo(
   ({

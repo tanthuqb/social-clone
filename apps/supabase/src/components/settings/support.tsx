@@ -2,7 +2,7 @@
 
 import { CommonButton, Textarea, cn, toast } from "@suzu/ui";
 import { useContext, useState } from "react";
-import { ModalContext } from "../modals/provider";
+import { ModalContext } from "@/components/modals/provider";
 import { createClient } from "@/lib/supabase/client";
 
 function Support() {

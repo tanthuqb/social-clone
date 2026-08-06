@@ -5,13 +5,13 @@ import { BaseIconBTN } from "@/components/master-layout";
 import { SetStateAction, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
-import { FeedCreateButton } from "../feed-create-button";
+import { FeedCreateButton } from "@/components/shared/feed-create-button";
 import { BgdCommonBadges } from "@/components/master-layout/badges/bgd_commonBadges";
-import DropdownMenuComponent from "../dropdownMenu/dropdown-menu";
+import DropdownMenuComponent from "@/components/shared/dropdownMenu/dropdown-menu";
 import { DrawerSearch } from "@/components/search/drawer-search";
 import { DrawerNoti } from "@/components/notifications/drawer-noti";
 import { cn } from "@suzu/ui";
-import { useMediaQuery } from "node_modules/@suzu/ui/src/components/hooks";
+import { useMediaQuery } from "@suzu/ui/hooks";
 import { effect } from "zod";
 
 interface DrawerSearchProps {

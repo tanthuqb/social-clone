@@ -2,7 +2,7 @@
 
 import { Button, toast } from "@suzu/ui";
 import { useContext, useTransition } from "react";
-import { ModalContext } from "../provider";
+import { ModalContext } from "@/components/modals/provider";
 import { deleteFeedAction } from "@/lib/actions/feed/actions";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";

@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { BaseText } from "../master-layout/base-text";
+import { BaseText } from "@/components/master-layout/base-text";
 import { ListNotifications } from "./list-notifications";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import React from "react";

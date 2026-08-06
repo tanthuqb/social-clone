@@ -3,7 +3,7 @@
 import { BaseIconBTN } from "@/components/master-layout";
 import { BaseText } from "@/components/master-layout/base-text";
 import { memo, useContext } from "react";
-import { ModalContext } from "../../provider";
+import { ModalContext } from "@/components/modals/provider";
 import { useRouter } from "next/navigation";
 import { useCountCharacters } from "@/components/tiptap/providers/count-character-provider";
 

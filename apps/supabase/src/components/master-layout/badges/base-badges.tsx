@@ -1,5 +1,5 @@
 import { cn } from "@suzu/ui";
-import { BaseText } from "../base-text";
+import { BaseText } from "@/components/master-layout/base-text";
 
 
 interface BaseBadgesProps {

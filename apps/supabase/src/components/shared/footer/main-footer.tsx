@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import {NavbarMobile} from "../navbar/navmobile";
+import {NavbarMobile} from "@/components/shared/navbar/navmobile";
 
 export default async function  MainFooter() {
   const supabase = await createClient();

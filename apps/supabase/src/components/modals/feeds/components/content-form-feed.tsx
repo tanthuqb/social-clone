@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import { HeaderModal } from "./header-modal";
-// import { ModalContext } from "../../provider";
+// import { ModalContext } from "@/components/modals/provider";
 import { Avatar } from "@/components/shared/avatar";
 import { BaseIconBTN } from "@/components/master-layout";
 import { FooterModal } from "./footer-modal";
@@ -24,10 +24,10 @@ import {
   ScrollArea,
   toast,
 } from "@suzu/ui";
-import { useMediaQuery } from "node_modules/@suzu/ui/src/components/hooks";
+import { useMediaQuery } from "@suzu/ui/hooks";
 import { BaseText } from "@/components/master-layout/base-text";
 import { useParams, useRouter } from "next/navigation";
-import { ModalContext } from "../../provider";
+import { ModalContext } from "@/components/modals/provider";
 import { createClient } from "@/lib/supabase/client";
 import {
   createFeedImageAction,

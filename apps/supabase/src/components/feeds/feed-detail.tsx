@@ -1,9 +1,9 @@
 "use client";
 import { Divider } from "@suzu/ui";
 import { InteractiveWidget } from "./components";
-import CommentForm from "../comments/comment-form";
+import CommentForm from "@/components/comments/comment-form";
 
-import { ContentCard, FooterCard, HeaderCard } from "../master-layout";
+import { ContentCard, FooterCard, HeaderCard } from "@/components/master-layout";
 
 type FeedDetailProps = {
   className?: string;

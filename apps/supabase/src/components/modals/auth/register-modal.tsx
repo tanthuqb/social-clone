@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import RegisterForm from "@/components/modals/auth/register-form";
-import { ModalContext } from "../provider";
+import { ModalContext } from "@/components/modals/provider";
 import { BaseCommonBTN } from "@/components/master-layout";
 
 function RegisterModal({

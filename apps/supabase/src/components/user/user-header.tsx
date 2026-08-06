@@ -1,10 +1,10 @@
-import { Avatar } from "../shared/avatar";
+import { Avatar } from "@/components/shared/avatar";
 import {
   getUserFollowById,
   getUserFollowingCountPrepared,
   getUserFollowsCountPrepared,
 } from "@/lib/api/userFollows/queries";
-import { FollowButton } from "../userFollows/follow-btn";
+import { FollowButton } from "@/components/userFollows/follow-btn";
 import { createClient } from "@/lib/supabase/server";
 
 export const UserHeader = async ({

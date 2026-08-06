@@ -1,8 +1,8 @@
 "use client";
 
 import { BaseText } from "@/components/master-layout/base-text";
-import DropdownMenuComponent from "../../dropdownMenu/dropdown-menu";
-import { useMediaQuery } from "node_modules/@suzu/ui/src/components/hooks";
+import DropdownMenuComponent from "@/components/shared/dropdownMenu/dropdown-menu";
+import { useMediaQuery } from "@suzu/ui/hooks";
 import { BaseIconBTN } from "@/components/master-layout";
 import { BackButton } from "@/components/master-layout/button/back-button";
 import { cn } from "@suzu/ui";

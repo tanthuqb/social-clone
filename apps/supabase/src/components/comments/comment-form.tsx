@@ -6,15 +6,15 @@ import React, { memo, useContext, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRealtimeTable } from "@/hooks/useRealtimeTable";
 import { useRouter } from "next/navigation";
-import FeedCreateCommon from "../modals/feeds/feed-create-common";
+import FeedCreateCommon from "@/components/modals/feeds/feed-create-common";
 import {
   BaseCommonBTN,
   BaseIconBTN,
   ContentCard,
   FooterCard,
   HeaderCard,
-} from "../master-layout";
-import { BaseText } from "../master-layout/base-text";
+} from "@/components/master-layout";
+import { BaseText } from "@/components/master-layout/base-text";
 
 function CommentForm({
   feed,

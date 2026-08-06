@@ -1,5 +1,5 @@
 import { timeAgo } from "@suzu/ui";
-import { BaseText } from "../base-text";
+import { BaseText } from "@/components/master-layout/base-text";
 
 interface BaseUserInfoProps {
   displayName?: string;

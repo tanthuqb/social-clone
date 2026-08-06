@@ -4,8 +4,8 @@ import { useContext } from "react";
 import { cn } from "@suzu/ui";
 import { ModalContext } from "@/components/modals/provider";
 import { createClient } from "@/lib/supabase/client";
-import { BaseIconBTN } from "../master-layout";
-import { useMediaQuery } from "node_modules/@suzu/ui/src/components/hooks";
+import { BaseIconBTN } from "@/components/master-layout";
+import { useMediaQuery } from "@suzu/ui/hooks";
 
 const FeedCreateButton = ({
   className,

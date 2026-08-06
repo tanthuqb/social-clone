@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import LoginForm from "@/components/modals/auth/login-form";
-import { ModalContext } from "../provider";
+import { ModalContext } from "@/components/modals/provider";
 import { BaseCommonBTN, BaseIconBTN } from "@/components/master-layout";
 
 import { BaseText } from "@/components/master-layout/base-text";

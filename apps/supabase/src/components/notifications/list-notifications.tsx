@@ -11,8 +11,8 @@ import { NotiDetail } from "./noti-detail";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useRealtimeTable } from "@/hooks/useRealtimeTable";
-import { BaseText } from "../master-layout/base-text";
-import { BaseIconBTN } from "../master-layout";
+import { BaseText } from "@/components/master-layout/base-text";
+import { BaseIconBTN } from "@/components/master-layout";
 import { NotificationAction } from "@/modules/notifications/notifications.action";
 
 type UserNotiProps = {

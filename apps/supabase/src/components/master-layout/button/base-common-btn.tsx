@@ -1,6 +1,6 @@
 "use client";
 
-import { BaseText } from "../base-text";
+import { BaseText } from "@/components/master-layout/base-text";
 import { BaseIconBTN } from "./base-icon-btn";
 interface PropsBTN {
   className?: string;

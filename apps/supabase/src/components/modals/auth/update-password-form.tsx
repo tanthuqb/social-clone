@@ -14,7 +14,7 @@ import {
   toast,
 } from "@suzu/ui";
 import { useContext } from "react";
-import { ModalContext } from "../provider";
+import { ModalContext } from "@/components/modals/provider";
 import { createClient } from "@/lib/supabase/client";
 import { redirect } from "next/navigation";
 const formSchema = z

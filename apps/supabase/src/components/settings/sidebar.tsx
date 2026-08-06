@@ -2,9 +2,9 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { usePathname } from "next/navigation";
-import { BaseCommonBTN } from "../master-layout";
+import { BaseCommonBTN } from "@/components/master-layout";
 import Link from "next/link";
-import { BaseText } from "../master-layout/base-text";
+import { BaseText } from "@/components/master-layout/base-text";
 
 function SidebarSetings() {
   const supabase = createClient();

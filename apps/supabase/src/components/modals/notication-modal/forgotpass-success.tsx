@@ -7,7 +7,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { ModalContext } from "../provider";
+import { ModalContext } from "@/components/modals/provider";
 import { BaseCommonBTN } from "@/components/master-layout";
 
 function ForgotPassSuccess({

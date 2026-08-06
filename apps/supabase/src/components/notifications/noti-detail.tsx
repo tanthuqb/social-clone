@@ -1,15 +1,15 @@
 "use client";
 import { Divider, toast } from "@suzu/ui";
-import DropdownMenuComponent from "../shared/dropdownMenu/dropdown-menu";
-import { FollowButton } from "../userFollows/follow-btn";
+import DropdownMenuComponent from "@/components/shared/dropdownMenu/dropdown-menu";
+import { FollowButton } from "@/components/userFollows/follow-btn";
 import Link from "next/link";
 import { ReactionState } from "@/lib/supabase/database.types";
-import { BaseUserInfo } from "../master-layout";
+import { BaseUserInfo } from "@/components/master-layout";
 import { createClient } from "@/lib/supabase/client";
 import { markNotificationReadAction } from "@/lib/actions/notifications/actions";
 import { Suspense, useEffect, useState } from "react";
-import { Avatar } from "../shared/avatar";
-import { BaseText } from "../master-layout/base-text";
+import { Avatar } from "@/components/shared/avatar";
+import { BaseText } from "@/components/master-layout/base-text";
 import { redirect, useRouter } from "next/navigation";
 type NotiDetailProps = {
   notification?: Notifications_Detail;
