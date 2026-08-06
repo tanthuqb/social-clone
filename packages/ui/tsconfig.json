@@ -2,10 +2,11 @@
   "extends": "@suzu/typescript-config/react-library.json",
   "compilerOptions": {
     // "outDir": "dist",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
     "paths": {
       "@/*": ["./src/*"]
     },
-    "baseUrl": "./"
   },
   "include": [
     ".",
