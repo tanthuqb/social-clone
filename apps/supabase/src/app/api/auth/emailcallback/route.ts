@@ -1,18 +1,7 @@
-import { createClient } from '@/lib/supabase/server';
-import { type NextRequest, NextResponse } from 'next/server'
-export async function GET(request: NextRequest) {
+import { type NextRequest } from "next/server";
+import { handleAuthCallback } from "@/lib/auth/callback";
 
-  const { searchParams, origin } = new URL(request.url)
-  const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/'
-  if(code) {
-    const supbase = await createClient();
-    const { data,error } = await supbase.auth.exchangeCodeForSession(code)
-    
-    if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
-        // return NextResponse.jsom{message:data}
-    }
-  }
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+// Email confirmation link target.
+export async function GET(request: NextRequest) {
+  return handleAuthCallback(request, { setUsername: true });
 }

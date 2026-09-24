@@ -1,15 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createFeed, deleteFeed, updateFeed } from "@/lib/api/feeds/mutations";
-import {
-    FeedId,
-    NewFeedParams,
-    UpdateFeedParams,
-    feedIdSchema,
-    insertFeedParams,
-    updateFeedParams,
-} from "@/lib/db/schema/feeds";
 import { createClient } from "@/lib/supabase/server";
 
 const handleErrors = (e: unknown) => {
@@ -22,20 +13,44 @@ const handleErrors = (e: unknown) => {
     return errMsg;
 };
 
-const revalidateFeeds = () => revalidatePath("/");
+// Saved posts are listed on the owner's profile page.
+const revalidateFeeds = () => revalidatePath("/", "layout");
 
 export const saveFeedAction = async (feedId: string) => {
     const supabase = await createClient();
     const { data: session } = await supabase.auth.getUser();
     if (!session?.user) return { data: null, error: "Not authenticated" };
 
-    const { error } = await supabase
+    // Idempotent: saving an already-saved post is a no-op (no duplicates).
+    const { data: existing, error: lookupError } = await supabase
         .from("feed_collections")
-        .insert({ user_id: session.user.id, feed_id: feedId });
-    if (error) return { data: null, error: error.message };
+        .select("id")
+        .eq("user_id", session.user.id)
+        .eq("feed_id", feedId)
+        .limit(1);
+    if (lookupError) return { data: null, error: lookupError.message };
+    if (!existing || existing.length === 0) {
+        const { error } = await supabase
+            .from("feed_collections")
+            .insert({ user_id: session.user.id, feed_id: feedId });
+        if (error) return { data: null, error: error.message };
+    }
 
     revalidateFeeds();
     return { data: null, error: null };
+};
+
+export const isFeedSavedAction = async (feedId: string) => {
+    const supabase = await createClient();
+    const { data: session } = await supabase.auth.getUser();
+    if (!session?.user) return false;
+    const { data } = await supabase
+        .from("feed_collections")
+        .select("id")
+        .eq("user_id", session.user.id)
+        .eq("feed_id", feedId)
+        .limit(1);
+    return (data?.length ?? 0) > 0;
 };
 
 export const unsaveFeedAction = async (feedId: string) => {

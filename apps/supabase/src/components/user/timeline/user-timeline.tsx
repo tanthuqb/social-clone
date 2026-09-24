@@ -15,18 +15,23 @@ export const UserTimeline = async ({
   session?: Session;
 }) => {
   const supabase = await createClient();
-  const { data: feed_collections, error } = await supabase
-    .from("feed_collections")
-    .select("*, feed_id!left(*,feed_images(*),user_id!left(*))")
-    .eq("user_id", session?.user?.id as string)
-    .order("created_at", { ascending: false })
-    .limit(5);
+  const viewerId = session?.user?.id;
+  const isOwnProfile = !!viewerId && viewerId === user?.id;
+  // Saved posts are private: only load them on the viewer's own profile.
+  const { data: feed_collections } = isOwnProfile
+    ? await supabase
+        .from("feed_collections")
+        .select("*, feed_id!left(*,feed_images(*),user_id!left(*))")
+        .eq("user_id", viewerId)
+        .order("created_at", { ascending: false })
+        .limit(5)
+    : { data: null };
   return (
     <div className="flex flex-grow flex-col">
-      {session && session?.user?.id !== user?.id ? (
+      {!isOwnProfile ? (
         <div className="px-0 py-4 sm:p-4">
           {/* <div className="flex justify-center border-b-[1px] border-b-slate-900">
-            <div className="px-4 py-2 font-semibold text-slate-900">Bài đăng</div>
+            <div className="px-4 py-2 font-semibold text-slate-900">Posts</div>
           </div> */}
           {(feeds?.length ?? 0) > 0 ? (
             <FeedList
@@ -43,7 +48,7 @@ export const UserTimeline = async ({
                 <EmptyIcon type="feeds" />
               </div>
               <div className="text-center text-[15px] font-normal leading-6 text-slate-500">
-                Chưa có bài đăng
+                No posts yet
               </div>
             </div>
           )}
@@ -78,7 +83,7 @@ export const UserTimeline = async ({
                     <EmptyIcon type="feeds" />
                   </div>
                   <div className="text-center text-[15px] font-normal leading-6 text-slate-500">
-                    Chưa có bài đăng
+                    No posts yet
                   </div>
                 </div>
               )}
@@ -98,7 +103,7 @@ export const UserTimeline = async ({
                     <EmptyIcon type="bookmarks" />
                   </div>
                   <div className="text-center text-[15px] font-normal leading-6 text-slate-500">
-                    Chưa có bài viết lưu trữ
+                    No saved posts yet
                   </div>
                 </div>
               )}

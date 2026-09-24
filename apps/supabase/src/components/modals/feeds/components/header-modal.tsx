@@ -39,13 +39,13 @@ const HeaderModal = memo(({
 
   const getTitle = type
     ? editing === true && parentFeedId === undefined
-      ? "Chỉnh sửa thảo luận"
+      ? "Edit comment"
       : parentFeedId === undefined && editing === false
-        ? "Bình luận bài viết"
-        : "Trả lời bình luận"
+        ? "Comment on post"
+        : "Reply to comment"
     : editing
-      ? "Chỉnh sửa bài viết"
-      : "Bài viết mới";
+      ? "Edit post"
+      : "Create post";
   return (
     <div className="flex w-full flex-shrink-0 items-center justify-between gap-2">
       <BaseIconBTN

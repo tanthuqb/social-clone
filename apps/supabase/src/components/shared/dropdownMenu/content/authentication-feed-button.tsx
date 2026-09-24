@@ -26,7 +26,7 @@ const AuthenticationFeedButton = ({ className }: { className?: string }) => {
                     className,
                 )}
             >
-                Lưu bài viết
+                Save post
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -39,7 +39,7 @@ const AuthenticationFeedButton = ({ className }: { className?: string }) => {
                     className,
                 )}
             >
-                Ẩn bài viết
+                Hide post
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -52,7 +52,7 @@ const AuthenticationFeedButton = ({ className }: { className?: string }) => {
                     className,
                 )}
             >
-                <span className="text-red-500 hover:text-red-500">Chặn</span>
+                <span className="text-red-500 hover:text-red-500">Block</span>
 
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -66,7 +66,7 @@ const AuthenticationFeedButton = ({ className }: { className?: string }) => {
                     className,
                 )}
             >
-                <span className="text-red-500 hover:text-red-500">Báo cáo</span>
+                <span className="text-red-500 hover:text-red-500">Report</span>
             </DropdownMenuItem>
         </>
     );

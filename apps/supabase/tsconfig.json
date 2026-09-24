@@ -1,7 +1,11 @@
 {
   "extends": "@suzu/typescript-config/base.json",
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,22 +23,23 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
-    "target": "esnext",
-    "typeRoots": ["./src/types", "./src/lib/supabase/database.types.ts"]
+    "target": "esnext"
   },
   "include": [
     "next-env.d.ts",
-    "./src/types/**/*.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "**/*.mts",
     ".next/types/**/*.ts",
-    "next.config.mjs",
-    "src/app/(app)/(inside)/settings/language",
-    "src/app/(app)/(inside)/settings/supportettings/support",
-    "../../packages/ui/src/components/ui/base-badges.tsx",
-    "../../packages/ui/src/components/ui/bgd_commonBadges.tsx"
+    ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "playwright-report",
+    "test-results"
+  ]
 }

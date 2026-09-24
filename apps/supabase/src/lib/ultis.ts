@@ -4,8 +4,8 @@ import { redirect } from "next/navigation";
 import { customAlphabet } from "nanoid";
 import customSlugify from "slugify";
 export const nanoid = customAlphabet("abcdefghijklmnopqrstuvwxyz0123456789");
-const isProduction = process.env.NODE_ENV === 'production';
-const url = isProduction ? 'https://dev.suzu.net' : 'http://localhost:3000';
+import { getSiteUrl } from "@/lib/site-url";
+const url = getSiteUrl();
 
 
 export function constructMetadata({
@@ -77,7 +77,7 @@ export const slugify = (
   };
 
   const defaultExtend = {
-    đ: "d",
+    "\u0111": "d",
   };
 
   customSlugify.extend({ ...defaultExtend, ...args });

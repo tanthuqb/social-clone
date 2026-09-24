@@ -22,17 +22,17 @@ const formSchema = z
     password: z
       .string()
       .min(8, {
-        message: "Mật khẩu cần có độ dài tối thiểu ít nhất 8 ký tự.",
+        message: "Password must be at least 8 characters long.",
       })
-      .regex(/[a-z]/, { message: "Mật khẩu phải có chữ cái viết thường" })
-      .regex(/[A-Z]/, { message: "Mật khẩu phải có ít nhất một chữ in hoa" })
+      .regex(/[a-z]/, { message: "Password must contain a lowercase letter" })
+      .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
       .regex(/[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, {
-        message: "Mật khẩu phải có ít nhất một số hoặc ký tự đặc biệt",
+        message: "Password must contain at least one number or special character",
       }),
     passwordConfirm: z.string(),
   })
   .refine((data) => data.password === data.passwordConfirm, {
-    message: "Mật khẩu không đồng bộ",
+    message: "Passwords do not match",
     path: ["passwordConfirm"],
   });
 
@@ -54,7 +54,7 @@ export default function UpdatePasswordForm() {
           if (error) {
             toast.error(error.message);
           } else {
-            toast.success("Tạo mật khẩu thành công");
+            toast.success("Password created successfully");
             redirect("/");
           }
           
@@ -64,10 +64,10 @@ export default function UpdatePasswordForm() {
       <div className="p-4 pb-2.5 md:p-[32px_16px_0px_16px]">
         <div className="mx-auto flex max-w-[358px] flex-col gap-5">
           <div className="text-[23px] font-semibold leading-7 text-slate-700">
-            Tạo mật khẩu mới!
+            Create a new password!
           </div>
           <p>
-            Điền mật khẩu mới bạn muốn tạo bên dưới.Và đừng quên nữa nhé 😉!
+            Enter the new password you want below. And don't forget it again 😉!
           </p>
           <Form {...form}>
             <form
@@ -82,7 +82,7 @@ export default function UpdatePasswordForm() {
                     <FormControl>
                       <Input
                         className="border-0 ring-1 ring-neutral-100"
-                        placeholder="Nhập mật khẩu"
+                        placeholder="Enter password"
                         type="password"
                         {...field}
                       />
@@ -100,7 +100,7 @@ export default function UpdatePasswordForm() {
                     <FormControl>
                       <Input
                         className="border-0 ring-1 ring-neutral-100"
-                        placeholder="Nhập lại mật khẩu"
+                        placeholder="Confirm password"
                         type="password"
                         {...field}
                       />
@@ -130,7 +130,7 @@ export default function UpdatePasswordForm() {
                   <div
                     className={`flex-1 ${form.getValues("passwordConfirm") && form.getValues("password") ? "text-white" : "text-slate-500"} text-center text-[15px] font-semibold leading-6`}
                   >
-                    Tạo mật khẩu
+                    Create password
                   </div>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -147,12 +147,12 @@ export default function UpdatePasswordForm() {
       </div>
       <Divider className="my-5 bg-black/10" />
       <div className="flex justify-center gap-2 pb-4 md:pb-[24px]">
-        <span>Bạn đã có tài khoản 🙄?</span>
+        <span>Already have an account 🙄?</span>
         <strong
           onClick={() => setShowLoginModal(true)}
           className="cursor-pointer"
         >
-          Đăng nhập nào
+          Log in
         </strong>
       </div>
     </>

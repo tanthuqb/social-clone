@@ -22,22 +22,22 @@ import { createClient } from "@/lib/supabase/client";
 const formSchema = z
   .object({
     email: z.string().email({
-      message: "Hãy nhập địa chỉ email chính xác dinh dạng admin@example.com",
+      message: "Please enter a valid email address, e.g. admin@example.com",
     }),
     password: z
       .string()
       .min(8, {
-        message: "Mật khẩu cần có độ dài tối thiểu ít nhất 8 ký tự.",
+        message: "Password must be at least 8 characters long.",
       })
-      .regex(/[a-z]/, { message: "Mật khẩu phải có chữ cái viết thường" })
-      .regex(/[A-Z]/, { message: "Mật khẩu phải có ít nhất một chữ in hoa" })
+      .regex(/[a-z]/, { message: "Password must contain a lowercase letter" })
+      .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
       .regex(/[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, {
-        message: "Mật khẩu phải có ít nhất một số hoặc ký tự đặc biệt",
+        message: "Password must contain at least one number or special character",
       }),
     passwordConfirm: z.string(),
   })
   .refine((data) => data.password === data.passwordConfirm, {
-    message: "Mật khẩu không đồng bộ",
+    message: "Passwords do not match",
     path: ["passwordConfirm"],
   });
 
@@ -60,7 +60,7 @@ export default function RegisterFormAction() {
       email: dataForm.email,
       password: dataForm.password,
       options: {
-        emailRedirectTo: `${location.origin}`,
+        emailRedirectTo: `${location.origin}/api/auth/emailcallback`,
       },
     });
     if (!error) {
@@ -78,9 +78,9 @@ export default function RegisterFormAction() {
     const authError = await signUpNewUser(data);
     console.log(authError);
 
-    if (authError) return toast.error("Đăng ký thất bại");
+    if (authError) return toast.error("Sign up failed");
     else {
-      toast.success("Đăng ký thành công");
+      toast.success("Signed up successfully");
       setTimeout(() => {
         setShowUpdateInfoUserModal(true);
         setShowRegisterModal(false);
@@ -100,7 +100,7 @@ export default function RegisterFormAction() {
               <FormItem>
                 <FormControl>
                   <Input
-                    placeholder="Nhập email"
+                    placeholder="Enter email"
                     type="text"
                     {...field}
                     className="border-0 ring-1 ring-neutral-100"
@@ -120,7 +120,7 @@ export default function RegisterFormAction() {
               <FormItem>
                 <FormControl>
                   <Input
-                    placeholder="Nhập mật khẩu"
+                    placeholder="Enter password"
                     type="password"
                     {...field}
                     className="border-0 ring-1 ring-neutral-100"
@@ -140,7 +140,7 @@ export default function RegisterFormAction() {
               <FormItem>
                 <FormControl>
                   <Input
-                    placeholder="Nhập lại mật khẩu"
+                    placeholder="Confirm password"
                     type="password"
                     {...field}
                     className="border-0 ring-1 ring-neutral-100"
@@ -174,7 +174,7 @@ export default function RegisterFormAction() {
             <div
               className={`flex-1 ${form.getValues("email") && form.getValues("password") ? "text-white" : "text-slate-500"} text-center text-[15px] font-semibold leading-6`}
             >
-              SuZu thuiii
+              Sign up
             </div>
             <svg
               xmlns="http://www.w3.org/2000/svg"

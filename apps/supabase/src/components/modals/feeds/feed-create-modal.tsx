@@ -4,6 +4,7 @@ import {
   SetStateAction,
   memo,
   useCallback,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -29,7 +30,7 @@ const FeedCreateModal = memo(function FeedCreateModal({
   parentFeedId?: Feed["id"];
   setParentFeedId?: Dispatch<SetStateAction<Feed["id"]>>;
 }) {
-  // type = true gọi form cho comment ngược lại cho feed
+  // type = true renders the comment form, otherwise the feed form
   return (
     <Modal
       className="!h-auto"
@@ -58,6 +59,12 @@ export function useFeedCreateModal() {
   const [user, setUserProfile] = useState<Profile | null>(null);
   const [parentFeedId, setParentFeedId] = useState<Feed["id"] | undefined>();
   const [session, setSession] = useState<Session | null>(null);
+
+  // Leave edit mode whenever the modal closes, so the next "create" or
+  // "reply" does not silently edit the previously edited post.
+  useEffect(() => {
+    if (!showFeedCreateModal) setFeed(undefined);
+  }, [showFeedCreateModal]);
 
   const FeedCreateModalCallback = useCallback(() => {
     return (

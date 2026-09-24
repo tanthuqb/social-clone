@@ -47,3 +47,9 @@ supabase/.temp/
 
 # TypeScript incremental build info
 *.tsbuildinfo
+
+# Playwright
+**/playwright-report/
+**/test-results/
+**/playwright/.auth/
+**/blob-report/

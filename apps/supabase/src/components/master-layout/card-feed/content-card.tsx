@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { sanitizeContent } from "@/lib/sanitize";
+import { LinkPreview } from "@/components/feeds/components/link-preview";
 import { BaseCommonBTN } from "@/components/master-layout/button/base-common-btn";
 import {
   Carousel,
@@ -22,6 +24,14 @@ interface ContentCardProps {
 const ContentCard = ({ feed, isComment, inFeed }: ContentCardProps) => {
   const divRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  // Defense in depth: content is sanitized on write, and again on render
+  // for rows created before sanitization existed.
+  const safeContent = useMemo(() => sanitizeContent(feed?.content), [feed?.content]);
+  const firstLink = useMemo(() => {
+    if (!safeContent || safeContent.includes("data-youtube-video")) return null;
+    const match = safeContent.match(/<a[^>]+href="(https?:\/\/[^"]+)"/i);
+    return match ? match[1].replace(/&amp;/g, "&") : null;
+  }, [safeContent]);
 
   // Checou overflow is triggered
   function isOverflow() {
@@ -56,13 +66,13 @@ const ContentCard = ({ feed, isComment, inFeed }: ContentCardProps) => {
               ref={divRef}
               id="content-titap"
               className={`${isExpanded || !inFeed ? "line-clamp-none" : "line-clamp-2"} sz-parag-reg whitespace-pre-wrap break-all text-slate-900`}
-              dangerouslySetInnerHTML={{ __html: feed?.content! }}
+              dangerouslySetInnerHTML={{ __html: safeContent }}
             ></div>
             {/* {inFeed && <Link href={`/p/${feed?.id}`} className="inset-0 absolute"></Link>} */}
           </div>
           {isExpanded === false && inFeed && (
             <BaseCommonBTN
-              text="Xem thêm"
+              text="See more"
               onClick={handleClick}
               className="sz-label-m-semi text-neutral-700"
               isButton={true}
@@ -167,9 +177,12 @@ const ContentCard = ({ feed, isComment, inFeed }: ContentCardProps) => {
             )}
           </div>
         )}
-      {/* Type 3 */}
-      {/* Type 4 */}
-      {/* Type 5 */}
+      {/* Link preview for the first link in the post */}
+      {feed?.type === "feed" && firstLink && (
+        <div className={`${isComment ? "mt-[1.5px]" : "mt-2.5"} w-full px-4`}>
+          <LinkPreview url={firstLink} />
+        </div>
+      )}
     </div>
   );
 };

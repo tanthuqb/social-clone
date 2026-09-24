@@ -197,7 +197,7 @@ export const InteractiveWidget = ({
         </div>
       </div>
       {/** list avatar */}
-      {/* Chỗ này chỉ hiển thị 5 mạng giùm em nha anh Lộc ơi, nếu hơn 5 mạng thì cố dấu + */}
+      {/* Only show 5 avatars here; if there are more than 5, show a + sign */}
       {feedReactionUser && feedReactionUser?.length > 0 ? (
         <div className="flex h-10 items-center gap-2 self-stretch px-4">
           {feedReactionUser?.slice(0, 5).map((result, index) => (
@@ -218,7 +218,7 @@ export const InteractiveWidget = ({
               {countLikeState + countDisLikeState <= 5 ? null : (
                 <>
                   <div>{countLikeState + countDisLikeState - 5}</div>
-                  <div>tương tác</div>
+                  <div>reactions</div>
                 </>
               )}
             </div>
@@ -227,7 +227,7 @@ export const InteractiveWidget = ({
       ) : (
         <div className="flex h-10 items-center gap-2 self-stretch px-4">
           <BaseText
-            text={"Hãy là người tương tác bài viết đầu tiên..."}
+            text={"Be the first to react to this post..."}
             textColor="neutral-500"
             className="sz-label-m-reg"
           />

@@ -19,24 +19,24 @@ function ChangePassword({ session }: { session: Session }) {
     confirmPassword: string,
   ) => {
     if (currentPassword == "" || newPassword == "" || confirmPassword == "") {
-      toast.error("vui lòng nhập đầy đủ thông tin");
+      toast.error("Please fill in all fields");
     } else if (newPassword != confirmPassword) {
-      toast.error("Mật khẩu không trùng khớp");
+      toast.error("Passwords do not match");
     } else {
       const { error } = await supabase.auth.signInWithPassword({
         email: session?.user?.email as string,
         password: currentPassword as string,
       });
       if (error) {
-        toast.error("mật khẩu hiện tại không đúng");
+        toast.error("Current password is incorrect");
       } else {
         const { data, error: passwordError } = await supabase.auth.updateUser({
           password: newPassword,
         });
         if (passwordError) {
-          toast.error("mật khẩu mới phải khác mật khẩu hiện tại");
+          toast.error("New password must be different from the current password");
         } else {
-          toast.success("Thay đổi mật khẩu thành công");
+          toast.success("Password changed successfully");
           redirect(`/`);
         }
       }
@@ -51,8 +51,8 @@ function ChangePassword({ session }: { session: Session }) {
       },
     );
     if (error) {
-      toast.error("Tài khoản không tồn tại");
-    } else toast.message("Đã gửi email xác nhận thay đổi mật khẩu");
+      toast.error("Account does not exist");
+    } else toast.message("Password change confirmation email sent");
   };
   return (
     <div className="h-full max-h-full overflow-y-auto">
@@ -60,14 +60,14 @@ function ChangePassword({ session }: { session: Session }) {
         <div className="flex flex-col gap-2 px-4">
           <div className="gap-0.5 self-stretch">
             <div className="py-1 text-[15px] font-semibold text-[#334155]">
-              Mật khẩu hiện tại
+              Current password
             </div>
             <Input
               className="w-full items-center gap-2 rounded-md border border-[#1F1F1F]/10 bg-white p-2 placeholder:text-neutral-500"
               type="password"
               name="password"
               required
-              placeholder="Nhập mật khẩu hiện tại"
+              placeholder="Enter current password"
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setCurrentPassword(e?.target?.value.replace(/\s/g, ""))
               }
@@ -76,7 +76,7 @@ function ChangePassword({ session }: { session: Session }) {
               className="py-4 text-[15px] font-semibold text-slate-900"
               onClick={async () => handleResetPassword()}
             >
-              Quên mật khẩu
+              Forgot password
             </button>
           </div>
           <div className="flex max-w-xl items-start gap-1 self-stretch">
@@ -85,27 +85,27 @@ function ChangePassword({ session }: { session: Session }) {
 
           <div className="self-stretch">
             <div className="py-1 text-[15px] font-semibold text-[#334155]">
-              Mật khẩu mới
+              New password
             </div>
             <Input
               className="w-full items-center gap-2 rounded-md border border-[#1F1F1F]/10 bg-white p-2 placeholder:text-neutral-500"
               type="password"
               name="password"
               required
-              placeholder="Thay đổi mật khẩu"
+              placeholder="Enter new password"
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setNewPassword(e?.target?.value.replace(/\s/g, ""))
               }
             />
             <div className="mt-5 py-1 text-[15px] font-semibold text-[#334155]">
-              Nhập lại mật khẩu mới
+              Confirm new password
             </div>
             <Input
               className="w-full items-center gap-2 rounded-md border border-[#1F1F1F]/10 bg-white p-2 placeholder:text-neutral-500"
               type="password"
               name="password"
               required
-              placeholder="Thay đổi mật khẩu"
+              placeholder="Enter new password"
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setConfirmPassword(e?.target?.value.replace(/\s/g, ""))
               }
@@ -121,7 +121,7 @@ function ChangePassword({ session }: { session: Session }) {
             className="btn btn-default block w-full md:inline-block md:w-auto"
             disabled={!true}
           >
-            Cập nhật thông tin
+            Save
           </button>
         </div>
       </div>

@@ -41,14 +41,14 @@ function FeedPin({
         if (errorFeed_pin) {
           toast.error(errorFeed_pin);
         } else {
-          toast("Ghim bài viết thành công", {
+          toast("Post pinned successfully", {
             icon: <CheckIcon />,
             duration: 5000,
           });
           window.location.reload();
         }
       } else {
-        toast("Bỏ ghim bài viết thành công!", {
+        toast("Post unpinned successfully!", {
           icon: <CheckIcon />,
           duration: 5000,
         });
@@ -60,7 +60,7 @@ function FeedPin({
       onClick={handlePin}
       className="cursor-pointer text-[15px] text-[#0F172A]"
     >
-      {feed?.pin ? "Bỏ ghim bài viết" : "Ghim bài viết"}
+      {feed?.pin ? "Unpin post" : "Pin post"}
     </DropdownMenuItem>
   );
 }

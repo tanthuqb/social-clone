@@ -1,20 +1,27 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
+import { useEffect } from "react";
+import {
+  ErrorScreen,
+  GENERIC_ERROR_MESSAGE,
+} from "@/components/shared/error-screen";
 
 export default function Error({
   error,
+  reset,
 }: {
-  error: string
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
   useEffect(() => {
-    console.error(error)
-  }, [error])
+    console.error(error);
+  }, [error]);
 
   return (
-    <div>
-      <h2>{error}</h2>
-
-    </div>
-  )
+    <ErrorScreen
+      title="Something went wrong"
+      message={GENERIC_ERROR_MESSAGE}
+      onRetry={reset}
+    />
+  );
 }

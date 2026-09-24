@@ -24,10 +24,10 @@ export default async function HomePage() {
 
   return (
     <main className="py-0 sm:py-2">
-      {/* TODO - Làm phase sau */}
-      {/* <FeedHeaderSection inFeed={true} text={"Dành cho bạn"} /> */}
+      {/* TODO - Do in a later phase */}
+      {/* <FeedHeaderSection inFeed={true} text={"For you"} /> */}
       <HeaderSectionCommon
-        text={"Dành cho bạn"}
+        text={"For you"}
         session={session}
         user={user!}
       />

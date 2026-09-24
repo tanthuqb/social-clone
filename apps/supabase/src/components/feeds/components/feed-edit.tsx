@@ -40,7 +40,7 @@ function FeedEdit({
       onClick={handleEditFeed}
       className="cursor-pointer text-[15px] text-[#0F172A]"
     >
-      Chỉnh sửa bài viết
+      Edit post
     </DropdownMenuItem>
   );
 }

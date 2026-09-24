@@ -11,7 +11,7 @@ export default function SignOutBtn() {
       onClick={SignOut}
     >
       {/* <LogoutIcon className="w-4 h-4 mr-2" /> */}
-      Đăng xuất
+      Log out
     </button>
   );
 }

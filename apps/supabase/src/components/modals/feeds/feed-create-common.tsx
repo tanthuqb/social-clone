@@ -63,6 +63,7 @@ const FeedCreateCommon = memo(
       <div
         className={`flex cursor-pointer flex-col bg-white p-4 ${checkPathName ? "border-b-trans-black-10 border-b" : "mb-2 shadow sm:rounded-xl"}`}
         onClick={handleCreateFeed}
+        data-testid="composer-trigger"
       >
         <div className="flex items-center gap-2">
           <Avatar user={user!} session={session} />
@@ -71,8 +72,8 @@ const FeedCreateCommon = memo(
               className="sz-parag-reg line-clamp-1"
               text={
                 checkPathName
-                  ? "Viết bình luận bây giờ"
-                  : "Chia sẻ cảm nghĩ của bạn ngay bây giờ..."
+                  ? "Write a comment now"
+                  : "Share what's on your mind..."
               }
               textColor="slate-500"
             />
@@ -86,7 +87,7 @@ const FeedCreateCommon = memo(
           <div className="rounded-full border border-neutral-300 bg-white px-4 py-2">
             <BaseText
               className="sz-label-m-semi"
-              text={`${checkPathName ? "Bình luận" : "Đăng"}`}
+              text={`${checkPathName ? "Comment" : "Post"}`}
               textColor="neutral-900"
             />
           </div>

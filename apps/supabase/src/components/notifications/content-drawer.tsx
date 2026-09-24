@@ -21,7 +21,7 @@ const ContentDrawer = React.forwardRef<HTMLDivElement, ContentDrawerProps>(({ us
         <div className="flex justify-center h-10">
           <div className="flex flex-col items-start justify-center gap-2.5">
             <BaseText
-              text={"Thông báo"}
+              text={"Notifications"}
               textColor="neutral-700"
               className="sz-text-h5-semi"
             />

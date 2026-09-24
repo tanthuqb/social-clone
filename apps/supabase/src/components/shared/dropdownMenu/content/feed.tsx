@@ -20,17 +20,17 @@ function Feed({
   userFeed?: string;
   session?: Session;
 }) {
-  return user !== null ? (
+  return session?.user ? (
     <>
-      {/* Nếu là author của Feed */}
+      {/* If the user is the feed author */}
       {session?.user?.id === userFeed ? (
         <>
           <FeedEdit user={user} feed={feed} />
           <DropdownMenuSeparator />
-          {/* lưu bài viết */}
+          {/* save post */}
           <FeedSave feed={feed} />
           <DropdownMenuSeparator />
-          {/* ghim bài viết */}
+          {/* pin post */}
           <FeedPin userId={user?.id!} feed={feed} />
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -39,14 +39,14 @@ function Feed({
               className,
             )}
           >
-            Ẩn bài viết
+            Hide post
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <FeedDelete feed={feed} />
         </>
       ) : (
         <>
-          {/* Nếu là guest */}
+          {/* If the user is a guest */}
           <FeedSave feed={feed} />
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -55,7 +55,7 @@ function Feed({
               className,
             )}
           >
-            Ẩn bài viết
+            Hide post
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -64,7 +64,7 @@ function Feed({
               className,
             )}
           >
-            <span className="text-red-500 hover:text-red-500">Chặn</span>
+            <span className="text-red-500 hover:text-red-500">Block</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -73,7 +73,7 @@ function Feed({
               className,
             )}
           >
-            <span className="text-red-500 hover:text-red-500">Báo cáo</span>
+            <span className="text-red-500 hover:text-red-500">Report</span>
           </DropdownMenuItem>
         </>
       )}

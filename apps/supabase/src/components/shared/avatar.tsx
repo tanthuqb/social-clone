@@ -35,7 +35,7 @@ const Avatar = ({
   type?: string;
 }) => {
   const pathname = usePathname();
-  const isUserPathname = pathname === `/u/${user?.full_name}`;
+  const isUserPathname = pathname === `/u/${user?.full_name ?? user?.id}`;
   const [followingUser, setFollowingUser] = useState<UserFollows | null>(null);
   const [following, setFollowing] = useState<number>(0);
   const [follower, setFollower] = useState<number>(0);
@@ -77,11 +77,11 @@ const Avatar = ({
         const { error } = await followAction(user?.id);
         if (error) {
           console.log(error);
-          toast.error("Theo dõi thất bại");
+          toast.error("Failed to follow");
         } else {
           setShowPlus(false);
           setFollowingState(true);
-          toast.success("Theo dõi thành công");
+          toast.success("Followed successfully");
         }
       }
     }
@@ -113,7 +113,7 @@ const Avatar = ({
     <AvatarComponent className={className}>
       <Link
         className="flex items-center space-x-2"
-        href={`/u/${user?.full_name}`}
+        href={`/u/${user?.full_name ?? user?.id}`}
       >
         <AvatarImage src={user?.avatar_url ?? ""} />
       </Link>
@@ -128,7 +128,7 @@ const Avatar = ({
       <div className="avatar relative flex h-10 w-10 flex-col self-stretch">
         <Link
           className="flex items-center space-x-2"
-          href={`/u/${user?.full_name}`}
+          href={`/u/${user?.full_name ?? user?.id}`}
         >
           <AvatarImage src={user?.avatar_url ?? ""} />
         </Link>
@@ -207,7 +207,7 @@ const Avatar = ({
       <div className="avatar relative flex h-10 w-10 flex-col self-stretch">
         <Link
           className="flex items-center space-x-2"
-          href={`/u/${user?.full_name}`}
+          href={`/u/${user?.full_name ?? user?.id}`}
         >
           <AvatarImage src={user?.avatar_url ?? ""} />
         </Link>
@@ -234,7 +234,7 @@ const Avatar = ({
     <HoverCard openDelay={300}>
       <HoverCardTrigger asChild>
         {/* TODO
-        Check lại điều kiện này khi vào trang cá nhân của người khác
+        Re-check this condition when visiting another user's profile
         */}
         <AvatarComponent className={className}>
           <div className="avatar relative flex h-10 w-10 flex-col self-stretch">
@@ -252,7 +252,7 @@ const Avatar = ({
             )}
             <Link
               className="flex items-center space-x-2"
-              href={`/u/${user?.full_name}`}
+              href={`/u/${user?.full_name ?? user?.id}`}
             >
               <AvatarImage src={user?.avatar_url ?? ""} />
             </Link>
@@ -297,7 +297,7 @@ const Avatar = ({
                     {follower ?? 0}
                   </div>
                   <div className="text-xs font-normal leading-[150%] text-slate-900">
-                    Người theo dõi
+                    Followers
                   </div>
                 </div>
                 <div className="row-item flex items-baseline gap-1">
@@ -305,7 +305,7 @@ const Avatar = ({
                     {following ?? 0}
                   </div>
                   <div className="text-xs font-normal leading-[150%] text-slate-900">
-                    Đang theo dõi
+                    Following
                   </div>
                 </div>
               </div>

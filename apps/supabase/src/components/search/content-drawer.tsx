@@ -65,7 +65,7 @@ const ContentDrawer = React.forwardRef<HTMLDivElement, ContentDrawerProps>(
             }),
           );
           if (error) {
-            toast.error("Có lỗi xảy ra, vui lòng thử lại sau");
+            toast.error("Something went wrong, please try again later");
           }
           setSearchUser(data!);
         }
@@ -75,7 +75,7 @@ const ContentDrawer = React.forwardRef<HTMLDivElement, ContentDrawerProps>(
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Enter") {
-        window.location.href = `/search?search=${valueInput}`;
+        window.location.href = `/search?search=${encodeURIComponent(valueInput)}`;
       }
     };
 
@@ -86,7 +86,7 @@ const ContentDrawer = React.forwardRef<HTMLDivElement, ContentDrawerProps>(
           <div className="hidden h-10 justify-center sm:flex">
             <div className="flex flex-col items-start justify-center gap-2.5">
               <BaseText
-                text={"Tìm kiếm"}
+                text={"Search"}
                 textColor="neutral-700"
                 className="sz-text-h5-semi"
               />
@@ -98,7 +98,7 @@ const ContentDrawer = React.forwardRef<HTMLDivElement, ContentDrawerProps>(
           <div className="w-full rounded-[8px] border bg-white">
             <BaseCommonIHL
               srcLeft={"/assets/icons-24/search.png"}
-              placeholder={"Tìm kiếm tại đây"}
+              placeholder={"Search here"}
               onChange={(e) => handleChange(e.target.value as string)}
               srcRight={valueInput !== "" ? "/assets/icons-24/cancel.png" : ""}
               onClick={handleDelete}

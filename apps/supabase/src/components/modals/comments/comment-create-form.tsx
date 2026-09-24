@@ -54,7 +54,7 @@ export const CommentCreateForm = ({
     const supabase = createClient();
     const { data: session, error } = await supabase.auth.getUser();
     if (error || !session || !session.user || !session.user.id) {
-      toast.error("chưa đăng nhập");
+      toast.error("You are not logged in");
       return;
     }
     setErrors(null);
@@ -64,11 +64,11 @@ export const CommentCreateForm = ({
         FormData.get("content") as string,
       );
       if (error) {
-        toast.error("Đăng bình luận thất bại");
+        toast.error("Failed to post comment");
         return;
       }
       setShowCommentCreateModal(false);
-      toast.success(`Chỉnh sửa thành công!`);
+      toast.success(`Updated successfully!`);
       router.refresh();
     } else {
       if (!comment) {
@@ -77,11 +77,11 @@ export const CommentCreateForm = ({
           content: FormData.get("content") as string,
         });
         if (error) {
-          toast.error("Đăng bình luận thất bại");
+          toast.error("Failed to post comment");
           return;
         }
         setShowCommentCreateModal(false);
-        toast.success(`Đăng bình luận thành công!`);
+        toast.success(`Comment posted successfully!`);
         router.refresh();
       }
     }
@@ -93,11 +93,11 @@ export const CommentCreateForm = ({
         parent_id: comment.id,
       });
       if (error) {
-        toast.error("Trả lời bình luận thất bại");
+        toast.error("Failed to reply to comment");
         return;
       }
       setShowCommentCreateModal(false);
-      toast.success(`Trả lời bình luận thành công!`);
+      toast.success(`Reply posted successfully!`);
       router.refresh();
     } else {
       if (!!comment.id) {
@@ -106,11 +106,11 @@ export const CommentCreateForm = ({
           FormData.get("content") as string,
         );
         if (error) {
-          toast.error("Chỉnh sửa reply thất bại");
+          toast.error("Failed to update reply");
           return;
         }
         setShowCommentCreateModal(false);
-        toast.success(`Chỉnh sửa reply thành công!`);
+        toast.success(`Reply updated successfully!`);
         router.refresh();
       }
     }
@@ -135,10 +135,10 @@ export const CommentCreateForm = ({
           <Textarea
             name="content"
             // rows={5}
-            placeholder="Hãy nêu cảm nghĩ của bạn ở đây..."
+            placeholder="Share your thoughts here..."
             className={cn(
               errors?.content
-                ? "ring-destructive ring"
+                ? "ring-destructive ring-3"
                 : "resize-none border-none focus:border-none",
             )}
             onChange={(e) => handleChangeContent(e.target.value)}
@@ -175,7 +175,7 @@ const SaveButton = ({
   errors,
   countContent,
 }: {
-  editing: Boolean;
+  editing: boolean;
   errors: boolean;
   countContent: number;
 }) => {
@@ -195,7 +195,7 @@ const SaveButton = ({
       disabled={isCreating || isUpdating || errors}
       aria-disabled={isCreating || isUpdating || errors}
     >
-      {editing ? `Cập nhật` : "Đăng tải"}
+      {editing ? `Update` : "Post"}
     </Button>
   );
 };

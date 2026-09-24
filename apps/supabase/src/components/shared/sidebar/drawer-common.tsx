@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import { NavItem } from "@/components/shared/navbar/nav-item";
 import { BaseIconBTN } from "@/components/master-layout";
@@ -33,8 +34,8 @@ function DrawerCommon({
   const [withoutDrawer, setWithoutDrawer] = useState<boolean>(false);
 
   useEffect(() => {
-    let timer = setTimeout(() => {
-      let val = Object.keys(drawerOpen).filter((v) => drawerOpen[v]).length > 0;
+    const timer = setTimeout(() => {
+      const val = Object.keys(drawerOpen).filter((v) => drawerOpen[v]).length > 0;
       setWithoutDrawer(val);
     }, 200);
 
@@ -42,7 +43,7 @@ function DrawerCommon({
   }, [drawerOpen]);
 
   function setDrawerStateDeplay(value: Record<string, boolean>) {
-    let key = Object.keys(value)[0];
+    const key = Object.keys(value)[0];
     if (value[key]) {
       setTimeout(() => {
         setDrawerOpen({ ...drawerOpen, ...value });
@@ -61,17 +62,17 @@ function DrawerCommon({
           { hidden: !isHomePage && isMobile },
         )}
       >
-        <a href="/">
+        <Link href="/">
           <BaseIconBTN
             src={"/assets/img_logo.png"}
             alt=""
             width={40}
             height={40}
           />
-        </a>
+        </Link>
       </div>
       {/* Navbar */}
-      {/* <div className="">Chi tiết bài viết</div> */}
+      {/* <div className="">Post details</div> */}
       <div className="relative hidden flex-col items-start justify-center gap-2 sm:flex">
         <NavItem
           href="/"
@@ -104,7 +105,7 @@ function DrawerCommon({
             drawerKey="notification"
           />
 
-          <div className="absolute left-8 top-2.5 flex items-start shadow-sm">
+          <div className="absolute left-8 top-2.5 flex items-start shadow-xs">
             {notifications != 0 && notifications && (
               <BgdCommonBadges
                 text={notifications >= 9 ? 9 : notifications}

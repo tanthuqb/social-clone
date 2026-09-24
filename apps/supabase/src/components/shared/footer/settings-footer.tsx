@@ -23,20 +23,20 @@ export default async function SettingsFooter() {
             href=""
             className="text-[15px] font-normal leading-[22.5px] text-gray-900"
           >
-            Điều khoản SuZu
+            SuZu Terms
           </Link>
           <Link
             href=""
             className="items-center text-center text-[15px] font-normal leading-[22.5px] text-gray-900"
           >
-            Chính sách riêng tư
+            Privacy Policy
           </Link>
         </div>
         <Link
           href=""
           className="mt-4 flex w-full items-center justify-center text-[15px] font-normal leading-[22.5px] text-gray-900 md:hidden"
         >
-          Chính sách bảo mật
+          Security Policy
         </Link>
       </div>
 

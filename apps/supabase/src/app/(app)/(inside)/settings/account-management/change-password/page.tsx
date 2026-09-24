@@ -8,7 +8,7 @@ async function Home() {
   return (
     <div className="flex h-dvh flex-col">
       <div className="relative hidden h-[64px] items-center justify-center sm:flex">
-        <div className="sz-label-m-semi text-neutral-700">Thay đổi mật khẩu</div>
+        <div className="sz-label-m-semi text-neutral-700">Change password</div>
         <div className="absolute left-0 top-1/2 -translate-y-1/2">
           <BackButton currentResource={`/`} />
         </div>

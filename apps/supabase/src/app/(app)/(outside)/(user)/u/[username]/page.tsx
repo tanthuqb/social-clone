@@ -8,25 +8,54 @@ import MainFooter from "@/components/shared/footer/main-footer";
 import { HeaderSectionCommon } from "@/components/shared/header/global/header-section-common";
 import type { Metadata } from 'next'
 import { constructMetadata } from "@/lib/ultis";
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 
 type Props = {
   params: Promise<{ username: string }>
 }
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Profiles are addressed by username (`full_name`). Users who have not picked
+ * a username yet are linked by their id instead, so accept both.
+ */
+async function getProfileByUsername(rawUsername: string) {
+  let username = rawUsername;
+  try {
+    username = decodeURIComponent(rawUsername);
+  } catch {
+    // keep the raw value
+  }
+  const supabase = await createClient();
+  const { data: byName } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("full_name", username)
+    .maybeSingle();
+  if (byName) return byName;
+  if (!UUID_RE.test(username)) return null;
+  const { data: byId } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", username)
+    .maybeSingle();
+  return byId;
+}
+
 export async function generateMetadata(
   { params }: Props,
 ): Promise<Metadata> {
-  const supabase = await createClient();
   const { username } = await params;
-  const { data: profile } = await supabase.from('profiles').select('*').eq('full_name', username).single()
+  const profile = await getProfileByUsername(username);
   if (!profile) {
-    return redirect('/error')
+    return constructMetadata({ title: "Profile not found", noIndex: true });
   }
   const metadata = constructMetadata({
-    title: `${profile.full_name} - Profile`,
-    description: `${profile.full_name} - Profile - SuZu Social Network`,
+    title: `${profile.full_name ?? profile.display_name} - Profile`,
+    description: `${profile.full_name ?? profile.display_name} - Profile - SuZu Social Network`,
     image: profile.avatar_url || ``,
     noIndex: false
   });
@@ -42,26 +71,17 @@ export default async function Page({
   const supabase = await createClient();
   const { data: session } = await supabase.auth.getUser();
   const { username: usernameByParams } = await params;
-  let feeds;
+  const user = await getProfileByUsername(usernameByParams);
+  if (!user) notFound();
 
-  const { data: user, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("full_name", usernameByParams)
-    .maybeSingle();
-  if (!session?.user?.id) {
-    let data = null;
-    feeds = data;
-  } else {
-    const { data } = await getFeedsPrepared(user?.id);
-    feeds = data;
-  }
+  // Public profiles are visible to guests too (feeds are publicly readable).
+  const { data: feeds } = await getFeedsPrepared(user.id);
 
   return (
     <div className="">
       {/* InFeed */}
       <HeaderSectionCommon
-        text={`@${user?.full_name ?? "full_name"}`}
+        text={`@${user.full_name ?? user.display_name ?? "user"}`}
         session={session}
         user={user!}
       />
@@ -79,7 +99,7 @@ export default async function Page({
                 className="w-full rounded-full border border-slate-300"
               >
                 <Pencil className="mr-1 h-4 w-4" />
-                Chỉnh sửa thông tin
+                Edit profile
               </Button>
             </Link>
           )}

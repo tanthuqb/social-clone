@@ -37,11 +37,11 @@ function FeedUnpin({
       if (errorFeed_unpin) {
         toast.error(errorFeed_unpin);
       } else {
-        toast.success("Bỏ ghim bài viết thành công");
+        toast.success("Post unpinned successfully");
         window.location.reload();
       }
     } else {
-      toast.error("Bài viết chưa được ghim");
+      toast.error("This post is not pinned");
     }
   }
 
@@ -50,7 +50,7 @@ function FeedUnpin({
       onClick={handlePin}
       className="cursor-pointer text-[15px] text-[#0F172A]"
     >
-      Ghim bài viết
+      Unpin post
     </DropdownMenuItem>
   );
 }

@@ -1,8 +1,11 @@
 import type { Config } from "tailwindcss";
-import theme, { fontFamily } from "tailwindcss/defaultTheme";
+import defaultTheme from "tailwindcss/defaultTheme";
 import sharedConfig from "@suzu/ui/tailwind.config";
 import plugin from "tailwindcss/plugin";
-const path = require("path");
+import path from "node:path";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
 
 const config: Config = {
   presets: [sharedConfig as any],
@@ -19,7 +22,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)", ...fontFamily.sans],
+        sans: ["var(--font-inter)", ...defaultTheme.fontFamily.sans],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -111,33 +114,20 @@ const config: Config = {
     },
   },
   plugins: [
-    function ({ addUtilities }: { addUtilities: Function }) {
-      const newUtilities = {
+    plugin(({ addUtilities }) => {
+      addUtilities({
         ".content": {
           content: "attr(data-placeholder)",
         },
-        ".backdrop-blur-sm": {
-          "backdrop-filter": "blur(8px)",
-        },
-        ".backdrop-blur-lg": {
-          "backdrop-filter": "blur(16px)",
-        },
-        ".before:empty::before": {
-          content: "attr(data-placeholder)",
-          float: "left",
-          height: "0",
-          "pointer-events": "none",
-        },
-      };
-      addUtilities(newUtilities, ["responsive", "hover"]);
-    },
+      });
+    }),
     plugin(({ addComponents, theme }) => {
       addComponents({
         ".btn": {
           width: "100%",
           height: theme("spacing.10"),
           borderRadius: theme("borderRadius.full"),
-          fontSize: theme("fontSize.[15px]"),
+          fontSize: "15px",
           minWidth: "127px",
           padding: "8px 16px",
         },

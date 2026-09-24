@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-import { Hr, Tailwind, Text } from "@react-email/components";
+import { Hr, Tailwind, Text } from "react-email";
 import { Fragment } from "react";
 
 export default function Footer({

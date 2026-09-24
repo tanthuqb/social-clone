@@ -34,7 +34,7 @@ interface FooterCardProps {
 }
 export const fetchCountCommentDataAction = async (feedId: string | null) => {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/countComments?feed_id=${feedId}`,
+    `/api/countComments?feed_id=${feedId}`,
     {
       next: {
         revalidate: 0,
@@ -146,10 +146,10 @@ const FooterCard = ({
 
   const handleShare = async (feedId: string) => {
     try {
-      await navigator.clipboard.writeText(window.location.href + "p/" + feedId);
-      toast.success("Đã sao chép liên kết");
+      await navigator.clipboard.writeText(`${window.location.origin}/p/${feedId}`);
+      toast.success("Link copied");
     } catch (err) {
-      toast.error("Sao chép liên kết thất bại");
+      toast.error("Failed to copy link");
     }
   };
 
@@ -184,7 +184,7 @@ const FooterCard = ({
               textColor="neutral-500"
             />
             <BaseText
-              text={"tương tác"}
+              text={"reactions"}
               className="sz-parag-reg"
               textColor="neutral-500"
             />
@@ -208,7 +208,7 @@ const FooterCard = ({
               textColor="neutral-500"
             />
             <BaseText
-              text={"Bình luận"}
+              text={"Comments"}
               className="sz-parag-reg"
               textColor="neutral-500"
             />
@@ -224,11 +224,11 @@ const FooterCard = ({
           {/* Heart button */}
           <div className="flex items-start">
             {/* Like */}
-            <div className="group">
+            <div className="group" data-testid="react-like" data-state={state ?? "neutral"}>
               <div className="cursor-pointer group-hover:hidden">
                 <InteractiveBTN
                   className={cn("bg-trans-black-5", { "bg-white": !inFeed })}
-                  text="Thích"
+                  text="Like"
                   type={1}
                   state={
                     state === ReactionState.LIKE
@@ -246,7 +246,7 @@ const FooterCard = ({
                     "bg-white": !inFeed,
                     "hover:bg-trans-black-10": inFeed,
                   })}
-                  text="Thích"
+                  text="Like"
                   type={1}
                   state={
                     state === ReactionState.LIKE
@@ -269,7 +269,7 @@ const FooterCard = ({
             ></div>
 
             {/* Dislike */}
-            <div className="group">
+            <div className="group" data-testid="react-dislike" data-state={state ?? "neutral"}>
               <div className="cursor-pointer group-hover:hidden">
                 <InteractiveBTN
                   className={cn("bg-trans-black-5", { "bg-white": !inFeed })}
@@ -313,7 +313,7 @@ const FooterCard = ({
                 className={cn(
                   `bg-trans-black-5 ${isMobile ? "px-1" : "pr-1"} hover:bg-trans-black-10`,
                 )}
-                text={isMobile ? "" : "Bình luận"}
+                text={isMobile ? "" : "Comment"}
                 isButton={false}
                 type={3}
                 inFeed={inFeed}
@@ -324,7 +324,7 @@ const FooterCard = ({
               className={cn(`bg-trans-black-5 ${isMobile ? "px-1" : "pr-1"}`, {
                 "bg-white": !inFeed,
               })}
-              text={isMobile ? "" : "Trả lời"}
+              text={isMobile ? "" : "Reply"}
               type={5}
               isButton={true}
               action={() => handleComment(feedId)}
@@ -338,7 +338,7 @@ const FooterCard = ({
               <DropdownMenuTrigger>
                 <InteractiveBTN
                   className={`bg-trans-black-5 ${isMobile ? "px-1" : "pr-1"} hover:bg-trans-black-10`}
-                  text={isMobile ? "" : "Chia sẻ"}
+                  text={isMobile ? "" : "Share"}
                   type={4}
                   isButton={false}
                   inFeed={inFeed}
@@ -352,7 +352,7 @@ const FooterCard = ({
                   }}
                   className="cursor-pointer text-[15px] text-[#0F172A]"
                 >
-                  Sao chép liên kết
+                  Copy link
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

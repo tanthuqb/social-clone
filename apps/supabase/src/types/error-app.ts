@@ -10,7 +10,7 @@ interface AuthErrorApp {
 const authErrorCode: AuthErrorApp[] = [
     {
         code: 422,
-        message: "Tài khoản đã tồn tại!"
+        message: "Account already exists!"
     },
     {
         code: 22023,
@@ -18,11 +18,11 @@ const authErrorCode: AuthErrorApp[] = [
     },
     {
         code: "PGRST203",
-        message: "Lỗi đặt tên trong functions"
+        message: "Function naming error"
     },
     {
         code:'22P02',
-        message: "sai dữ liệu"
+        message: "Invalid data"
     }
 ]
 

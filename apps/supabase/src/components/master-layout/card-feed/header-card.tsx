@@ -41,14 +41,14 @@ const HeaderCard = ({
             />
           )}
 
-          <Link href={`/u/${feed?.user_id?.full_name}`}>
+          <Link href={`/u/${feed?.user_id?.full_name ?? feed?.user_id?.id}`}>
             <BaseText text={feed?.user_id?.display_name as string} className="sz-label-m-semi" textColor="neutral-700" />
           </Link>
         </div>
       ) : (
         <div className="flex items-center flex-1 gap-2">
           {feed?.user_id && <Avatar user={feed?.user_id} />}
-          <Link href={`/u/${feed?.user_id?.full_name}`}>
+          <Link href={`/u/${feed?.user_id?.full_name ?? feed?.user_id?.id}`}>
             <BaseText text={feed?.user_id?.display_name as string} className="sz-label-m-semi" textColor="neutral-700" />
           </Link>
         </div>

@@ -31,20 +31,20 @@ import { slugify } from "@/lib/ultis";
 const formSchema = z.object({
   username: z
     .string({
-      required_error: "Vui lòng nhập tên hiển thị.",
+      required_error: "Please enter a display name.",
     })
     .max(21, {
-      message: "Tối đa 20 ký tự",
+      message: "Maximum 20 characters",
     }),
   personalname: z
     .string({
-      required_error: "Vui lòng nhập tên cá nhân.",
+      required_error: "Please enter your name.",
     })
     .max(21, {
-      message: "Tối đa 20 ký tự",
+      message: "Maximum 20 characters",
     }),
   gender: z.enum(["male", "female", "none"], {
-    required_error: "Vui lòng chọn giới tính.",
+    required_error: "Please select a gender.",
   }),
 });
 
@@ -74,8 +74,8 @@ function ContentStepForm() {
   const maxTotalCount = 20;
   const supabase = createClient();
   const handleOpenNameAccount = async () => {
-    // Thọ call API ở đây khi user submit step 1
-    // Lấy value tên hiển thị là displayNameValue để gửi lên API
+    // Call the API here when the user submits step 1
+    // Use displayNameValue (display name) as the value sent to the API
     const { data: session } = await supabase.auth.getUser();
     if (session && session.user) {
       const { error } = await updateProfileAction({
@@ -85,7 +85,7 @@ function ContentStepForm() {
         toast.error(error);
       }
     }
-    let slugDisplayName = slugify(displayNameValue, { replacement: "." });
+    const slugDisplayName = slugify(displayNameValue, { replacement: "." });
     const { data: search } = await supabase
       .from("profiles")
       .select("full_name")
@@ -152,7 +152,7 @@ function ContentStepForm() {
       console.error("Error uploading avatar:", error);
     } else {
       //@ts-ignore
-      let path =
+      const path =
         process.env.NEXT_PUBLIC_SUPABASE_URL +
         "storage/v1/object/public" +
         "/avatars/" +
@@ -162,8 +162,8 @@ function ContentStepForm() {
     setCheckNameAccount(true);
   };
   const handleOpenGender = async () => {
-    // Thọ call API ở đây khi user submit step 2
-    // Lấy value tên cá nhân là accountPersonal để gửi lên API
+    // Call the API here when the user submits step 2
+    // Use accountPersonal (personal name) as the value sent to the API
     const { data: session } = await supabase.auth.getUser();
     if (session && session.user) {
       const { error } = await updateProfileAction({
@@ -223,7 +223,7 @@ function ContentStepForm() {
             </button>
           )}
           <div className="flex-1 text-center text-[15px] font-semibold leading-6 text-white">
-            Cập nhật thông tin
+            Update information
           </div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -241,21 +241,21 @@ function ContentStepForm() {
             {checkNameAccount ? (
               <div className="flex flex-col gap-2.5 self-stretch text-left">
                 <div className="text-left text-[23px] font-semibold text-slate-700">
-                  Chúng tôi có thể gọi bạn là gì!
+                  What should we call you?
                 </div>
                 <div className="text-[15px] font-normal text-slate-900">
-                  Tên tài khoản của bạn là duy nhất trên SuZu.Bạn có thể thay
-                  đổi sau này nếu muốn.
+                  Your username is unique on SuZu. You can change
+                  it later if you want.
                 </div>
               </div>
             ) : toggleGender ? (
               <div className="flex flex-col gap-2.5 self-stretch text-left">
                 <div className="text-left text-[23px] font-semibold text-slate-700">
-                  Cho SuZu biết giới tính nha
+                  Tell SuZu your gender
                 </div>
                 <div className="text-[15px] font-normal text-slate-900">
-                  Điều này hỗ trợ SuZu đưa những nội dung liên quan đến bạn &
-                  SuZu không hiển thị thông tin này trên trang cá nhân của bạn.
+                  This helps SuZu show you relevant content &
+                  SuZu does not display this on your profile.
                 </div>
               </div>
             ) : (
@@ -272,11 +272,11 @@ function ContentStepForm() {
                   </AvatarComponent>
                 </div>
                 <div className="text-left text-[23px] font-semibold text-slate-700">
-                  Chào mừng đến SuZu nà! 🎉
+                  Welcome to SuZu! 🎉
                 </div>
                 <div className="text-[15px] font-normal text-slate-900">
-                  Các câu trả lời trong một vài câu hỏi tới sẽ giúp SuZu gợi ý
-                  những nội dung phù hợp đến với bạn.
+                  Your answers to the next few questions will help SuZu suggest
+                  content that suits you.
                 </div>
               </div>
             )}
@@ -291,7 +291,7 @@ function ContentStepForm() {
                     <div className="flex flex-col items-start gap-1 self-stretch">
                       <div className="mb-1 flex items-start justify-between self-stretch">
                         <p className="flex-basis-0 leading-150 flex-shrink-0 font-sans text-[15px] font-semibold text-[#334155]">
-                          Tên cá nhân
+                          Name
                         </p>
                         <p
                           className={`leading-150 font-sans text-[15px] font-normal ${personalCountName <= 20 ? "text-[#6B7280]" : "text-red-500"}`}
@@ -308,7 +308,7 @@ function ContentStepForm() {
                               onChange={(e: any) => handleChangePersonalname(e)}
                             >
                               <Input
-                                placeholder="Nhập tên cá nhân"
+                                placeholder="Enter your name"
                                 {...field}
                                 value={accountPersonal}
                                 maxLength={21}
@@ -320,7 +320,7 @@ function ContentStepForm() {
                       />
 
                       <div className="text-[15px] font-normal text-slate-500">
-                        Gợi ý dành cho bạn:
+                        Suggestions for you:
                       </div>
                       <div className="flex flex-wrap items-start gap-1 text-start">
                         <span className="text-[15px] font-semibold text-slate-900">
@@ -359,7 +359,7 @@ function ContentStepForm() {
                                       />
                                     </FormControl>
                                     <FormLabel className="rounded-full text-center text-[15px] font-semibold">
-                                      Nam
+                                      Male
                                     </FormLabel>
                                   </FormItem>
                                   <FormItem className="flex items-center space-x-3 space-y-0 text-slate-700">
@@ -370,7 +370,7 @@ function ContentStepForm() {
                                       />
                                     </FormControl>
                                     <FormLabel className="text-[15px] font-semibold">
-                                      Nữ
+                                      Female
                                     </FormLabel>
                                   </FormItem>
                                   <FormItem className="flex items-center space-x-3 space-y-0 text-slate-700">
@@ -381,7 +381,7 @@ function ContentStepForm() {
                                       />
                                     </FormControl>
                                     <FormLabel className="text-[15px] font-semibold">
-                                      Không muốn nói
+                                      Prefer not to say
                                     </FormLabel>
                                   </FormItem>
                                 </RadioGroup>
@@ -396,7 +396,7 @@ function ContentStepForm() {
                     <div className="flex w-full flex-col items-start gap-1 self-stretch">
                       <div className="mb-1 flex items-start justify-between self-stretch">
                         <p className="flex-basis-0 leading-150 flex-shrink-0 font-sans text-[15px] font-semibold text-[#334155]">
-                          Tên hiển thị
+                          Display name
                         </p>
                         <p
                           className={`leading-150 font-sans text-[15px] font-normal ${countName <= 20 ? "text-[#6B7280]" : "text-red-500"}`}
@@ -414,7 +414,7 @@ function ContentStepForm() {
                               onChange={(e: any) => handleChangeNameDisplay(e)}
                             >
                               <Input
-                                placeholder="Nhập tên hiển thị"
+                                placeholder="Enter display name"
                                 {...field}
                                 value={displayNameValue}
                                 className="w-full"
@@ -433,13 +433,13 @@ function ContentStepForm() {
                       <div
                         className={`mt-2.5 w-full items-center rounded-full ${activeButton && countName !== 0 ? "cursor-pointer bg-slate-900" : "bg-slate-50"}`}
                       >
-                        {/* Button submit cuối cùng */}
+                        {/* Final submit button */}
                         <button
                           type="submit"
                           disabled={!activeButton || countName === 0}
                           className={`w-full px-4 py-2 ${activeButton && countName !== 0 ? "text-white" : "text-slate-300"}`}
                         >
-                          SuZuu 💫
+                          Let's go 💫
                         </button>
                       </div>
                     </div>
@@ -451,7 +451,7 @@ function ContentStepForm() {
             {checkNameAccount ? (
               <div className="w-full pb-10 md:pb-0">
                 <button
-                  //Bước này click để vào step 3
+                  //Click here to go to step 3
                   onClick={handleOpenGender}
                   disabled={
                     !activeButton ||
@@ -463,7 +463,7 @@ function ContentStepForm() {
                   <div
                     className={`w-full px-4 py-2 text-center ${activeButton && personalCountName <= 20 ? "text-white" : "text-slate-300"}`}
                   >
-                    Tiếp theo
+                    Next
                   </div>
                 </button>
               </div>
@@ -472,8 +472,8 @@ function ContentStepForm() {
               toggleGender === false && (
                 <div className="w-full pb-10 md:pb-0">
                   <button
-                    // Button đầu tiên
-                    // Click để vào step 2
+                    // First button
+                    // Click to go to step 2
                     onClick={handleOpenNameAccount}
                     disabled={
                       !activeButton || countName === 0 || countName > 20
@@ -483,7 +483,7 @@ function ContentStepForm() {
                     <div
                       className={`w-full px-4 py-2 text-center ${activeButton && countName <= 20 ? "text-white" : "text-slate-300"}`}
                     >
-                      Tiếp theo
+                      Next
                     </div>
                   </button>
                 </div>

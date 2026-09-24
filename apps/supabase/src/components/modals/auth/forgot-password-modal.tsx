@@ -27,7 +27,7 @@ function ForgotPasswordModal({
       <div className="flex w-full flex-col items-start gap-1 self-stretch rounded-full pb-2">
         <div className="flex w-full items-center gap-2">
           <div className="flex-1 text-center text-[15px] font-semibold leading-6 text-white">
-            Quên mật khẩu
+            Forgot password
           </div>
           <BaseCommonBTN
             className="p-2"
@@ -44,14 +44,14 @@ function ForgotPasswordModal({
         <div className="mx-auto flex w-[354px] flex-col gap-5 px-5">
           <div className="flex flex-col gap-2.5 text-left">
             <div className="text-left text-[23px] font-semibold leading-7 text-slate-700">
-              Quên mật khẩu rồi 🤧!
+              Forgot your password 🤧?
             </div>
 
             <div className="text-xs font-normal text-slate-500">
               <div className="text-xs font-normal text-slate-500">
-                Hãy nhập địa chỉ email của bạn bên dưới.
+                Enter your email address below.
                 <br />
-                Email đã đăng ký trên SuZu, để tạo mật khẩu mới.
+                Use the email registered on SuZu to create a new password.
               </div>
             </div>
 
@@ -64,11 +64,11 @@ function ForgotPasswordModal({
 
           <div className="flex w-full items-center justify-center border-t border-slate-100 pb-10 pt-3 md:pb-6">
             <div className="text-center text-[15px] font-normal text-slate-500">
-              Bạn đã có tài khoản 😉?
+              Already have an account 😉?
             </div>
             <BaseCommonBTN
               className="p-2"
-              text="Đăng nhập nào"
+              text="Log in"
               isButton={true}
               onClick={() => {
                 setShowForgotPasswordModal(false);

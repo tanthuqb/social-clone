@@ -32,7 +32,7 @@ function ForgotPassSuccess({
             isButton={true}
           />
           <div className="flex-1 text-center text-[15px] font-semibold leading-6 text-white">
-            Đăng ký
+            Sign up
           </div>
           <BaseCommonBTN
             isButton={true}
@@ -50,15 +50,15 @@ function ForgotPassSuccess({
           <div className="flex flex-col items-center">
             <div className="flex flex-col items-center gap-2.5 self-stretch px-4 text-left">
               <div className="text-left text-[23px] font-semibold text-slate-700">
-                Kiểm tra email của bạn nha!
+                Check your email!
               </div>
               <div className="text-[15px] font-normal text-slate-900">
-                SuZu đã gửi đường dẫn đặt lại mật khẩu đến email admin@suzu.vn
-                bạn đã nhập trước đó.
+                SuZu has sent a password reset link to admin@suzu.vn,
+                the email you entered.
               </div>
               <div className="mt-5 text-[15px] font-normal text-slate-900">
-                Nếu không tìm thấy email nào từ chúng tôi hãy kiểm tra trong hòm
-                thư rác của bạn nha.
+                If you can't find our email, please check your
+                spam folder.
               </div>
             </div>
             {/*=========== DESKTOP ========== */}
@@ -71,7 +71,7 @@ function ForgotPassSuccess({
             >
               <div className="rounded-full bg-slate-900">
                 <CommonButton
-                  text="Gửi lại email xác minh"
+                  text="Resend verification email"
                   states="default"
                   activeButton={false}
                 />
@@ -88,7 +88,7 @@ function ForgotPassSuccess({
             >
               <div className="rounded-full bg-slate-900">
                 <CommonButton
-                  text="Gửi lại email xác minh"
+                  text="Resend verification email"
                   states="default"
                   activeButton={false}
                 />
@@ -98,7 +98,7 @@ function ForgotPassSuccess({
 
           <div className="flex w-full items-center justify-center border-t border-slate-100 px-4 pb-10 pt-3 md:pb-6">
             <div className="flex text-center text-slate-500">
-              Bạn đã có tài khoản 😉?
+              Already have an account 😉?
               <button
                 onClick={(event) => {
                   setShowLoginModal(true);
@@ -106,7 +106,7 @@ function ForgotPassSuccess({
                 }}
                 className="ml-2 text-[15px] font-semibold leading-6 text-slate-900"
               >
-                Đăng nhập nào
+                Log in
               </button>
             </div>
           </div>

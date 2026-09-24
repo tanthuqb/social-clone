@@ -49,15 +49,15 @@ const FooterModal = memo(
 
     const getTextSubmit = type
       ? editing === true && parentFeedId === undefined
-        ? "Cập nhật"
+        ? "Update"
         : parentFeedId === undefined && editing === false
-          ? "Bình luận"
-          : "Bình luận"
+          ? "Comment"
+          : "Comment"
       : editing
-        ? "Cập nhật"
+        ? "Update"
         : loading
-          ? "Đăng bài..."
-          : "Đăng bài";
+          ? "Posting..."
+          : "Post";
 
     return (
       <div className="flex items-center justify-end gap-2.5 self-stretch p-4">
@@ -71,6 +71,7 @@ const FooterModal = memo(
         <button
           type="submit"
           title="post"
+          data-testid="composer-submit"
           className={`rounded-full flex gap-2 px-4 py-2 transition-all duration-300 ${currentState || loading ? "bg-trans-black-5" : "bg-neutral-900"}`}
           disabled={currentState || loading}
         >

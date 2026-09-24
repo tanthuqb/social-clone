@@ -43,6 +43,8 @@ const DropdownMenuComponent = ({
   return (
     <DropdownMenu onOpenChange={(open) => setOpen(open)}>
       <DropdownMenuTrigger
+        data-testid={`menu-trigger-${iconTrigger}`}
+        aria-label={iconTrigger === "menu" ? "Main menu" : "More options"}
         className={cn("hover:bg-trans-black-5 rounded-full flex items-center justify-center border-none p-2 transition-all duration-300 hover:rounded-full focus:border-none",
           { "bg-trans-black-5 rounded-full": open },
           className

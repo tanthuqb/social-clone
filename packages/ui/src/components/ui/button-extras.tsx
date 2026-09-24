@@ -24,7 +24,7 @@ function ButtonExtras({
   if (disabledTooltip) {
     return (
       <Tooltip content={disabledTooltip}>
-        <div className="flex items-center justify-center w-full h-10 px-4 text-sm text-gray-400 transition-all bg-gray-100 border border-gray-200 rounded-md cursor-not-allowed focus:ring-0 focus:outline-none">
+        <div className="flex items-center justify-center w-full h-10 px-4 text-sm text-gray-400 transition-all bg-gray-100 border border-gray-200 rounded-md cursor-not-allowed focus:ring-0 focus:outline-hidden">
           <p>{text}</p>
         </div>
       </Tooltip>
@@ -35,7 +35,7 @@ function ButtonExtras({
       // if onClick is passed, it's a "button" type, otherwise it's being used in a form, hence "submit"
       type={props.onClick ? "button" : "submit"}
       className={cn(
-        "flex w-full items-center justify-center space-x-2 rounded-md border px-3 py-2 text-sm transition-all focus:outline-none",
+        "flex w-full items-center justify-center space-x-2 rounded-md border px-3 py-2 text-sm transition-all focus:outline-hidden",
         props.disabled || loading
           ? "cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400"
           : {

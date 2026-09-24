@@ -31,7 +31,7 @@ function Modal({
       return;
     }
     // fire onClose event if provided
-    onClose && onClose();
+    onClose?.();
 
     // if setShowModal is defined, use it to close modal
     if (setShowModal) {
@@ -53,7 +53,7 @@ function Modal({
           }
         }}
       >
-        <Drawer.Overlay className="fixed inset-0 z-40 bg-slate-900 bg-opacity-80 backdrop-blur-sm" />
+        <Drawer.Overlay className="fixed inset-0 z-40 bg-slate-900/80 backdrop-blur-sm" />
         <Drawer.Portal>
           <Drawer.Content
             className={cn(
@@ -81,7 +81,7 @@ function Modal({
         <Dialog.Overlay
           // for detecting when there's an active opened modal
           id="modal-backdrop"
-          className="fixed inset-0 z-40 animate-fade-in bg-slate-900 bg-opacity-80 backdrop-blur-sm"
+          className="fixed inset-0 z-40 animate-fade-in bg-slate-900/80 backdrop-blur-sm"
         />
         <Dialog.Content
           // onOpenAutoFocus={(e) => e.preventDefault()}

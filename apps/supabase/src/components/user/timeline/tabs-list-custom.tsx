@@ -8,8 +8,8 @@ const TabListCustom = () => {
   const [activeFeedTab, setActiveFeedTab] = useState(true);
   const [activeBookmarksTab, setActiveBookmarksTab] = useState(false);
   const handleClickFeedTabs = (e: any) => {
-    const isFeed = e.target.innerText === "Bài đăng";
-    const isBookmarks = e.target.innerText === "Đã lưu";
+    const isFeed = e.target.innerText === "Posts";
+    const isBookmarks = e.target.innerText === "Saved";
     if (isFeed) {
       setActiveFeedTab(!activeFeedTab);
       setActiveBookmarksTab(!activeBookmarksTab);
@@ -19,8 +19,8 @@ const TabListCustom = () => {
     }
   };
   const handleClickBookmarksTabs = (e: any) => {
-    const isFeed = e.target.innerText === "Bài đăng";
-    const isBookmarks = e.target.innerText === "Đã lưu";
+    const isFeed = e.target.innerText === "Posts";
+    const isBookmarks = e.target.innerText === "Saved";
     if (isFeed) {
       setActiveFeedTab(!activeFeedTab);
       setActiveBookmarksTab(!activeBookmarksTab);
@@ -39,7 +39,7 @@ const TabListCustom = () => {
         })}
       >
         <BaseText
-          text={"Bài đăng"}
+          text={"Posts"}
           className="sz-label-m-semi"
           textColor="neutral-700"
         />
@@ -52,7 +52,7 @@ const TabListCustom = () => {
         })}
       >
         <BaseText
-          text={"Đã lưu"}
+          text={"Saved"}
           className="sz-label-m-semi"
           textColor="neutral-700"
         />

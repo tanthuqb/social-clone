@@ -25,20 +25,15 @@ function LoginModal({
     <Modal showModal={showLoginModal} setShowModal={setShowLoginModal}>
       <div className="flex w-full flex-col items-start gap-1 self-stretch rounded-full pb-2">
         <div className="flex w-full items-center justify-between gap-2">
-          <button type="button" title="...">
-            <BaseIconBTN
-              className="p-2 opacity-0"
-              src={""}
-              width={24}
-              height={24}
-            />
-          </button>
-          <BaseText text={"Đăng nhập"} className="sz-label-m-semi" />
+          {/* Spacer that balances the close button so the title stays centered. */}
+          <span aria-hidden="true" className="block h-10 w-10" />
+          <BaseText text={"Log in"} className="sz-label-m-semi" />
           <button
             onClick={() => {
               setShowLoginModal(false);
             }}
             type="button"
+            aria-label="Close"
           >
             <BaseIconBTN
               className="p-2"
@@ -53,20 +48,20 @@ function LoginModal({
         <div className="flex flex-col gap-5 px-4">
           <div className="flex flex-col gap-2.5 text-left">
             <div className="text-[23px] font-semibold leading-7 text-slate-700">
-              Chào mừng đến SuZu nà!
+              Welcome to SuZu!
             </div>
 
             <div className="text-xs font-normal text-slate-500">
-              Mạng xã hội để giải trí và vui chơi thoải mái nhưng hãy
+              A social network to relax and have fun, but please
               <br />
               <span className="text-xs font-semibold text-gray-900 underline">
-                có chơi có chịu
+                be responsible
               </span>{" "}
-              khi chia sẻ những suy nghĩ của{" "}
+              when sharing your{" "}
               <span className="text-xs font-normal text-gray-700">
-                bản thân
+                own
               </span>{" "}
-              mình!
+              thoughts!
             </div>
 
             <LoginForm />
@@ -74,11 +69,11 @@ function LoginModal({
 
           <div className="flex w-full items-center justify-center border-t border-slate-100 pb-10 pt-3 text-[15px] md:pb-6">
             <div className="text-center font-normal text-slate-500">
-              Bạn vẫn chưa có tài khoản 🙄?
+              Don't have an account yet 🙄?
             </div>
             <BaseCommonBTN
               className="ml-1 py-2"
-              text="Đăng ký ngay"
+              text="Sign up now"
               isButton={true}
               onClick={() => {
                 setShowLoginModal(false);

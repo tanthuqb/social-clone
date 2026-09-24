@@ -1,161 +1,175 @@
 # Suzu Social Clone
 
-A modern social networking application built with Next.js 14, Supabase, and Turborepo. This project is designed as a monorepo to manage the main application, shared packages, and transactional emails efficiently.
+A social networking app built with **Next.js 16**, **React 19**, Supabase and Turborepo. The monorepo holds the main app, a shared UI library, transactional email templates and shared tooling configs.
 
 ## ✨ Features
 
-- **Feeds**: Create, edit, delete and pin posts with rich text (TipTap editor), images, video and link previews.
-- **Comments**: Nested comments with reactions.
-- **Reactions**: Like / dislike engagement on both feeds and comments.
-- **Collections**: Save (bookmark) feeds to a personal collection.
-- **Follows**: Follow / unfollow users, personalized follow suggestions.
-- **Notifications**: Realtime notifications on comments, reactions and new followers (Postgres triggers + Supabase Realtime).
-- **Search**: Search profiles and feeds (Postgres full-text functions, Typesense-ready).
-- **Profiles**: Public user pages, avatar upload (Supabase Storage), profile editing and privacy settings.
-- **Auth**: Supabase Auth with email/password and OAuth (Google, Facebook) via `@supabase/ssr` cookie-based sessions.
+- **Feeds**: create, edit, delete and pin posts written in a TipTap 3 editor. Posts can include images (Supabase Storage), embedded YouTube videos (paste a link) and link previews (Open Graph, fetched server-side with SSRF protection). Post HTML is sanitized on write and on render.
+- **Comments**: nested replies (replies to replies are grouped under their top-level comment), with reactions.
+- **Reactions**: like / dislike on feeds and comments, updated live over Supabase Realtime.
+- **Collections**: save a post, or remove it from your saved posts. Saved posts show on your own profile ("Saved" tab) and are private to you.
+- **Follows**: follow / unfollow users, with follow suggestions based on users' post counts.
+- **Notifications**: comments, reactions, new followers and new posts from people you follow. Postgres triggers create the rows; Supabase Realtime updates the unread badge and the list live.
+- **Search**: matches post content and author display name / username.
+- **Profiles**: public pages at `/u/<username>`, or `/u/<user id>` before a username is chosen. Includes avatar upload, profile editing, change password, language preference (English by default), and a support/report form.
+- **Auth**: Supabase Auth with email/password and OAuth (Google, Facebook), using `@supabase/ssr` cookie sessions refreshed in `src/proxy.ts`. `/settings/**` and `/notifications` require a signed-in user.
 
 ## 🏗 Project Structure
 
-This project uses [Turborepo](https://turbo.build/repo) to manage the workspace.
+This project uses [Turborepo](https://turborepo.com) with pnpm workspaces.
 
-### Apps
+| Path | What |
+| --- | --- |
+| [apps/supabase](apps/supabase) | Main Next.js 16 App Router app: UI, server actions, route handlers, `proxy.ts` session refresh, Playwright E2E tests |
+| [packages/ui](packages/ui) | Shared UI components (Radix UI, Tailwind CSS 4, sonner, vaul) |
+| [packages/transactional](packages/transactional) | Transactional email templates ([React Email](https://react.email/) 6) |
+| [tooling/eslint-config](tooling/eslint-config) | Shared ESLint 10 flat configs |
+| [tooling/tailwind-config](tooling/tailwind-config) | Shared Tailwind preset (JS config loaded through `@config`) |
+| [tooling/typescript-config](tooling/typescript-config) | Shared `tsconfig` bases |
+| [supabase/migrations](supabase/migrations) | Database schema (Supabase CLI migrations) |
 
-- **[apps/supabase](apps/supabase)**: The main Next.js 14 application (App Router). It handles the frontend UI, authentication, and backend logic integrations with Supabase.
-  - **Tech Stack**: Next.js 14, React 18, Tailwind CSS, TypeScript, Supabase (Auth / Database / Storage / Realtime), Drizzle ORM (schema typing), TipTap.
+### Tech stack (versions as of 2026-09)
 
-### Packages
+| Area | Version |
+| --- | --- |
+| Next.js / React | 16.3.6 / 19.3.0 (webpack builder, `proxy.ts`, async request APIs) |
+| Supabase | `@supabase/supabase-js` 2.117.1, `@supabase/ssr` 0.12.7 (`getAll`/`setAll` cookies, `getClaims()` in the proxy) |
+| Styling | Tailwind CSS 4.3.3 (`@tailwindcss/postcss`), Radix UI primitives (latest), lucide-react 1.x |
+| Editor | TipTap 3.31.3 |
+| Email | React Email 6.11 (`react-email`) |
+| Tooling | TypeScript 6.0.3, ESLint 10.11 (flat config), Turborepo 2.11.3, Prettier 3.9, Playwright 1.63 |
 
-- **[packages/ui](packages/ui)**: A shared UI component library (Radix UI based) used across the application.
-- **[packages/transactional](packages/transactional)**: Transactional email templates built with [React Email](https://react.email/).
-- **[tooling](tooling)**: Shared configuration for ESLint, TypeScript, and Tailwind CSS.
+> TypeScript 7 (the native compiler) is out, but it is not used here yet: `typescript-eslint` supports `<6.1`, and TypeScript 7 does not ship the JavaScript compiler API that Next.js type-checking relies on.
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- **Node.js**: >= 20.0.0
-- **Package Manager**: pnpm 10.x (`npm i -g pnpm`)
-- **Supabase CLI**: >= 2.x — for database migrations and type generation.
-- **Docker**: Only required if you want to run a local Supabase instance.
+- **Node.js** >= 20 (tested on Node 24)
+- **pnpm** 10.x (`corepack enable` or `npm i -g pnpm`)
+- **Supabase CLI** >= 2.x, for migrations and type generation
+- **Docker**, only if you want a local Supabase stack
 
-### Installation
-
-1.  **Clone the repository:**
-
-    ```bash
-    git clone https://github.com/tanthuqb/social-clone.git
-    cd social-clone
-    ```
-
-2.  **Install dependencies:**
-
-    ```bash
-    pnpm install
-    ```
-
-### Environment Setup
-
-1.  **Environment Variables:**
-
-    Copy the example environment file in `apps/supabase` and fill in your Supabase project credentials:
-
-    ```bash
-    cd apps/supabase
-    cp .env.example .env.local
-    ```
-
-    | Variable | Description |
-    | --- | --- |
-    | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/publishable key (safe for the browser) |
-    | `SERVICE_ROLE_KEY` | Supabase service role key — **server only, never expose to the client** |
-    | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth credentials |
-    | `FACEBOOK_CLIENT_ID` / `FACEBOOK_CLIENT_SECRET` | Facebook OAuth credentials |
-    | `NEXT_PUBLIC_APP_NAME` / `NEXT_PUBLIC_APP_DOMAIN` | App branding |
-    | `GA_MEASUREMENT_ID` | Google Analytics (optional) |
-
-2.  **Local Supabase (optional):**
-
-    ```bash
-    npx supabase login
-    npx supabase start   # requires Docker; prints local API URL + keys
-    ```
-
-### Running the Application
-
-To start the development server for all apps and packages:
+### Install
 
 ```bash
-pnpm run dev
+git clone https://github.com/tanthuqb/social-clone.git
+cd social-clone
+pnpm install
 ```
 
-- **Main App**: [http://localhost:3000](http://localhost:3000)
-- **Supabase Studio** (local only): [http://localhost:54323](http://localhost:54323)
+### Environment
+
+```bash
+cp apps/supabase/.env.example apps/supabase/.env.local
+```
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | yes | Supabase project URL (keep the trailing `/`) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | yes | Anon / publishable key (browser-safe; RLS protects data) |
+| `SUPABASE_PROJECT_ID` | no | Project ref, for CLI helpers |
+| `NEXT_PUBLIC_APP_NAME` | no | App name used in metadata |
+| `NEXT_PUBLIC_SITE_URL` | no | Absolute site URL for Open Graph metadata (falls back to `VERCEL_URL`, then `http://localhost:$PORT`) |
+| `GA_MEASUREMENT_ID` | no | Google Analytics; scripts are only added when set |
+| `E2E_USER_EMAIL` / `E2E_USER_PASSWORD` | tests only | Dedicated, confirmed test account for authenticated Playwright specs |
+
+OAuth providers (Google, Facebook) are configured in the Supabase dashboard under **Authentication → Providers**. Add `http(s)://<your-host>/api/auth/callback` to the Auth **Redirect URLs**, plus `/api/auth/emailcallback` and `/api/auth/passwordcallback`.
+
+The app never uses a service-role key; every query runs as the signed-in user (or anon) under RLS.
+
+### Run
+
+```bash
+pnpm dev            # http://localhost:3000
+```
 
 ## 🛠 Commands
 
-- `pnpm run build`: Build all apps and packages.
-- `pnpm run dev`: Start the development server.
-- `pnpm run lint`: Lint all code.
-- `pnpm run format`: Format code with Prettier.
+| Command | What it does |
+| --- | --- |
+| `pnpm dev` | Start the dev server(s) |
+| `pnpm build` | Production build of all packages (`next build --webpack` for the app) |
+| `pnpm lint` | ESLint 10 (flat config) in every package |
+| `pnpm check-types` | `next typegen && tsc --noEmit` in the app, plus `tsc --noEmit` in the packages |
+| `pnpm test:e2e` | Playwright end-to-end tests (starts the app on port **3104**) |
+| `pnpm format` | Prettier |
+
+### End-to-end tests
+
+```bash
+cd apps/supabase
+pnpm test:e2e:install        # once: downloads Chromium
+pnpm test:e2e                # or from the repo root: pnpm test:e2e
+```
+
+- `playwright.config.ts` starts `next dev --webpack --port 3104` and reuses a server that is already running there. Tests run against `http://localhost:3104`, using the Supabase project from `apps/supabase/.env.local`.
+- **Guest specs** (`e2e/guest.spec.ts`) cover:
+  - the home feed
+  - the login modal and its validation errors
+  - 404 pages for unknown routes, profiles and posts
+  - the settings login guard
+  - public profile and post pages, using URLs found in the live feed (skipped when the feed is empty)
+- **Authenticated specs** (`e2e/authenticated.spec.ts`) cover:
+  - creating a post, commenting and reacting
+  - saving a post to your collection and removing it
+  - following and unfollowing
+  - editing the profile bio
+- The authenticated specs need `E2E_USER_EMAIL` and `E2E_USER_PASSWORD`, and are **skipped with a message** when those are not set. Every spec that creates data cleans it up: the post and its comments are deleted, the reaction, save and follow are toggled back, and the bio is restored.
+- Reports are written to `apps/supabase/playwright-report/` (git-ignored).
 
 ## 📦 Database & Migrations
 
-The database schema is managed with **Supabase CLI migrations** in [supabase/migrations](supabase/migrations).
+The schema lives in [supabase/migrations](supabase/migrations) (Supabase CLI).
 
 ```bash
-# Link to your Supabase project (one time)
-supabase link --project-ref <your-project-ref>
-
-# Check which migrations are applied
-supabase migration list --linked
-
-# Apply pending migrations to the remote database
-supabase db push --linked
-
-# Regenerate TypeScript types after schema changes
+supabase link --project-ref <your-project-ref>   # once
+supabase migration list --linked                 # what is applied
+supabase db push --linked                        # apply pending migrations
 supabase gen types typescript --linked > apps/supabase/src/lib/supabase/database.types.ts
 ```
 
-> **Note:** `database.types.ts` ends with a hand-written section of app enums (`FeedPrivacy`, `ReactionState`, …). If you regenerate the file, keep/re-append that section.
+> `database.types.ts` ends with hand-written app enums (`FeedPrivacy`, `ReactionState`, …). Keep or re-append that section after regenerating.
+
+| Migration | Purpose |
+| --- | --- |
+| `20251217134658_remote_schema.sql` | Baseline schema pulled from the original project |
+| `20260804150908_add_feed_collections_and_comment_engagement.sql` | `feed_collections` + `comment_engagement` tables with RLS |
+| `20260804154419_enable_rls_legacy_tables.sql` | RLS + owner policies on all legacy tables |
+| `20260804154903_harden_function_security.sql` | Revoke RPC access to trigger/internal functions, pin `search_path` |
+| `20260805090000_enable_realtime_publication.sql` | Add app tables to `supabase_realtime` |
+| `20260924120000_rls_hardening_storage_and_integrity.sql` | Covers: feeds privacy-aware SELECT; saved posts private and deduplicated (unique `(user_id, feed_id)`); reports owned by `user_id`; no self-follows; content limit moved to HTML (5000, plain text is capped at 300 by the app); OAuth sign-up no longer fails on duplicate names; owner-only Storage policies and bucket creation |
 
 ### Schema overview
 
 | Table | Purpose |
 | --- | --- |
-| `profiles` | User profiles (1-1 with `auth.users`) |
-| `feeds` | Posts (supports nesting via `parent_id`, pinning, privacy & status enums) |
+| `profiles` | User profiles (1-1 with `auth.users`); `full_name` is the unique username |
+| `feeds` | Posts **and comments** (`type = 'feed' / 'comment'`, nesting via `parent_id`), pinning, privacy & status enums |
 | `feed_images` / `feed_medias` | Post attachments |
-| `feed_engagement` | Reactions on feeds |
-| `comments` | Comments on feeds (nested via `parent_id`) |
-| `comment_engagement` | Reactions on comments |
-| `feed_collections` | Saved/bookmarked feeds |
+| `feed_engagement` | Reactions on posts and comments |
+| `comments` / `comment_engagement` | Legacy tables (not used by the UI; comments are rows in `feeds`) |
+| `feed_collections` | Saved posts |
 | `user_follows` | Follow relationships |
-| `notifications` | Notification records created by Postgres triggers |
-| `report` | Content reports |
+| `notifications` | Created by Postgres triggers; `status` = seen (badge), `read` = opened |
+| `report` | Support / bug reports |
 
-**Storage buckets**: `avatars` (profile pictures) and `suzu` (feed media) — both public.
+**Storage buckets**: `avatars` (profile pictures) and `suzu` (post images). Both are public-read. Once the 2026-09 migration is applied, uploads go to `<user_id>/<file>` and only the owner can change or delete them.
 
-> ⚠️ **Security note:** the original tables in `public` currently have **RLS disabled** (legacy schema). The newer tables (`feed_collections`, `comment_engagement`) ship with RLS policies. Enabling RLS with proper policies on the remaining tables is strongly recommended before production use.
+**Security:** RLS is enabled on every `public` table. Content is publicly readable (respecting `feeds.privacy`), and writes are restricted to the owner. Notifications and saved posts are private.
 
-Drizzle ORM is used for schema typing/validation helpers in `apps/supabase/src/lib/db/schema`; the source of truth for the database is the Supabase migrations folder.
+`src/lib/db/schema` holds **Zod** schemas and app enums used for input validation. Drizzle ORM is no longer a dependency; the database's source of truth is the migrations folder.
 
 ## ▲ Deploying to Vercel
 
-The app deploys as a standard Next.js monorepo project:
-
-1. Import the GitHub repository into [Vercel](https://vercel.com/new).
-2. Set **Root Directory** to `apps/supabase` (Vercel auto-detects Turborepo + pnpm).
-3. Add the environment variables from the table above in Project Settings → Environment Variables.
-4. Push to `main` — Vercel builds and deploys automatically.
-
-Make sure the Supabase migrations have been pushed (`supabase db push --linked`) before the first deploy, and add your Vercel domain to the Supabase Auth **Redirect URLs** allow-list.
+1. Import the repository into [Vercel](https://vercel.com/new) and set **Root Directory** to `apps/supabase`.
+2. Add the environment variables above.
+3. Apply the migrations (`supabase db push --linked`) and add the Vercel domain's callback URLs to the Supabase Auth redirect allow-list.
 
 ## ✉️ Emails
 
-Transactional emails are located in `packages/transactional`. To preview emails:
-
 ```bash
 cd packages/transactional
-pnpm run dev
+pnpm dev      # preview server on http://localhost:3010
+pnpm export   # render templates to ./out
 ```

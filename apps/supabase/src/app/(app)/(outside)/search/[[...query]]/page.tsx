@@ -9,12 +9,14 @@ import { HeaderSectionSearch } from "@/components/shared/header/global/header-se
 const INITIAL_NUMBER_OF_USERSEARCH = 5;
 // const NUMBER_OF_FEEDS_TO_USERSEARCH = 5
 
-const fetchUserData = async (id: Profile["id"]) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/user?userId=${id}`,
-    { cache: "no-cache" },
-  );
-  const data = await res.json();
+const fetchUserData = async (id: Profile["id"] | undefined) => {
+  if (!id) return null;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
   return data;
 };
 
@@ -28,23 +30,23 @@ const SearchPage = async ({
   const resolvedSearchParams = await searchParams;
   const search = resolvedSearchParams?.search?.toString().trim();
   const searchData = await fetchSearchDataAction(
-    search!,
+    search ?? "",
     0,
     INITIAL_NUMBER_OF_USERSEARCH,
   );
-  const profile = await fetchUserData(session?.user?.id!);
+  const profile = await fetchUserData(session?.user?.id);
   return (
     <Suspense fallback={<Loading />}>
       <HeaderSectionSearch
-        text={search!}
+        text={search ?? ""}
         session={session}
-        profile={profile}
+        profile={profile as Profile}
         searchData={searchData}
       />
       <ResultSearch
         searchData={searchData}
-        profile={profile}
-        searchParams={search!}
+        profile={profile as Profile}
+        searchParams={search ?? ""}
         session={session}
       />
       <MainFooter />

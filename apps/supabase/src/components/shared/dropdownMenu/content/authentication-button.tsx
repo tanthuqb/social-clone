@@ -30,25 +30,25 @@ const AuthenticationButton = ({ className, props }: { className?: string, props?
     props === 'Register' ? (
       <div role="button" onClick={handlelogin}>
         <DropdownMenuItem className="cursor-pointer text-[15px] text-[#0F172A]">
-          Đăng ký tài khoản!
+          Sign up!
         </DropdownMenuItem>
       </div>
     ) : props === 'Login' ? (
       <div role="button" onClick={handlelogin}>
         <DropdownMenuItem className="cursor-pointer text-[15px] text-[#0F172A]">
-          Vào SuZu!
+          Log in to SuZu!
         </DropdownMenuItem>
       </div>) :
       props === 'Support' ? (
         <div role="button" onClick={handlelogin}>
           <DropdownMenuItem className="cursor-pointer text-[15px] text-[#0F172A]">
-            Hỗ trợ
+            Support
           </DropdownMenuItem>
         </div>) :
         props === 'Error' && (
           <div role="button" onClick={handlelogin}>
             <DropdownMenuItem className="cursor-pointer text-[15px] text-[#0F172A]">
-              Báo lỗi
+              Report a bug
             </DropdownMenuItem>
           </div>)
   );

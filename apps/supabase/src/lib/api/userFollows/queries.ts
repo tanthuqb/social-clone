@@ -8,7 +8,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 export const getUserFollows = async () => {
     const supabase = await createClient();    
-    let { data: rows, error } = await supabase.from('user_follows').select('*, user_id!left(*),following_id!left(*)')
+    const { data: rows, error } = await supabase.from('user_follows').select('*, user_id!left(*),following_id!left(*)')
     return { userFollows: rows };
 
 };

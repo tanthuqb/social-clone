@@ -132,7 +132,7 @@ export default function RegisterForm() {
         <div className="flex items-center justify-center gap-2.5 self-stretch">
           <div className="flex h-[1px] flex-1 items-start gap-1 rounded-full bg-slate-100" />
           <div className="text-xs font-normal leading-4 text-slate-500 ">
-            hoặc
+            or
           </div>
           <div className="flex h-[1px] flex-1 items-start gap-1 rounded-full bg-slate-100" />
         </div>

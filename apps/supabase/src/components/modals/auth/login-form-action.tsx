@@ -28,7 +28,7 @@ export default function LoginFormAction({ setTypeFormModal }: any) {
               <FormItem>
                 <FormControl>
                   <Input
-                    placeholder="Nhập email"
+                    placeholder="Enter email"
                     type="text"
                     {...field}
                     className="border-0 ring-1 ring-neutral-100"
@@ -46,7 +46,7 @@ export default function LoginFormAction({ setTypeFormModal }: any) {
             <FormItem>
               <FormControl>
                 <Input
-                  placeholder="Nhập mật khẩu"
+                  placeholder="Enter password"
                   type="password"
                   {...field}
                   className="border-0 ring-1 ring-neutral-100"
@@ -65,7 +65,7 @@ export default function LoginFormAction({ setTypeFormModal }: any) {
             }}
             className="cursor-pointer text-[15px] font-semibold leading-6 text-slate-900"
           >
-            Quên mật khẩu
+            Forgot password
           </div>
         </div>
 
@@ -95,7 +95,7 @@ export default function LoginFormAction({ setTypeFormModal }: any) {
                   : "text-slate-500"
               } text-center text-[15px] font-semibold leading-6`}
             >
-              SuZu thuiii
+              Log in
             </div>
 
             <svg

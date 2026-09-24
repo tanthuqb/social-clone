@@ -3,7 +3,7 @@ import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
 const config = {
   presets: [sharedConfig as any],
-  darkMode: ["class"],
+  darkMode: "class",
   content: [
     "./pages/**/*.{ts,tsx}",
     "./src/components/**/*.{ts,tsx}",

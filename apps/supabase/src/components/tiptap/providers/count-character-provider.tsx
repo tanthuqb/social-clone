@@ -1,4 +1,4 @@
-"use clinet"
+"use client"
 import { SetStateAction, createContext, useContext, useState } from "react";
 
 type TCountCharactersContextProvider = {

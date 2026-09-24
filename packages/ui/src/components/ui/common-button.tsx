@@ -53,7 +53,7 @@ function CommonButton({
           )}
           {text && (
             <div
-              className={`text-[15px] font-semibold ${text === "Hủy bỏ" || text === "Đăng xuất" ? "text-slate-900" : activeButton ? "text-slate-500" : "text-white"} `}
+              className={`text-[15px] font-semibold ${text === "Cancel" || text === "Log out" ? "text-slate-900" : activeButton ? "text-slate-500" : "text-white"} `}
             >
               {text}
             </div>

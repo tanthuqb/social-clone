@@ -28,6 +28,26 @@ export const ListNotifications = ({
   const supabase = createClient();
   const { datas, setData, scrollTrigger, loading } = NotificationAction().PagingNotifications(session,notifications);
 
+  // New notifications for this user appear live at the top of the list.
+  useRealtimeTable({
+    table: "notifications",
+    event: "INSERT",
+    filter: `user_noti_id=eq.${session?.user?.id ?? "00000000-0000-0000-0000-000000000000"}`,
+    onChange: async (payload: any) => {
+      const id = payload?.new?.id;
+      if (!id || payload?.new?.user_id === session?.user?.id) return;
+      const { data } = await supabase
+        .from("notifications")
+        .select("*,user_id!left(*),feed_id!left(*),comment_id!left(*)")
+        .eq("id", id)
+        .maybeSingle();
+      if (!data) return;
+      setData((prev: any) =>
+        prev?.some((noti: any) => noti?.id === id) ? prev : [data, ...(prev ?? [])],
+      );
+    },
+  });
+
   useRealtimeTable({
     table: "notifications",
     event: "DELETE",
@@ -68,7 +88,7 @@ export const ListNotifications = ({
                 />
               </div>
               <BaseText
-                text={"Chưa có thông báo nào"}
+                text={"No notifications yet"}
                 className="sz-label-m-reg sm:ml-[82px] p-3 text-center"
                 textColor="neutral-500"
               />

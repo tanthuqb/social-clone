@@ -17,11 +17,13 @@ type FeedDetailProps = {
 const FeedDetail = ({ inFeed, feed, profiles, session }: FeedDetailProps) => {
   if (!feed?.id) return <></>;
 
-  // Phase 2: Realtime - tạm comment vì chưa xử lý realtime
+  // Phase 2: Realtime - commented out for now since realtime is not handled yet
 
   return (
     <div
       className={`${inFeed ? "shadow-common-sm bg-white py-4" : "p-0 sm:p-4"} flex w-full flex-col sm:rounded-2xl`}
+      data-testid="feed-card"
+      data-feed-id={feed.id}
     >
       <div
         className={`flex flex-col items-start sm:rounded-2xl ${inFeed ? null : "shadow-common-sm bg-white py-4"}`}
@@ -34,8 +36,8 @@ const FeedDetail = ({ inFeed, feed, profiles, session }: FeedDetailProps) => {
           session={session}
           inFeed={inFeed}
           iconTrigger="dots"
-          comment={false} // dùng để check hiện content dropdown comment
-          notifications={false} // dùng để check hiện content dropdown notification
+          comment={false} // used to decide whether to show the comment dropdown content
+          notifications={false} // used to decide whether to show the notification dropdown content
           user={profiles!}
         />
 
@@ -61,7 +63,7 @@ const FeedDetail = ({ inFeed, feed, profiles, session }: FeedDetailProps) => {
             {/** Header */}
             <div className="items-center gap-2.5 self-stretch px-4">
               <div className="flex-1 text-[18px] font-semibold not-italic leading-[23.4px] text-slate-900">
-                Tương tác
+                Reactions
               </div>
             </div>
 
@@ -86,7 +88,7 @@ const FeedDetail = ({ inFeed, feed, profiles, session }: FeedDetailProps) => {
             {/* header */}
             <div className="flex items-center gap-2.5 self-stretch px-4 pb-2.5">
               <div className="text-[18px] font-semibold not-italic leading-[23.4px] text-slate-900">
-                Thảo luận
+                Comments
               </div>
             </div>
             {/* col - component create,.... comment */}

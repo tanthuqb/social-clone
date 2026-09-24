@@ -7,7 +7,7 @@ export default async function EditProfile() {
   const supabase = await createClient();
   const { data: session, error } = await supabase.auth.getUser();
   if (error) {
-    // đoạn này trả về tramg error hay 404
+    // should this return the error page or 404?
   }
   let user;
   if (session && session.user) {
@@ -28,7 +28,7 @@ export default async function EditProfile() {
 
   return (
     <div className="flex h-dvh flex-col">
-      <HeaderCommonSettings text="Chỉnh sửa hồ sơ" />
+      <HeaderCommonSettings text="Edit profile" />
       <div className="shadow-common-sm h-[calc(100dvh_-_60px)] rounded-none bg-neutral-50 py-4 sm:h-[calc(100dvh_-_80px)] sm:rounded-3xl">
         <Profile user={user} session={session} />
       </div>

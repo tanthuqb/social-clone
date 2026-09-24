@@ -37,9 +37,14 @@ import {
   createFeedEntryAction,
   updateFeedEntryAction,
 } from "@/lib/actions/feed/actions";
-import { FeedPrivacy, FeedStatus } from "@/lib/supabase/database.types";
+import { FeedPrivacy } from "@/lib/supabase/database.types";
+import {
+  FEED_MEDIA_BUCKET,
+  objectPathFromPublicUrl,
+  uploadUserFile,
+} from "@/lib/storage";
 import { useContentTiptap } from "@/components/tiptap/providers/content-provider";
-import { toastFeed } from "@/app/(app)/(outside)/toast/toast";
+import { toastFeed } from "@/components/shared/toast-feed";
 interface ContentFormProps {
   user: Profile;
   type: boolean;
@@ -62,7 +67,7 @@ const ContentForm = memo(
     const [files, setFiles] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const { content } = useContentTiptap();
-    let feedImage = feed?.feed_images ?? null;
+    const feedImage = feed?.feed_images ?? null;
     const supabase = createClient();
     const [filesPreview, setFilesPreview] = useState<any[]>(
       feed?.feed_images ?? [],
@@ -86,132 +91,115 @@ const ContentForm = memo(
     const handleSubmit = async (event: React.SyntheticEvent) => {
       event.preventDefault();
       setLoading(true);
-      const { data: session, error } = await supabase.auth.getUser();
+      try {
+        const { data: auth } = await supabase.auth.getUser();
+        const userId = auth?.user?.id;
+        if (!userId) {
+          toast.error("Please log in first.");
+          return;
+        }
 
-      /**
-       * Editing or Create a new feed
-       */
-      if (editing) {
-        const { data, error } = await updateFeedEntryAction(feed.id, {
-          content: content,
-          type: type ? "comment" : "feed",
-        });
-
-        if (typeof data === "object" && data !== null && files?.length > 0) {
-          /**
-           * Push new images
-           */
-          const uploadPromises = await Promise.all(
-            files.map(async (file, index) => {
-              if (!file?.name && feedImage) {
-                feedImage = feedImage.filter(
-                  (existingUrl) => existingUrl.image !== file?.image,
+        const uploadNewImages = async (targetFeedId: string) => {
+          const newFiles = files.filter((file) => file instanceof File);
+          await Promise.all(
+            newFiles.map(async (file: File) => {
+              try {
+                const publicUrl = await uploadUserFile(
+                  supabase,
+                  FEED_MEDIA_BUCKET,
+                  userId,
+                  file,
                 );
-                return false;
-              }
-              let path = file?.name;
-              const { data: url, error } = await supabase.storage
-                .from("suzu")
-                .upload(path + `_${Date.now()}`, file);
-              if (!error) {
-                await createFeedImageAction({
-                  feed_id: data?.id as string,
-                  image:
-                    process.env.NEXT_PUBLIC_SUPABASE_URL +
-                    "storage/v1/object/public" +
-                    "/suzu/" +
-                    url?.path,
+                const result = await createFeedImageAction({
+                  feed_id: targetFeedId,
+                  image: publicUrl,
                 });
-              } else toast.error(error.message);
+                if (typeof result === "string") toast.error(result);
+              } catch (error) {
+                toast.error((error as Error).message);
+              }
+            }),
+          );
+        };
+
+        if (editing) {
+          const { data, error } = await updateFeedEntryAction(feed.id, {
+            content: content,
+            type: type ? "comment" : "feed",
+          });
+          if (error || !data) {
+            toast.error(error ?? "Failed to update post");
+            return;
+          }
+
+          await uploadNewImages(data.id);
+
+          // Existing images the user removed from the form.
+          const keptUrls = new Set(
+            files.filter((file) => !(file instanceof File)).map((file) => file?.image),
+          );
+          const removed = (feedImage ?? []).filter(
+            (image) => !keptUrls.has(image.image),
+          );
+          await Promise.all(
+            removed.map(async (image) => {
+              await deleteFeedImageAction(image.id!);
+              const path = objectPathFromPublicUrl(image.image, FEED_MEDIA_BUCKET);
+              if (path) {
+                await supabase.storage.from(FEED_MEDIA_BUCKET).remove([path]);
+              }
             }),
           );
 
-          /**
-           * Remove images
-           */
-          if (feedImage && feedImage.length > 0) {
-            const deleteImage = await Promise.all(
-              feedImage?.map(async (imageUrl) => {
-                const url: string = imageUrl?.image!;
-                await deleteFeedImageAction(imageUrl?.id!);
-                const parts: string[] = url?.split("/");
-                if (url && parts.length > 0) {
-                  const filename: string = parts[parts?.length - 1];
-                  const { data, error } = await supabase.storage
-                    .from("suzu")
-                    .remove([filename!]);
-                }
-              }),
+          setShowFeedCreateModal(false);
+          type
+            ? toast("Comment updated successfully!", {
+              icon: <CheckIcon />,
+              duration: 5000,
+            })
+            : toastFeed(
+              "Updated successfully",
+              "checkIcon",
+              "View",
+              `/p/${data.id}`,
             );
+          router.refresh();
+        } else {
+          // Comments attach to the parent comment/feed; top-level posts never
+          // inherit the feed id of the page they were created from.
+          const parentId = type
+            ? (parentFeedId ?? (feedId as string | undefined) ?? null)
+            : null;
+          const { data, error } = await createFeedEntryAction({
+            content: content,
+            type: type ? "comment" : "feed",
+            privacy: FeedPrivacy.PUBLIC,
+            parent_id: parentId,
+          });
+          if (error || !data) {
+            toast.error(error ?? "Failed to publish post");
+            return;
           }
-        }
 
-        setShowFeedCreateModal(false);
-        type
-          ? toast("Cập nhật bình luận thành công!", {
-            icon: <CheckIcon />,
-            duration: 5000,
-          })
-          : toastFeed(
-            "Chỉnh sửa thành công",
-            "checkIcon",
-            "Xem",
-            `/p/${data?.id}`,
-          );
-        setLoading(false);
-        router.refresh();
-      } else {
-        const { data, error } = await createFeedEntryAction({
-          content: content,
-          type: type ? "comment" : "feed",
-          privacy: FeedPrivacy.PUBLIC,
-          status: FeedStatus.ACTIVE,
-          parent_id: parentFeedId! ? parentFeedId! : (feedId! as string),
-        });
+          await uploadNewImages(data.id);
 
-        if (typeof data === "object" && data !== null) {
-          /**
-           * Push images
-           */
-          if (data?.id! && files?.length > 0) {
-            const uploadPromises = await Promise.all(
-              files.map(async (file, index) => {
-                let path = file?.name;
-                const { data: url, error } = await supabase.storage
-                  .from("suzu")
-                  .upload(path + `_${Date.now()}`, file);
-                if (!error) {
-                  await createFeedImageAction({
-                    feed_id: data?.id as string,
-                    image:
-                      process.env.NEXT_PUBLIC_SUPABASE_URL +
-                      "storage/v1/object/public" +
-                      "/suzu/" +
-                      url?.path,
-                  });
-                } else toast.error(error.message);
-              }),
+          setShowFeedCreateModal(false);
+          type
+            ? toast("Comment posted successfully", {
+              icon: <CheckIcon />,
+              duration: 5000,
+            })
+            : toastFeed(
+              "Post published successfully",
+              "checkIcon",
+              "View",
+              `/p/${data.id}`,
             );
-          }
+          router.refresh();
         }
-        setShowFeedCreateModal(false);
-        router.refresh();
-        type
-          ? toast("Bình luận thành công", {
-            icon: <CheckIcon />,
-            duration: 5000,
-            // action: <Button className='px-2 py-1 flex-end bg-slate-200 text-foreground' onClick={() => console.log('Action!')}>Action</Button>,
-          })
-          : toastFeed(
-            "Đăng bài thành công",
-            "checkIcon",
-            "Xem",
-            `/p/${data?.id}`,
-          );
+      } finally {
         setLoading(false);
-        router.refresh();
       }
-      // end "Editing"
     };
 
     /**
@@ -264,7 +252,7 @@ const ContentForm = memo(
      * @returns
      */
     const handleFileSelect = (e: any) => {
-      let selectedFiles: File[] = Array.from(e.target.files);
+      const selectedFiles: File[] = Array.from(e.target.files);
       if (selectedFiles) {
         handleValidateImageFiles(selectedFiles);
       }
@@ -276,7 +264,7 @@ const ContentForm = memo(
      * @param data
      */
     const handleDeleteImage = (data: { image: string; key: number }) => {
-      // Xử lý xóa ảnh khi update feed
+      // Handle image removal when updating a feed
       if (feed?.feed_images && feed?.feed_images?.length > 0) {
         setFilesPreview(
           filesPreview.filter((e) => {

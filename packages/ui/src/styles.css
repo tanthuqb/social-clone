@@ -1,3 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/*
+ * Tailwind CSS v4: the consuming app generates all utilities (its globals.css
+ * imports "tailwindcss" and adds this package with @source). Nothing here.
+ */

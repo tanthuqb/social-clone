@@ -33,7 +33,7 @@ const ListUserSuggestSidebar = ({
               key={index}
             >
               <Link
-                href={`/u/${user?.full_name}`}
+                href={`/u/${user?.full_name ?? user?.id}`}
                 className="flex flex-1 items-start gap-2"
               >
                 <div className="avatar relative flex h-10 w-10 flex-col self-stretch">
@@ -53,7 +53,7 @@ const ListUserSuggestSidebar = ({
                   <BaseUserInfo
                     displayName={user?.display_name!}
                     username={user?.full_name!}
-                    message={`${user?.countFollowing!} người theo dõi`}
+                    message={`${user?.countFollowing!} followers`}
                   />
                 </div>
               </Link>
@@ -73,7 +73,7 @@ const ListUserSuggestSidebar = ({
           );
         })}
 
-      {/* Check lại điều kiện: Khi user bấm vào input => ktra nếu k có kq mới hiện phần này */}
+      {/* Re-check condition: when the user clicks the input => only show this if there are no results */}
       {!isLoading && (
         <div className="absolute bottom-96 left-40">
           <LoadingSpinner />
@@ -94,7 +94,7 @@ const ListUserSuggestSidebar = ({
               </div>
               <BaseText
                 text={
-                  "Nội dung bạn đang kiếm không tồn tại, hãy thử từ khoá khác nhé"
+                  "No results found. Try a different keyword"
                 }
                 className="sz-label-m-reg p-3 text-center"
                 textColor="neutral-500"

@@ -36,7 +36,7 @@ export const getFeedsPrepared = async (
     prepared
       .eq("user_id", userId)
       .eq("type", "feed")
-      .order("pin", { ascending: false })
+      .order("pin", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false })
       .limit(5);
   }

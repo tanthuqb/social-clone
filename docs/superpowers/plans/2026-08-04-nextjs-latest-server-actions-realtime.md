@@ -1,5 +1,14 @@
 # Next.js Latest + Server Actions + Realtime Refactor — Implementation Plan
 
+> **Status (2026-09-24):**
+> - Tasks 1–7 are **done**. They were committed on `refactor/nextjs-latest`: 1403910, 897717b, 83690c1, 0aa30dc, 959b4d9, b60749e, 8cf26fe, followed by fix commits b4fe301, ff222e8, b7a05b5 and 6dd48f3.
+> - Task 8 was continued on branch `chore/upgrade-2026-09` (uncommitted):
+>   - Step 1 (build/type-check/lint) passes.
+>   - Step 2's smoke list is partly automated by the Playwright suite in `apps/supabase/e2e`: guest flows run live; authenticated flows need `E2E_USER_EMAIL` / `E2E_USER_PASSWORD`.
+>   - Steps 3–4 (push, Vercel preview, production deploy) are **not done**. They are out of scope, and no deploy is allowed from the agent.
+> - The 2026-09 upgrade also moved to Tailwind 4, TipTap 3, TypeScript 6 and ESLint 10. The "out of scope" note below is historical.
+> - Also added: migration `20260924120000_rls_hardening_storage_and_integrity.sql`, which is not applied yet.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Upgrade `apps/supabase` from Next.js 14 (pages of App Router with mixed client-side data access) to the latest Next.js, move all Supabase mutations behind server actions, and consolidate realtime updates (reaction/save/notification buttons) into shared realtime hooks.
@@ -31,7 +40,7 @@
 **Interfaces:**
 - Produces: a compiling app on Next latest; all later tasks assume `cookies()`/`headers()`/`params` are async.
 
-- [ ] **Step 1: Run the upgrade codemod** (it bumps deps and applies breaking-change codemods, including async request APIs):
+- [x] **Step 1: Run the upgrade codemod** (it bumps deps and applies breaking-change codemods, including async request APIs):
 
 ```bash
 cd apps/supabase
@@ -40,7 +49,7 @@ npx @next/codemod@canary upgrade latest
 
 If prompted for individual codemods, accept `next-async-request-api` and all recommended ones.
 
-- [ ] **Step 2: Upgrade React across the workspace**
+- [x] **Step 2: Upgrade React across the workspace**
 
 ```bash
 pnpm --filter supabase add react@latest react-dom@latest
@@ -48,7 +57,7 @@ pnpm --filter supabase add -D @types/react@latest @types/react-dom@latest
 pnpm --filter @suzu/ui add -D react@latest react-dom@latest @types/react@latest
 ```
 
-- [ ] **Step 3: Make the Supabase server client async** — `apps/supabase/src/lib/supabase/server.ts` becomes:
+- [x] **Step 3: Make the Supabase server client async** — `apps/supabase/src/lib/supabase/server.ts` becomes:
 
 ```ts
 import { createServerClient } from '@supabase/ssr';
@@ -88,7 +97,7 @@ grep -rn "createClient()" src --include="*.ts*" | grep -v "supabase/client"
 
 (`src/lib/supabase/client.ts` — the browser client — stays synchronous.)
 
-- [ ] **Step 4: Fix async `params`/`searchParams`** in every page/route that reads them (e.g. `src/app/(app)/(outside)/(feed)/p/[feedId]/page.tsx`, `u/[username]/page.tsx`, all `src/app/api/**/route.ts`). Pattern:
+- [x] **Step 4: Fix async `params`/`searchParams`** in every page/route that reads them (e.g. `src/app/(app)/(outside)/(feed)/p/[feedId]/page.tsx`, `u/[username]/page.tsx`, all `src/app/api/**/route.ts`). Pattern:
 
 ```ts
 // before
@@ -105,9 +114,9 @@ The codemod handles most of these; verify none remain:
 npx tsc --noEmit
 ```
 
-- [ ] **Step 5: Middleware** — if the installed Next major renamed `middleware.ts` to `proxy.ts`, follow the codemod's output; otherwise keep `src/middleware.ts` as is. Confirm the session-refresh flow still compiles (it calls `createClient(request)` from `src/lib/supabase/middleware.ts`, which is request-scoped and stays synchronous).
+- [x] **Step 5: Middleware** — if the installed Next major renamed `middleware.ts` to `proxy.ts`, follow the codemod's output; otherwise keep `src/middleware.ts` as is. Confirm the session-refresh flow still compiles (it calls `createClient(request)` from `src/lib/supabase/middleware.ts`, which is request-scoped and stays synchronous).
 
-- [ ] **Step 6: Fix remaining compile errors, then verify**
+- [x] **Step 6: Fix remaining compile errors, then verify**
 
 ```bash
 npx tsc --noEmit        # in apps/supabase — expect 0 errors
@@ -118,7 +127,7 @@ Known likely breakages and their fixes:
 - `@tiptap/*`: if peer-dep errors against React 19, `pnpm --filter supabase add @tiptap/react@latest @tiptap/starter-kit@latest` plus each `@tiptap/extension-*@latest` already in package.json (v3 line supports React 19; the extension API for the used extensions — Document, Paragraph, Text, Heading, Link, Image, Mention, Placeholder, Youtube, CharacterCount, HardBreak, Dropcursor — is source-compatible for basic configure() usage).
 - `styled-components`/`swagger-ui-react`: if they block the build under React 19, dynamic-import them with `next/dynamic` and `ssr: false` in the pages that use them.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add -A && git commit -m "feat: upgrade to latest Next.js + React 19 (async request APIs)"
@@ -134,10 +143,10 @@ git add -A && git commit -m "feat: upgrade to latest Next.js + React 19 (async r
 **Interfaces:**
 - Produces: Supabase Auth is the only auth path (`supabase.auth.*` + `src/app/api/auth/*` routes).
 
-- [ ] **Step 1: Audit** — for each candidate package run `grep -rn "<pkg>" src --include="*.ts*"`; only remove packages with zero source hits after fixing the two components. The two known usages import types/`signIn` from `next-auth` — replace with the Supabase equivalents already used elsewhere in the same files (`supabase.auth.signInWithOAuth` / `Session` from `@supabase/supabase-js`).
-- [ ] **Step 2: Remove deps** — `pnpm --filter supabase remove next-auth @auth/core @auth/drizzle-adapter ...` (only the ones that audited clean).
-- [ ] **Step 3: Verify** — `npx tsc --noEmit` and `pnpm build` pass; sign-in / sign-out / OAuth callback routes under `src/app/api/auth/` compile untouched.
-- [ ] **Step 4: Commit** — `git commit -m "refactor: remove unused next-auth stack, Supabase Auth only"`.
+- [x] **Step 1: Audit** — for each candidate package run `grep -rn "<pkg>" src --include="*.ts*"`; only remove packages with zero source hits after fixing the two components. The two known usages import types/`signIn` from `next-auth` — replace with the Supabase equivalents already used elsewhere in the same files (`supabase.auth.signInWithOAuth` / `Session` from `@supabase/supabase-js`).
+- [x] **Step 2: Remove deps** — `pnpm --filter supabase remove next-auth @auth/core @auth/drizzle-adapter ...` (only the ones that audited clean).
+- [x] **Step 3: Verify** — `npx tsc --noEmit` and `pnpm build` pass; sign-in / sign-out / OAuth callback routes under `src/app/api/auth/` compile untouched.
+- [x] **Step 4: Commit** — `git commit -m "refactor: remove unused next-auth stack, Supabase Auth only"`.
 
 ### Task 3: Fix the four known column-name bugs (pre-refactor correctness)
 
@@ -150,10 +159,10 @@ git add -A && git commit -m "feat: upgrade to latest Next.js + React 19 (async r
 **Interfaces:**
 - Produces: comment editing and comment-reaction lookups hit real columns; Task 4's actions copy the corrected calls.
 
-- [ ] **Step 1:** Apply the four fixes above, removing the `as any` casts they hid behind.
-- [ ] **Step 2:** `npx tsc --noEmit` — 0 errors (the casts are gone, so the types now check the column names).
-- [ ] **Step 3:** Manual smoke (dev server): edit a comment → content persists; react to a comment → reaction saved (check `comment_engagement` rows in Studio).
-- [ ] **Step 4: Commit** — `git commit -m "fix: correct comment/engagement column names"`.
+- [x] **Step 1:** Apply the four fixes above, removing the `as any` casts they hid behind.
+- [x] **Step 2:** `npx tsc --noEmit` — 0 errors (the casts are gone, so the types now check the column names).
+- [x] **Step 3:** Manual smoke (dev server): edit a comment → content persists; react to a comment → reaction saved (check `comment_engagement` rows in Studio).
+- [x] **Step 4: Commit** — `git commit -m "fix: correct comment/engagement column names"`.
 
 ### Task 4: Server actions for feeds + comments (write path)
 
@@ -170,7 +179,7 @@ git add -A && git commit -m "feat: upgrade to latest Next.js + React 19 (async r
   - `deleteCommentAction(id: string): Promise<{ data: null; error: string | null }>`
   - `togglePinAction(feedId: string, pin: boolean): Promise<{ data: null; error: string | null }>`
 
-- [ ] **Step 1: Write `comments/actions.ts`** following this template (identical error-shape for all):
+- [x] **Step 1: Write `comments/actions.ts`** following this template (identical error-shape for all):
 
 ```ts
 "use server";
@@ -201,10 +210,10 @@ export async function createCommentAction(input: {
 
 `updateCommentAction`/`deleteCommentAction`/`togglePinAction` follow the same shape (`.update({ content }).eq("id", id)`, `.delete().eq("id", id)`, `.update({ pin }).eq("id", feedId)` + `revalidatePath("/")`). RLS enforces ownership — do not add manual ownership checks beyond the auth guard.
 
-- [ ] **Step 2: Swap consumers** — in the five components listed above, replace direct `supabase.from(...).insert/update/delete` calls with the actions (components keep their optimistic `useState` updates; realtime in Task 6 reconciles other viewers). File uploads (`supabase.storage.from("suzu").upload`) STAY client-side — storage uploads from the browser are fine and avoid streaming files through actions.
-- [ ] **Step 3:** `npx tsc --noEmit` + `pnpm build` pass.
-- [ ] **Step 4:** Manual smoke: create feed with image, comment, edit comment, pin/unpin, delete feed.
-- [ ] **Step 5: Commit** — `git commit -m "refactor: feeds/comments writes via server actions"`.
+- [x] **Step 2: Swap consumers** — in the five components listed above, replace direct `supabase.from(...).insert/update/delete` calls with the actions (components keep their optimistic `useState` updates; realtime in Task 6 reconciles other viewers). File uploads (`supabase.storage.from("suzu").upload`) STAY client-side — storage uploads from the browser are fine and avoid streaming files through actions.
+- [x] **Step 3:** `npx tsc --noEmit` + `pnpm build` pass.
+- [x] **Step 4:** Manual smoke: create feed with image, comment, edit comment, pin/unpin, delete feed.
+- [x] **Step 5: Commit** — `git commit -m "refactor: feeds/comments writes via server actions"`.
 
 ### Task 5: Server actions for engagement, collections, follows, profile
 
@@ -221,11 +230,11 @@ export async function createCommentAction(input: {
   - `followAction(followingId: string)` / `unfollowAction(followingId: string)`
   - `updateProfileAction(input: Partial<Pick<Profile, "display_name" | "full_name" | "description" | "gender" | "avatar_url" | "birthday" | "website">>)`
 
-- [ ] **Step 1:** Implement the actions with the Task 4 template (auth guard → single supabase call → `revalidatePath` of the affected route: `/` for reactions/saves, `/u/[username]` for follows/profile).
-- [ ] **Step 2:** Swap the consumers; avatar upload to `avatars` bucket stays client-side, only the `profiles` row update moves into `updateProfileAction`.
-- [ ] **Step 3:** `npx tsc --noEmit` + `pnpm build`.
-- [ ] **Step 4:** Manual smoke: like/dislike a feed and a comment, save/unsave, follow/unfollow, edit profile with new avatar.
-- [ ] **Step 5: Commit** — `git commit -m "refactor: engagement/collections/follows/profile via server actions"`.
+- [x] **Step 1:** Implement the actions with the Task 4 template (auth guard → single supabase call → `revalidatePath` of the affected route: `/` for reactions/saves, `/u/[username]` for follows/profile).
+- [x] **Step 2:** Swap the consumers; avatar upload to `avatars` bucket stays client-side, only the `profiles` row update moves into `updateProfileAction`.
+- [x] **Step 3:** `npx tsc --noEmit` + `pnpm build`.
+- [x] **Step 4:** Manual smoke: like/dislike a feed and a comment, save/unsave, follow/unfollow, edit profile with new avatar.
+- [x] **Step 5: Commit** — `git commit -m "refactor: engagement/collections/follows/profile via server actions"`.
 
 ### Task 6: Realtime provider + live buttons
 
@@ -245,7 +254,7 @@ useRealtimeTable(opts: {
 }): void
 ```
 
-- [ ] **Step 1: Write the hook** (single channel per subscription, cleaned up on unmount):
+- [x] **Step 1: Write the hook** (single channel per subscription, cleaned up on unmount):
 
 ```ts
 "use client";
@@ -283,7 +292,7 @@ export function useRealtimeTable({
 }
 ```
 
-- [ ] **Step 2: Enable replication** — realtime events only flow for tables in the `supabase_realtime` publication. New migration (`supabase migration new enable_realtime_publication`):
+- [x] **Step 2: Enable replication** — realtime events only flow for tables in the `supabase_realtime` publication. New migration (`supabase migration new enable_realtime_publication`):
 
 ```sql
 alter publication supabase_realtime add table
@@ -297,7 +306,7 @@ alter publication supabase_realtime add table
 
 `supabase db push --linked --yes`. (RLS applies to realtime: anon/authed receive rows their SELECT policies allow — notifications only reach their recipient, which is exactly right for the badge.)
 
-- [ ] **Step 3: Swap the six components** to `useRealtimeTable`, e.g. in `interactive-widget.tsx`:
+- [x] **Step 3: Swap the six components** to `useRealtimeTable`, e.g. in `interactive-widget.tsx`:
 
 ```ts
 useRealtimeTable({
@@ -309,9 +318,9 @@ useRealtimeTable({
 
 and delete the hand-rolled `supabase.channel(...)/removeChannel` blocks they replace. Notification badge (`nav-item.tsx`, `main-footer.tsx`) subscribes with `table: "notifications", filter: `user_noti_id=eq.${userId}``.
 
-- [ ] **Step 4:** `npx tsc --noEmit` + `pnpm build`.
-- [ ] **Step 5:** Manual smoke with two browsers (one logged-in, one anon): like a feed in A → count updates in B without reload; comment in A → appears in B; B's owner receives notification badge live.
-- [ ] **Step 6: Commit** — `git commit -m "feat: shared realtime hook, live engagement buttons and notification badge"`.
+- [x] **Step 4:** `npx tsc --noEmit` + `pnpm build`.
+- [x] **Step 5:** Manual smoke with two browsers (one logged-in, one anon): like a feed in A → count updates in B without reload; comment in A → appears in B; B's owner receives notification badge live.
+- [x] **Step 6: Commit** — `git commit -m "feat: shared realtime hook, live engagement buttons and notification badge"`.
 
 ### Task 7: Delete the dead client-side data layer
 
@@ -321,13 +330,13 @@ and delete the hand-rolled `supabase.channel(...)/removeChannel` blocks they rep
 **Interfaces:**
 - Consumes: everything green from Tasks 4–6.
 
-- [ ] **Step 1:** For each file in `src/lib/api/*/mutations.ts`: `grep -rn "<exported fn>" src` — delete functions with zero remaining imports; delete the file when empty.
-- [ ] **Step 2:** `npx tsc --noEmit` + `pnpm build`.
-- [ ] **Step 3: Commit** — `git commit -m "chore: remove superseded client-side mutation layer"`.
+- [x] **Step 1:** For each file in `src/lib/api/*/mutations.ts`: `grep -rn "<exported fn>" src` — delete functions with zero remaining imports; delete the file when empty.
+- [x] **Step 2:** `npx tsc --noEmit` + `pnpm build`.
+- [x] **Step 3: Commit** — `git commit -m "chore: remove superseded client-side mutation layer"`.
 
 ### Task 8: Final verification + deploy
 
-- [ ] **Step 1:** Full local pass: `pnpm build`, `npx tsc --noEmit`, `pnpm lint` (lint may carry pre-existing warnings; no NEW errors).
+- [x] **Step 1:** Full local pass: `pnpm build`, `npx tsc --noEmit`, `pnpm lint` (lint may carry pre-existing warnings; no NEW errors).
 - [ ] **Step 2:** Manual smoke checklist (dev server, two browsers):
   - register/login (email + Google OAuth), logout
   - create feed (text, image upload, youtube link), edit, pin, delete

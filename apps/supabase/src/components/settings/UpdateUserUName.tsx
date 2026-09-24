@@ -125,7 +125,7 @@ return (
       </div>
 
       <div className="text-[15px] font-normal text-slate-500">
-        Gợi ý dành cho bạn:
+        Suggestions for you:
       </div>
       <div className="flex flex-wrap items-start gap-1 text-start">
         <span className="text-[15px] font-semibold text-slate-900">{suggest1},</span>
@@ -137,7 +137,7 @@ return (
     <div className="items-center self-stretch justify-end hidden gap-1 md:flex">
       <div className={`mt-2.5 bg-slate-50 rounded-full ${changeBg ? 'bg-slate-900' : ''} ${isPending ? 'opacity-50' : ''}`}>
         <button className="px-4 py-2" disabled={!changeBg || isPending}>
-          <span className={`text-slate-300 font-semibold ${changeBg ? 'text-white' : ''}`}>Cập nhật thông tin</span>
+          <span className={`text-slate-300 font-semibold ${changeBg ? 'text-white' : ''}`}>Save</span>
         </button>
       </div>
     </div>
@@ -147,7 +147,7 @@ return (
     <div className="fixed inset-x-0 bottom-0 px-4 pb-10 md:hidden">
       <div className={`mt-2.5 w-full items-center rounded-full bg-slate-50 ${changeBg ? 'bg-slate-900' : ''} text-center ${isPending ? 'opacity-50' : ''}`}>
         <button className="px-4 py-2" disabled={!changeBg || isPending}>
-          <span className={`text-slate-300 font-semibold ${changeBg ? 'text-white' : ''}`}>Cập nhật thông tin</span>
+          <span className={`text-slate-300 font-semibold ${changeBg ? 'text-white' : ''}`}>Save</span>
         </button>
       </div>
     </div>

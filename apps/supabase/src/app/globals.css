@@ -1,6 +1,34 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Tailwind v4 with the existing JS config (presets: @suzu/ui -> @suzu/tailwind-config). */
+@config "../../tailwind.config.ts";
+
+/* Shared UI package lives outside this app; scan it for class names. */
+@source "../../../../packages/ui/src";
+
+/*
+ * v3 compatibility: v4 changed the default border color to currentColor and
+ * buttons to cursor:default. Keep the v3 look.
+ */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-gray-400);
+  }
+}
 
 @layer base {
   @supports (font-feature-settings: normal) {

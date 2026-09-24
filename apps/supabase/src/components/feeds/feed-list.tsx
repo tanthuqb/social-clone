@@ -1,6 +1,6 @@
 "use client";
 import Loading from "@/app/(app)/(outside)/loading";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { FeedDetail } from "./feed-detail";
 import { LoadingSpinner, cn, toast } from "@suzu/ui";
 import {
@@ -53,47 +53,35 @@ const FeedList = ({
       return data;
     }
   }
+  // Keep the list in sync with fresh server data (router.refresh() after a
+  // create/edit/delete): replace the server-rendered first page, keep any
+  // extra pages loaded by infinite scroll, and drop rows that disappeared.
+  const previousFirstPage = useRef<Set<string>>(
+    new Set((feeds ?? []).map((f: any) => f?.id)),
+  );
+  useEffect(() => {
+    const fresh = (feeds ?? []) as any[];
+    const freshIds = new Set(fresh.map((f) => f?.id));
+    const removed = previousFirstPage.current;
+    setFeedList((prev: any[]) => [
+      ...fresh,
+      ...(prev ?? []).filter(
+        (f: any) => f && !freshIds.has(f.id) && !removed.has(f.id),
+      ),
+    ]);
+    previousFirstPage.current = freshIds;
+  }, [feeds]);
+
   useRealtimeTable({
     table: "feeds",
+    event: "INSERT",
+    filter: "type=eq.feed",
     onChange: async (payload: any) => {
-      if (!session?.user?.id) return;
-      switch (payload?.eventType) {
-              case "INSERT":
-                if (payload && payload?.new && payload?.new?.user_id != session?.user?.id && payload.new?.type === "feed") {
-                  const followingName = await getName(
-                    payload?.new?.user_id,
-                  );
-                  if (followingName) toast.success('Có bài viết mới')
-                }
-                else if (payload?.new?.user_id == session?.user?.id) {
-                  setTimeout(async () => {
-                    const { data: getNewFeed } = await supabase.from("feeds")
-                    .select("*,user_id!left(*)")
-                    .eq("type", "feed")
-                    .eq('id', payload?.new?.id)
-                    .single()
-                  const { data: getImages, error } = await supabase.from("feed_images")
-                    .select("*")
-                    .eq('feed_id', payload?.new?.id)
-                  if (error) {
-                    setFeedList([getNewFeed, ...feedList])
-                    router.refresh();
-                  }
-                  else {
-                    console.log(getImages);
-                    
-                    const fulldata = {
-                      ...getNewFeed,
-                      feed_images: getImages
-                    }
-                    setFeedList([fulldata, ...feedList])
-                    router.refresh();
-                  }
-                }, 5000);
-
-                }
-              default:
-                break;
+      if (!session?.user?.id || type !== "feed") return;
+      // Own posts are added by the composer's router.refresh().
+      if (payload?.new?.user_id && payload.new.user_id !== session.user.id) {
+        const author = await getName(payload.new.user_id);
+        if (author) toast.success("New posts available");
       }
     },
   });
@@ -195,7 +183,7 @@ const FeedList = ({
           <>
             <LoadingSpinner />
             <div className="text-[15px] font-semibold leading-6 text-slate-500">
-              Chờ tí nhé, bên dưới còn nhiều lắm...
+              Hang on, there's plenty more below...
             </div>
           </>
         </div>

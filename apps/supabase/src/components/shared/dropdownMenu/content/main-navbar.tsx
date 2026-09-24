@@ -15,7 +15,7 @@ function MainNavbar({
     <>
       <Link
         // @ts-ignore
-        href={`/u/${user?.full_name}`}
+        href={`/u/${user?.full_name ?? user?.id}`}
       >
         <DropdownMenuItem
           className={cn(
@@ -26,7 +26,7 @@ function MainNavbar({
             className,
           )}
         >
-          Trang cá nhân
+          Profile
         </DropdownMenuItem>
       </Link>
       <DropdownMenuSeparator />
@@ -40,7 +40,7 @@ function MainNavbar({
             className,
           )}
         >
-          Cài đặt thông tin
+          Settings
         </DropdownMenuItem>
       </Link>
       <DropdownMenuSeparator />
@@ -54,7 +54,7 @@ function MainNavbar({
             className,
           )}
         >
-          Hỗ trợ
+          Support
         </DropdownMenuItem>
       </Link>
       <DropdownMenuSeparator />
@@ -68,7 +68,7 @@ function MainNavbar({
             className,
           )}
         >
-          Báo lỗi
+          Report a bug
         </DropdownMenuItem>
       </Link>
       <DropdownMenuSeparator />

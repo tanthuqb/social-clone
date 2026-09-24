@@ -23,7 +23,7 @@ const ListUserSuggest = ({ searchUser, profile }: ListUserSuggestProps) => {
               key={index}
             >
               <Link
-                href={`/u/${user?.full_name}`}
+                href={`/u/${user?.full_name ?? user?.id}`}
                 className="flex items-start flex-1 gap-2"
               >
                 <div className="relative flex flex-col self-stretch w-10 h-10 avatar">
@@ -42,7 +42,7 @@ const ListUserSuggest = ({ searchUser, profile }: ListUserSuggestProps) => {
                   <BaseUserInfo
                     displayName={user?.display_name!}
                     username={user?.full_name!}
-                    message={`${user?.countFollowing!} người theo dõi`}
+                    message={`${user?.countFollowing!} followers`}
                   />
                 </div>
               </Link>
@@ -56,10 +56,10 @@ const ListUserSuggest = ({ searchUser, profile }: ListUserSuggestProps) => {
           )
         })
       }
-      { /** thêm cái ref vào cho khi nhìn thấy nó scroll chỉnh lại đẹp chút  */}
+      { /** add a ref so scrolling adjusts nicely when it comes into view  */}
       {/* <div ref={ref}></div> */}
 
-      {/* Check lại điều kiện: Khi user bấm vào input => ktra nếu k có kq mới hiện phần này */}
+      {/* Re-check condition: when the user clicks the input => only show this if there are no results */}
       {searchUser?.length === 0 ? (
         <div className="flex items-center justify-center mr-10 mt-36">
           <div className="">
@@ -72,7 +72,7 @@ const ListUserSuggest = ({ searchUser, profile }: ListUserSuggestProps) => {
               />
             </div>
             <BaseText
-              text={"Nội dung bạn đang kiếm không tồn tại, hãy thử từ khoá khác nhé"}
+              text={"No results found. Try a different keyword"}
               className="sz-label-m-reg ml-[82px] p-3 text-center"
               textColor="neutral-500"
             />

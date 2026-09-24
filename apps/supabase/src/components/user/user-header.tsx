@@ -61,7 +61,7 @@ export const UserHeader = async ({
                   {follows}
                 </div>
                 <div className="text-[12px] font-normal not-italic leading-[18px] text-[#000]">
-                  Người theo dõi
+                  Followers
                 </div>
               </div>
               <div className="flex items-baseline gap-1">
@@ -69,7 +69,7 @@ export const UserHeader = async ({
                   {following}
                 </div>
                 <div className="text-[12px] font-normal not-italic leading-[18px] text-[#000]">
-                  Đang theo dõi
+                  Following
                 </div>
               </div>
             </div>

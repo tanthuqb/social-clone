@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createFeed, deleteFeed, updateFeed } from "@/lib/api/feeds/mutations";
+import { createFeed, updateFeed } from "@/lib/api/feeds/mutations";
 import {
     FeedId,
     NewFeedParams,
@@ -11,7 +11,8 @@ import {
     updateFeedParams,
 } from "@/lib/db/schema/feeds";
 import { createClient } from "@/lib/supabase/server";
-import { FeedPrivacy, FeedStatus } from "@/lib/supabase/database.types";
+import { FeedPrivacy } from "@/lib/supabase/database.types";
+import { sanitizeContent, validateContentLength } from "@/lib/sanitize";
 
 const handleErrors = (e: unknown) => {
     const errMsg = "Error, please try again.";
@@ -23,7 +24,8 @@ const handleErrors = (e: unknown) => {
     return errMsg;
 };
 
-const revalidateFeeds = () => revalidatePath("/");
+// Feeds appear on the home page, profile pages and feed detail pages.
+const revalidateFeeds = () => revalidatePath("/", "layout");
 
 export const createFeedAction = async (input: NewFeedParams) => {
     try {
@@ -47,16 +49,23 @@ export const updateFeedAction = async (input: UpdateFeedParams) => {
     }
 };
 
+/** Deletes a feed/comment owned by the current user. Throws on failure. */
 export const deleteFeedAction = async (input: FeedId) => {
-    try {
+    const payload = feedIdSchema.parse({ id: input });
+    const supabase = await createClient();
+    const { data: session } = await supabase.auth.getUser();
+    if (!session?.user) throw new Error("Not authenticated");
 
-        const payload = feedIdSchema.parse({ id: input });
-        await deleteFeed(payload.id);
-        revalidateFeeds();
-    } catch (e) {
-      console.log('error',e);
-        return handleErrors(e);
-    }
+    const { data, error } = await supabase
+        .from("feeds")
+        .delete()
+        .eq("id", payload.id)
+        .eq("user_id", session.user.id)
+        .select("id");
+    if (error) throw new Error(error.message);
+    if (!data || data.length === 0) throw new Error("Post not found or not yours");
+    revalidateFeeds();
+    return { error: null };
 };
 
 export const togglePinAction = async (feedId: string, pin: boolean) => {
@@ -64,11 +73,16 @@ export const togglePinAction = async (feedId: string, pin: boolean) => {
     const { data: session } = await supabase.auth.getUser();
     if (!session?.user) return { data: null, error: "Not authenticated" };
 
-    const { error } = await supabase
+    const { data, error } = await supabase
         .from("feeds")
         .update({ pin })
-        .eq("id", feedId);
+        .eq("id", feedId)
+        .eq("user_id", session.user.id)
+        .select("id");
     if (error) return { data: null, error: error.message };
+    if (!data || data.length === 0) {
+        return { data: null, error: "Post not found or not yours" };
+    }
 
     revalidateFeeds();
     return { data: null, error: null };
@@ -79,15 +93,25 @@ export const createFeedEntryAction = async (input: {
     type: "feed" | "comment";
     parent_id?: string | null;
     privacy?: FeedPrivacy;
-    status?: FeedStatus;
 }) => {
     const supabase = await createClient();
     const { data: session } = await supabase.auth.getUser();
     if (!session?.user) return { data: null, error: "Not authenticated" };
 
+    const content = sanitizeContent(input.content);
+    const lengthError = validateContentLength(content);
+    if (lengthError) return { data: null, error: lengthError };
+
+    // Whitelist the columns a client may set (no status/id/user_id spoofing).
     const { data, error } = await supabase
         .from("feeds")
-        .insert({ ...input, user_id: session.user.id })
+        .insert({
+            content,
+            type: input.type === "comment" ? "comment" : "feed",
+            parent_id: input.parent_id ?? null,
+            privacy: input.privacy ?? FeedPrivacy.PUBLIC,
+            user_id: session.user.id,
+        })
         .select("*")
         .single();
     if (error) return { data: null, error: error.message };
@@ -104,9 +128,13 @@ export const updateFeedEntryAction = async (
     const { data: session } = await supabase.auth.getUser();
     if (!session?.user) return { data: null, error: "Not authenticated" };
 
+    const content = sanitizeContent(input.content);
+    const lengthError = validateContentLength(content);
+    if (lengthError) return { data: null, error: lengthError };
+
     const { data, error } = await supabase
         .from("feeds")
-        .update(input)
+        .update({ content, updated_at: new Date().toISOString() })
         .eq("id", id)
         .eq("user_id", session.user.id)
         .select("*, feed_images(*)")
@@ -145,8 +173,10 @@ export const getFeedsProfileAction = async (offset: number, limit: number, user_
       .select("*,feed_images(*),user_id!left(*)")
       .eq("type", "feed")
       .eq("user_id",user_id)
-      .range(offset, offset + limit - 1)
+      // Same order as the first page (getFeedsPrepared): pinned first.
+      .order("pin", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false })
+      .range(offset, offset + limit - 1)
       if (error) {
         throw new Error(`An error happened: ${JSON.stringify(error)}`)
       }

@@ -34,7 +34,7 @@ function EditComment({
       // @ts-ignore
       onClick={handleEditComment}
       className="cursor-pointer text-[15px] text-[#0F172A]">
-      Chỉnh sửa thảo luận
+      Edit comment
     </DropdownMenuItem>
   );
 }

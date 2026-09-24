@@ -24,7 +24,7 @@ function AccountManagement({ session }: { session: Session }) {
           <div className="flex flex-col items-start gap-1 self-stretch">
             <div className="mb-1 flex items-start justify-between">
               <p className="flex-basis-0 leading-150 text-text-neutral-300 flex-shrink-0 font-sans text-[15px] font-semibold">
-                Email của bạn
+                Your email
               </p>
             </div>
             <Input
@@ -42,7 +42,7 @@ function AccountManagement({ session }: { session: Session }) {
           <div className="flex flex-col items-start gap-1 self-stretch">
             <div className="mb-1 flex items-start justify-between">
               <p className="flex-shrink-0 font-sans text-[15px] font-semibold text-[#334155]">
-                Mật khẩu
+                Password
               </p>
             </div>
             <PasswordEnabeld session={session} />
@@ -54,7 +54,7 @@ function AccountManagement({ session }: { session: Session }) {
         </div>
 
         <div className="flex gap-2 self-stretch px-4 py-[5px]">
-          <div className="text-[23px] font-semibold">Liên kết tài khoản</div>
+          <div className="text-[23px] font-semibold">Linked accounts</div>
         </div>
 
         <div className="flex w-full max-w-xl justify-between px-4">
@@ -78,8 +78,8 @@ function AccountManagement({ session }: { session: Session }) {
                 session?.user?.app_metadata?.providers?.some(
                   (provider: string) => provider == "google",
                 )
-                  ? "Đã kết nối"
-                  : "Kết nối"
+                  ? "Connected"
+                  : "Connect"
               }
               states="default"
               activeButton={true}
@@ -110,8 +110,8 @@ function AccountManagement({ session }: { session: Session }) {
                     provider == "facebook";
                   },
                 )
-                  ? "Đã kết nối"
-                  : "Kết nối"
+                  ? "Connected"
+                  : "Connect"
               }
               states="default"
               activeButton={true}
@@ -128,7 +128,7 @@ function AccountManagement({ session }: { session: Session }) {
             className="btn btn-default block w-full md:inline-block md:w-auto"
             disabled={!activeButton}
           >
-            Cập nhật thông tin
+            Save
           </button>
         </div>
       </div>
@@ -148,7 +148,7 @@ function PasswordEnabeld({ session }: { session: Session }) {
         </div>
         <div className="border-[1F1F1F]/10 flex min-w-[95px] items-center justify-center border-l">
           <CommonButton
-            text="Thay đổi"
+            text="Change"
             href="/settings/account-management/change-password"
           />
         </div>
@@ -161,7 +161,7 @@ function PasswordEnabeld({ session }: { session: Session }) {
         •••••••••
       </div>
       <div className="border-[1F1F1F]/50 flex min-w-[95px] items-center justify-center border-l">
-        <span>Thay đổi</span>
+        <span>Change</span>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import { BaseText } from "@/components/master-layout/base-text";
 import DropdownMenuComponent from "@/components/shared/dropdownMenu/dropdown-menu";
@@ -28,14 +29,14 @@ const HeaderSectionCommon = ({
         >
           {/* Logo */}
           <div className="hover:bg-trans-black-5 cursor-pointer p-0 transition-all duration-300 hover:rounded-full sm:p-3">
-            <a href="/">
+            <Link href="/">
               <BaseIconBTN
                 src={"/assets/img_logo.png"}
                 alt=""
                 width={40}
                 height={40}
               />
-            </a>
+            </Link>
           </div>
 
           <div className="flex-gap-2 items-center justify-center rounded-full">

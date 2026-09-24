@@ -1,43 +1,25 @@
-const { resolve } = require("node:path");
+// Flat config for internal React libraries (bundled by their consumer), e.g. @suzu/ui.
+import react from "eslint-plugin-react";
+import reactHooks from "eslint-plugin-react-hooks";
+import globals from "globals";
+import { baseConfig, relaxedTypeScriptRules } from "./base.js";
 
-const project = resolve(process.cwd(), "tsconfig.json");
-
-/*
- * This is a custom ESLint configuration for use with
- * internal (bundled by their consumer) libraries
- * that utilize React.
- *
- * This config extends the Vercel Engineering Style Guide.
- * For more information, see https://github.com/vercel/style-guide
- *
- */
-
-/** @type {import("eslint").Linter.Config} */
-module.exports = {
-  extends: ["eslint:recommended", "prettier", "eslint-config-turbo"],
-  plugins: ["only-warn"],
-  globals: {
-    React: true,
-    JSX: true,
-  },
-  env: {
-    browser: true,
-  },
-  settings: {
-    "import/resolver": {
-      typescript: {
-        project,
-      },
+export default [
+  ...baseConfig,
+  {
+    files: ["**/*.{js,jsx,ts,tsx}"],
+    plugins: { react, "react-hooks": reactHooks },
+    languageOptions: {
+      globals: { ...globals.browser, React: "readonly", JSX: "readonly" },
+      parserOptions: { ecmaFeatures: { jsx: true } },
+    },
+    // "detect" uses an API removed in ESLint 10; pin the major.minor instead.
+    settings: { react: { version: "19.3" } },
+    rules: {
+      ...relaxedTypeScriptRules,
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "off",
+      "react/jsx-key": "error",
     },
   },
-  ignorePatterns: [
-    // Ignore dotfiles
-    ".*.js",
-    "node_modules/",
-    "dist/",
-  ],
-  overrides: [
-    // Force ESLint to detect .tsx files
-    { files: ["*.js?(x)", "*.ts?(x)"] },
-  ],
-};
+];

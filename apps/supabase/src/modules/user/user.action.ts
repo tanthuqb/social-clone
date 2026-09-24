@@ -1,22 +1,21 @@
 import { toast } from "@suzu/ui";
-import { UserValid } from "./user.valid";
+import { useSignInWithPasswordForm } from "./user.valid";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 import { ModalContext } from "@/components/modals/provider";
 import { Provider } from "@supabase/supabase-js";
 import { ControllerResponse, ResponseStatus } from "@/lib/base/controller";
-import { toastFeed } from "@/app/(app)/(outside)/toast/toast";
+import { toastFeed } from "@/components/shared/toast-feed";
 
 export const UserACtion = () => {
   const { setShowLoginModal, setShowForgotPasswordModal } =
     useContext(ModalContext);
   const router = useRouter();
-  const { signInWithPassword } = UserValid;
-  const form = signInWithPassword();
+  const form = useSignInWithPasswordForm();
   const [user, setUser] = useState<User | null>(null);
 
-  const isProduction = process.env.NODE_ENV === 'production';
-  const url = isProduction ? 'https://dev.suzu.net' : 'http://localhost:3000';
+  // Same-origin API routes: works on any host/port (dev, preview, prod).
+  const url = "";
 
   const GetUser = async () => {
     const data = await fetch(`${url}/api/auth/profile`);
@@ -40,13 +39,13 @@ export const UserACtion = () => {
       const { status } = await data.json();
       if (status !== ResponseStatus.Success) {
         toastFeed(
-          "Login thất bại!",
+          "Login failed!",
         );
       } else {
         setShowLoginModal(false);
         router.refresh();
         toastFeed(
-          "Login thành công!",
+          "Logged in successfully!",
         );
       }
     } else {
@@ -67,14 +66,14 @@ export const UserACtion = () => {
         await data.json();
       if (status !== ResponseStatus.Success) {
         toastFeed(
-          "Login thất bại!",
+          "Login failed!",
         );
       } else {
         router.replace(result!.url);
       }
     } else {
       toastFeed(
-        "Login thất bại!",
+        "Login failed!",
       );
     }
   };
@@ -82,6 +81,7 @@ export const UserACtion = () => {
   const SignOut = async () => {
     await fetch(`${url}/api/auth/sign-out`);
     router.push("/");
+    router.refresh();
   };
 
   return {

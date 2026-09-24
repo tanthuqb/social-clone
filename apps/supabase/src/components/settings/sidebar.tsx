@@ -20,7 +20,7 @@ function SidebarSetings() {
       <div className="flex h-full flex-col">
         <div className="relative z-10 hidden h-16 items-center gap-2.5 self-stretch px-2 sm:flex">
           <BaseText
-            text={"Cài đặt"}
+            text={"Settings"}
             textColor="neutral-700"
             className="sz-text-h5-semi"
           />
@@ -35,7 +35,7 @@ function SidebarSetings() {
             <BaseCommonBTN
               isButton={false}
               srcImgLeft={`${pathname === "/settings" ? "/assets/icons-24/person-active.png" : "/assets/icons-24/person.png"}`}
-              text="Chỉnh sửa hồ sơ"
+              text="Edit profile"
               className="flex gap-2 rounded-full p-2"
             />
           </Link>
@@ -47,7 +47,7 @@ function SidebarSetings() {
             <BaseCommonBTN
               isButton={false}
               srcImgLeft={`${pathname === "/settings/edit-profile" ? "/assets/icons-24/person-active.png" : "/assets/icons-24/person.png"}`}
-              text="Chỉnh sửa hồ sơ"
+              text="Edit profile"
               className="flex gap-2 rounded-full p-2"
             />
           </Link>
@@ -59,7 +59,7 @@ function SidebarSetings() {
             <BaseCommonBTN
               isButton={false}
               srcImgLeft={`${pathname === "/settings/account-management" || pathname === "/settings/account-management/change-password" ? "/assets/icons-24/lock-active.png" : "/assets/icons-24/lock.png"}`}
-              text="Quản lý tài khoản"
+              text="Account management"
               className="flex gap-2 rounded-full p-2"
             />
           </Link>
@@ -74,7 +74,7 @@ function SidebarSetings() {
             <BaseCommonBTN
               isButton={false}
               srcImgLeft={`${pathname === "/settings/language" ? "/assets/icons-24/translate-active.png" : "/assets/icons-24/translate.png"}`}
-              text="Ngôn ngữ"
+              text="Language"
               className="flex gap-2 rounded-full p-2"
             />
           </Link>
@@ -89,7 +89,7 @@ function SidebarSetings() {
             <BaseCommonBTN
               isButton={false}
               srcImgLeft={`${pathname === "/settings/support" ? "/assets/icons-24/support-active.png" : "/assets/icons-24/support.png"}`}
-              text="Hỗ trợ"
+              text="Support"
               className="flex gap-2 rounded-full p-2"
             />
           </Link>
@@ -102,7 +102,7 @@ function SidebarSetings() {
           <BaseCommonBTN
             isButton={false}
             srcImgLeft="/assets/icons-24/logout.png"
-            text="Đăng xuất"
+            text="Log out"
             className="flex gap-2 rounded-full p-2"
           />
         </div>

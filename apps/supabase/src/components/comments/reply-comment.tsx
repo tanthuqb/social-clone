@@ -26,7 +26,8 @@ function ReplyComment({
             setShowLoginModal(true)
         } else {
             setShowFeedCreateModal(true)
-            setFeed(feed)
+            // Replying creates a new comment; never open the modal in edit mode.
+            setFeed(undefined)
             setType(true)
             setParentFeedId(feed?.id)
         }
@@ -38,7 +39,7 @@ function ReplyComment({
             // @ts-ignore
             onClick={handleReplyComment}
             className="cursor-pointer text-[15px] text-[#0F172A]">
-            Trả lời
+            Reply
         </DropdownMenuItem>
     );
 }

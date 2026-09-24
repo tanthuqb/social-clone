@@ -26,7 +26,7 @@ function SupportSuccess({
             fill="none"
           ></svg>
           <div className="flex-1 text-center text-[15px] font-semibold leading-6 text-white">
-            Hỗ trợ
+            Support
           </div>
           <div onClick={() => setShowNoticationSupportModal(false)}>
             <CloseIcon className="flex items-center justify-center text-center cursor-pointer" />
@@ -39,20 +39,20 @@ function SupportSuccess({
           <div className="flex flex-col items-center">
 
             <div className="flex flex-col gap-2.5 self-stretch items-center text-left px-4">
-              <div className="font-semibold text-[23px] text-slate-700 text-left">Thông tin hỗ trợ đã được gửi!</div>
-              <div className="font-normal text-[15px] text-slate-900">Thông tin của bạn đã được gửi đi thành công. Chúng tôi sẽ phản hồi thông tin cho bạn sớm nhất.</div>
+              <div className="font-semibold text-[23px] text-slate-700 text-left">Support request sent!</div>
+              <div className="font-normal text-[15px] text-slate-900">Your request has been sent successfully. We will get back to you as soon as possible.</div>
             </div>
             {/*=========== DESKTOP ========== */}
             <div className="mt-2.5 hidden items-center justify-center gap-1 self-stretch md:flex" onClick={() => setShowNoticationSupportModal(false)}>
               <div className="rounded-full bg-slate-900">
-                <CommonButton text="Gửi hỗ trợ khác?" states="default" activeButton={false} />
+                <CommonButton text="Send another request?" states="default" activeButton={false} />
               </div>
             </div>
 
             {/*=========== MOBILBE ========== */}
             <div className="mt-2.5 w-full items-center gap-1 self-stretch text-center md:hidden cursor-pointer pb-10 px-4" onClick={() => setShowNoticationSupportModal(false)}>
               <div className="rounded-full bg-slate-900">
-                <CommonButton text="Gửi hỗ trợ khác?" states="default" activeButton={false} />
+                <CommonButton text="Send another request?" states="default" activeButton={false} />
               </div>
             </div>
           </div>

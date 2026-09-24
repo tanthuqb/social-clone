@@ -9,7 +9,7 @@ import { useRealtimeTable } from "@/hooks/useRealtimeTable";
 import { useRouter } from "next/navigation";
 import { useMediaQuery } from "@suzu/ui/hooks";
 import { BaseIconBTN } from "@/components/master-layout";
-import { toastFeed } from "@/app/(app)/(outside)/toast/toast";
+import { toastFeed } from "@/components/shared/toast-feed";
 
 type NavItemProps = {
   className?: string;
@@ -51,20 +51,27 @@ export const NavItem = ({
     setShowLoginModal(true);
   };
 
+  const [refreshTick, setRefreshTick] = useState(0);
+  const viewerId = user?.user?.id;
+
+  // Unread (unseen) notification count for the badge.
   useEffect(() => {
-    async function getData() {
-      if (user?.user?.id) {
-        const { count: totalCount, error } = await supabase
-          .from("notifications")
-          .select("*", { count: "exact" })
-          .eq("status", false)
-          .eq("user_noti_id", user?.user?.id)
-          .neq("user_id", user?.user?.id);
-        setCount(totalCount ?? 0);
-      }
-    }
-    getData();
-  }, [count]);
+    if (!viewerId || href !== "/notifications") return;
+    let cancelled = false;
+    supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("status", false)
+      .eq("user_noti_id", viewerId)
+      .neq("user_id", viewerId)
+      .then(({ count: totalCount }) => {
+        if (!cancelled) setCount(totalCount ?? 0);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [viewerId, href, refreshTick]);
+
   async function getName(user_id: string) {
     const { data, error } = await supabase
       .from("profiles")
@@ -80,25 +87,26 @@ export const NavItem = ({
 
   useRealtimeTable({
     table: "notifications",
-    filter: user?.user?.id ? `user_noti_id=eq.${user.user.id}` : undefined,
+    // Only subscribe for the notifications nav item of a signed-in user.
+    filter: viewerId ? `user_noti_id=eq.${viewerId}` : "user_noti_id=eq.00000000-0000-0000-0000-000000000000",
     onChange: async (payload: any) => {
-      if (!user) return;
+      if (!viewerId || href !== "/notifications") return;
       switch (payload.eventType) {
               case "INSERT":
                 if (
                   payload?.new?.user_noti_id == user?.user?.id ||
                   user?.user?.id == null
                 ) {
-                  setCount((count) => count + 1);
+                  setRefreshTick((tick) => tick + 1);
                   if (payload?.new?.user_id != payload?.new?.user_noti_id) {
                     if (payload?.new?.type == "feed") {
                       const followingName = await getName(
                         payload?.new?.user_id,
                       );
                       toastFeed(
-                        `${followingName?.display_name} đã đăng bài viết mới `,
+                        `${followingName?.display_name} published a new post `,
                         "checkIcon",
-                        "Xem",
+                        "View",
                         `/p/${payload?.new?.feed_id}`,
                       );
                     } else toast.success("New notification");
@@ -108,14 +116,11 @@ export const NavItem = ({
                 break;
               case "UPDATE":
                 if (payload.new.user_noti_id == user?.user?.id) {
-                  setCount(0);
-                  router.refresh();
+                  setRefreshTick((tick) => tick + 1);
                 }
                 break;
               case "DELETE":
-                if (payload.old.user_noti_id == user?.user?.id)
-                  setCount((count) => count - 1);
-                router.refresh();
+                setRefreshTick((tick) => tick + 1);
                 break;
         default:
           break;
@@ -133,7 +138,7 @@ export const NavItem = ({
     >
       {statusLogin ? (
         href === "/" ? (
-          <a href="/">
+          <Link href="/">
             <BaseIconBTN
               src={routerActive ? srcActive : src}
               alt=""
@@ -141,15 +146,26 @@ export const NavItem = ({
               width={isMobile ? 24 : 32}
               height={isMobile ? 24 : 32}
             />
-          </a>
+          </Link>
         ) : href === "/search" || href === "/notifications" ? (
-          <BaseIconBTN
-            src={routerActive ? srcActive : src}
-            alt=""
-            className={`cursor-pointer ${isMobile ? "px-[22px] py-2" : "p-4"} transition-all duration-300 group-hover:rounded-full group-hover:bg-[rgba(31,31,31,0.05)]`}
-            width={isMobile ? 24 : 32}
-            height={isMobile ? 24 : 32}
-          />
+          <div className="relative">
+            <BaseIconBTN
+              src={routerActive ? srcActive : src}
+              alt=""
+              className={`cursor-pointer ${isMobile ? "px-[22px] py-2" : "p-4"} transition-all duration-300 group-hover:rounded-full group-hover:bg-[rgba(31,31,31,0.05)]`}
+              width={isMobile ? 24 : 32}
+              height={isMobile ? 24 : 32}
+            />
+            {href === "/notifications" && count > 0 && (
+              <span
+                className="pointer-events-none absolute right-2 top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-semibold leading-none text-white"
+                data-testid="notification-badge"
+                aria-label={`${count} unread notifications`}
+              >
+                {count > 99 ? "99+" : count}
+              </span>
+            )}
+          </div>
         ) : (
           // person
           <Link href={href}>

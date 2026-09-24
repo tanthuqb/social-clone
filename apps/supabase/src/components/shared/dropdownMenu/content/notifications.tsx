@@ -22,7 +22,7 @@ function Notifications({
   useEffect(() => {
     switch (notificationData?.type) {
       case "user_follows":
-        setHref(`/u/${notificationData?.user_id?.full_name}`);
+        setHref(`/u/${notificationData?.user_id?.full_name ?? notificationData?.user_id?.id}`);
         break;
       case "feed_engagement":
         setHref(`/p/${notificationData?.feed_id?.id}`);
@@ -54,7 +54,7 @@ function Notifications({
     }
   };
   const handleErrorNoti = () => {
-    // Hiện daialog báo lỗi
+    // Show the report dialog
     console.log("error noti");
   };
   return (
@@ -64,7 +64,7 @@ function Notifications({
           className="cursor-pointer text-[15px] text-[#0F172A]"
           onClick={() => handleWatchNoti()}
         >
-          Xem thông báo
+          View notification
         </DropdownMenuItem>
       </Link>
       <DropdownMenuItem
@@ -72,14 +72,14 @@ function Notifications({
         onClick={() => handleDeleteNoti(feed?.id!)}
         className="cursor-pointer text-[15px] text-[#0F172A]"
       >
-        Xóa thông báo
+        Delete notification
       </DropdownMenuItem>
       <DropdownMenuItem
         // @ts-ignore
         onClick={() => handleErrorNoti(feed?.id!)}
         className="cursor-pointer text-[15px] text-red-500 hover:text-red-500"
       >
-        <span className="text-red-500 hover:text-red-500">Báo lỗi</span>
+        <span className="text-red-500 hover:text-red-500">Report</span>
       </DropdownMenuItem>
     </>
   );

@@ -5,28 +5,27 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import relativeTime from "dayjs/plugin/relativeTime";
 import updateLocale from "dayjs/plugin/updateLocale";
-import "dayjs/locale/vi";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(relativeTime);
 dayjs.extend(updateLocale);
 
-dayjs.updateLocale("vi", {
+dayjs.updateLocale("en", {
   relativeTime: {
-    future: "%s tới",
-    past: "%s trước",
-    s: "1 giây",
-    m: "1 phút",
-    mm: "%d phút",
-    h: "1 giờ",
-    hh: "%d giờ",
-    d: "1 ngày",
-    dd: "%d ngày",
-    M: "1 tháng",
-    MM: "%d tháng",
-    y: "1 năm",
-    yy: "%d năm",
+    future: "in %s",
+    past: "%s ago",
+    s: "a few seconds",
+    m: "1 minute",
+    mm: "%d minutes",
+    h: "1 hour",
+    hh: "%d hours",
+    d: "1 day",
+    dd: "%d days",
+    M: "1 month",
+    MM: "%d months",
+    y: "1 year",
+    yy: "%d years",
   },
 });
 
@@ -65,7 +64,7 @@ export function nFormatter(
   ];
 
   const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
-  var item = lookup
+  const item = lookup
     .slice()
     .reverse()
     .find(function (_item: any) {
@@ -87,7 +86,7 @@ export const timeAgo = (
 ): string => {
   if (!timestamp) return "Never";
 
-  return dayjs(timestamp).locale("vi").tz("Asia/Ho_Chi_Minh").fromNow();
+  return dayjs(timestamp).locale("en").tz("Asia/Ho_Chi_Minh").fromNow();
   // const diff = Date.now() - new Date(timestamp).getTime();
   // if (diff < 1000) {
   //   // less than 1 second

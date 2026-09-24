@@ -9,7 +9,7 @@ export const NotificationAction = () => {
     useEffect(() => {
       const fetchData = async () => {
         const data = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?userId=${session?.user?.id}`,
+          `/api/notifications?userId=${session?.user?.id}`,
           {
             method: "GET",
           },
@@ -22,7 +22,7 @@ export const NotificationAction = () => {
             for (const notification of res.result) {
               if (notification?.status == false) {
                 const data = await fetch(
-                  `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?notificationId=${notification.id}`,
+                  `/api/notifications?notificationId=${notification.id}`,
                   {
                     method: "PUT",
                   },
@@ -59,9 +59,9 @@ export const NotificationAction = () => {
         const end = start + PAGE_COUNT - 1;
 
         let newItems = [] as Notifications_Detail[] | null;
-        let error = null;
+        const error = null;
         const data = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/paging/notifications?userId=${session?.user?.id}&start=${start}&end=${end}`,
+          `/api/paging/notifications?userId=${session?.user?.id}&start=${start}&end=${end}`,
           {
             method: "GET",
           },

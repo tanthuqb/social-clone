@@ -1,4 +1,5 @@
 "use client";
+import { AVATAR_BUCKET, uploadUserFile } from "@/lib/storage";
 import {
   Avatar as AvatarComponent,
   AvatarFallback,
@@ -49,43 +50,38 @@ function Profile({ user, session }: { user: Profile; session: Session }) {
     if (full_name.length < 5)
       return toast.error("Username must be at least 5 characters long");
     startTransition(async () => {
+      let avatar_url: string | undefined;
       if (fileAvatar) {
-        const filePath = user?.full_name;
-        let { data: url, error: uploadError } = await supabase.storage
-          .from("avatars")
-          .upload(filePath + `_${Date.now()}`, fileAvatar);
-        if (!uploadError) {
-          const { error: updateError } = await updateProfileAction({
-            display_name: display_name,
-            full_name: slugify(full_name, { replacement: "." }),
-            description: description,
-            gender: gender,
-            avatar_url:
-              process.env.NEXT_PUBLIC_SUPABASE_URL +
-              "storage/v1/object/public" +
-              "/avatars/" +
-              url?.path,
-          });
-          if (!updateError) {
-            toast.success("Successfully updated profile!");
-            window.location.reload();
-          }
-        } else {
-          toast.error("Failed to update profile!");
+        if (!session?.user?.id) {
+          toast.error("Please log in first.");
+          return;
         }
+        try {
+          avatar_url = await uploadUserFile(
+            supabase,
+            AVATAR_BUCKET,
+            session.user.id,
+            fileAvatar,
+          );
+        } catch (error) {
+          toast.error(`Failed to upload avatar: ${(error as Error).message}`);
+          return;
+        }
+      }
+      const { error } = await updateProfileAction({
+        display_name: display_name,
+        full_name: slugify(full_name, { replacement: "." }),
+        description: description,
+        gender: gender,
+        ...(avatar_url ? { avatar_url } : {}),
+      });
+      if (!error) {
+        toast.success("Successfully updated profile!");
+        window.location.reload();
       } else {
-        const { error } = await updateProfileAction({
-          display_name: display_name,
-          full_name: slugify(full_name, { replacement: "." }),
-          description: description,
-          gender: gender,
-        });
-        if (!error) {
-          toast.success("Successfully updated profile!");
-          window.location.reload();
-        } else {
-          toast.error("Failed to update profile!");
-        }
+        toast.error(
+          typeof error === "string" ? error : "Failed to update profile!",
+        );
       }
     });
   };
@@ -110,7 +106,7 @@ function Profile({ user, session }: { user: Profile; session: Session }) {
               <BackButton currentResource="" states="disable" />
             </div> */}
             <div className="px-4 text-[23px] font-semibold text-slate-900">
-              Tên tài khoản
+              Username
             </div>
           </div>
           <UpdateUserUName
@@ -157,22 +153,22 @@ function Profile({ user, session }: { user: Profile; session: Session }) {
                     htmlFor="fileInput"
                     className="btn min-w-[87px] cursor-pointer bg-black/5 text-center font-semibold text-neutral-700"
                   >
-                    Đổi ảnh
+                    Change photo
                   </label>
                 </div>
               </div>
               <div className="flex flex-col items-start gap-1 self-stretch">
                 <div className="mb-1 flex items-start justify-between self-stretch">
                   <p className="flex-basis-0 leading-150 flex-shrink-0 font-sans text-[15px] font-semibold text-[#334155]">
-                    Tên hiển thị
+                    Display name
                   </p>
                   <p className="leading-150 font-sans text-[15px] font-normal text-[#6B7280]">
                     1/20
                   </p>
                 </div>
                 <Input
-                  className="h-[40px] items-center gap-2 self-stretch rounded-md border border-[#D1D5DB] bg-white p-2 focus:outline-none focus:ring-0"
-                  placeholder="Nhập tên hiển thị..."
+                  className="h-[40px] items-center gap-2 self-stretch rounded-md border border-[#D1D5DB] bg-white p-2 focus:outline-hidden focus:ring-0"
+                  placeholder="Enter display name..."
                   name="display_name"
                   required
                   defaultValue={user?.display_name as string}
@@ -181,11 +177,11 @@ function Profile({ user, session }: { user: Profile; session: Session }) {
               <div className="flex flex-col items-start gap-1 self-stretch">
                 <div className="mb-1 flex items-start justify-between self-stretch">
                   <p className="flex-basis-0 leading-150 flex-shrink-0 font-sans text-[15px] font-semibold text-[#334155]">
-                    Tên tài khoản
+                    Username
                   </p>
                 </div>
                 <Input
-                  className="h-[40px] items-center gap-2 self-stretch rounded-md border border-[#D1D5DB] bg-white p-2 focus:outline-none focus:ring-0"
+                  className="h-[40px] items-center gap-2 self-stretch rounded-md border border-[#D1D5DB] bg-white p-2 focus:outline-hidden focus:ring-0"
                   placeholder="@username"
                   name="full_name"
                   required
@@ -196,7 +192,7 @@ function Profile({ user, session }: { user: Profile; session: Session }) {
               <div className="flex flex-col items-start gap-1 self-stretch">
                 <div className="flex items-start justify-between self-stretch">
                   <p className="flex-basis-0 leading-150 flex-shrink-0 font-sans text-[15px] font-semibold text-[#334155]">
-                    Giới tính
+                    Gender
                   </p>
                 </div>
                 <div className="flex items-start gap-5 self-stretch">
@@ -210,7 +206,7 @@ function Profile({ user, session }: { user: Profile; session: Session }) {
                         onChange={handleChange}
                         checked={selectedValue === "male"}
                       />
-                      Nam
+                      Male
                     </div>
                   </div>
                   <div className="flex h-6 items-center">
@@ -223,7 +219,7 @@ function Profile({ user, session }: { user: Profile; session: Session }) {
                         onChange={handleChange}
                         checked={selectedValue === "female"}
                       />
-                      Nữ
+                      Female
                     </div>
                   </div>
                   <div className="flex h-6 items-center">
@@ -235,7 +231,7 @@ function Profile({ user, session }: { user: Profile; session: Session }) {
                         onChange={handleChange}
                         checked={selectedValue === "none"}
                       />
-                      Không muốn nói
+                      Prefer not to say
                     </div>
                   </div>
                 </div>
@@ -243,7 +239,7 @@ function Profile({ user, session }: { user: Profile; session: Session }) {
               <div className="flex flex-col self-stretch">
                 <div className="flex items-start justify-between self-stretch">
                   <div className="flex-basis-0 leading-150 flex-shrink-0 font-sans text-[15px] font-semibold text-[#334155]">
-                    Mô tả
+                    Bio
                   </div>
                   <div className="leading-150 font-sans text-[15px] font-normal text-[#6B7280]">
                     1/150
@@ -251,8 +247,8 @@ function Profile({ user, session }: { user: Profile; session: Session }) {
                 </div>
                 <Textarea
                   name="description"
-                  className="max-h-[112px] min-h-[112px] items-center gap-2 self-stretch border border-slate-300 p-2 focus:outline-none focus:ring-0"
-                  placeholder="Giới thiệu về bạn"
+                  className="max-h-[112px] min-h-[112px] items-center gap-2 self-stretch border border-slate-300 p-2 focus:outline-hidden focus:ring-0"
+                  placeholder="Tell us about yourself"
                   defaultValue={user?.description as string}
                 />
               </div>
@@ -267,7 +263,7 @@ function Profile({ user, session }: { user: Profile; session: Session }) {
                 className="btn btn-default block w-full md:inline-block md:w-auto"
                 disabled={!true}
               >
-                Cập nhật thông tin
+                Save
               </button>
             </div>
           </div>

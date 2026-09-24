@@ -24,15 +24,18 @@ function Support() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     const supabase = createClient();
-    const { data, error } = await supabase
-      .from("report")
-      .insert([{ content: content }])
-      .select();
-    if (error) {
-      toast.error("Gửi báo cáo thất bại");
-    } else {
-      toast.success("Gửi thành công");
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth?.user) {
+      setShowLoginModal(true);
+      return;
     }
+    // report.user_id defaults to auth.uid() in the database.
+    const { error } = await supabase.from("report").insert([{ content }]);
+    if (error) {
+      toast.error("Failed to send report");
+      return;
+    }
+    toast.success("Sent successfully");
     setShowNoticationSupportModal(true);
     setActiveButton(false);
   };
@@ -48,7 +51,7 @@ function Support() {
             <div className="flex flex-col items-start gap-1 self-stretch">
               <div className="flex w-full justify-between">
                 <div className="text-[15px] font-semibold text-slate-700">
-                  Mô tả vấn đề bạn đang gặp phải
+                  Describe the problem you are having
                 </div>
                 <div className="text-[15px] font-normal text-slate-500">
                   1/500
@@ -56,7 +59,7 @@ function Support() {
               </div>
 
               <Textarea
-                placeholder="Hỗ trợ xử lý report nội dung"
+                placeholder="Describe your issue"
                 onChange={(e) => handleChangeValue(e.target.value)}
                 className="max-h-[300px] min-h-[184px] border-0"
               />
@@ -76,7 +79,7 @@ function Support() {
             className="btn btn-default block w-full md:inline-block md:w-auto"
             disabled={!activeButton}
           >
-            Gửi thông tin
+            Submit
           </button>
         </div>
       </form>

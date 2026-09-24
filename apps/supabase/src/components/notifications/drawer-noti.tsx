@@ -38,6 +38,7 @@ function DrawerNoti({
           srcActive={srcActive}
           statusLogin={user.user ? true : false}
           routerActive={drawerActive}
+          user={user}
         />
       </Drawer.Trigger>
       {user?.user && (

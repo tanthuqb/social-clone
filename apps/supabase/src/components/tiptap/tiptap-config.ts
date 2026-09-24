@@ -1,75 +1,57 @@
 "use client";
 
-// import StarterKit from "@tiptap/starter-kit";
-import Image from "@tiptap/extension-image";
-// import MenuBar from "./menu-bar";
-import Placeholder from "@tiptap/extension-placeholder";
-import Paragraph from "@tiptap/extension-paragraph";
-import Mention from "@tiptap/extension-mention";
 import Document from "@tiptap/extension-document";
+import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
-// import Heading from "@tiptap/extension-heading"
-import CharacterCount from "@tiptap/extension-character-count";
-// import Youtube from '@tiptap/extension-youtube'
+import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
-// import FileHandler from "@tiptap-pro/extension-file-handler";
+import Mention from "@tiptap/extension-mention";
+import Youtube from "@tiptap/extension-youtube";
+import { CharacterCount, Placeholder } from "@tiptap/extensions";
 
-// Limit character
-const limit = 300;
-
-/**
- * Make a custom link to add href in textNode of "Link extension"
- *    reference: https://tiptap.dev/docs/editor/guide/custom-extensions#paste-rules
- */
-export const CustomLink = (href: string) => {
-  return Link.extend({
-    addNodeView() {
-      return () => {
-        const link = document.createElement("a");
-        link.innerText = `${href}`;
-        return {
-          dom: link,
-        };
-      };
-    },
-  });
-};
-
-// export
+/** Maximum number of plain-text characters in a post or comment. */
+export const CONTENT_CHARACTER_LIMIT = 300;
 
 export const tiptapExtensions = [
   Document,
   Paragraph,
-  CharacterCount.configure({
-    limit,
-  }),
   Text,
+  CharacterCount.configure({
+    limit: CONTENT_CHARACTER_LIMIT,
+  }),
   Mention.configure({
     HTMLAttributes: {
       class: "mention",
     },
-    // suggestion,
   }),
   Placeholder.configure({
-    placeholder: "Hãy nêu cảm nghĩ của bạn ở đây...",
+    placeholder: "Share your thoughts here...",
   }),
   Image.configure({
     inline: true,
-    // allowBase64: true,
     HTMLAttributes: {
-      // class: 'border-2 border-orange-200 my-4 w-1/2 h-auto mx-auto',
+      // Images are uploaded separately (feed_images); hide inline copies.
       class: "hidden",
     },
   }),
-  // Youtube.configure({
-  //   inline: false,
-  // }),
-  // Link.configure({
-  //   openOnClick: true,
-  //   // linkOnPaste: true,
-  //   autolink: true,
-  //   HTMLAttributes: {
-  //     class: 'text-blue-500'
-  //   }
-  // })
+  // Pasting a YouTube URL embeds the video in the post.
+  Youtube.configure({
+    inline: false,
+    nocookie: true,
+    HTMLAttributes: {
+      class: "aspect-video w-full rounded-lg",
+    },
+  }),
+  // Autolink typed/pasted URLs so posts can show link previews.
+  Link.configure({
+    autolink: true,
+    linkOnPaste: true,
+    openOnClick: false,
+    defaultProtocol: "https",
+    HTMLAttributes: {
+      class: "text-blue-500 underline",
+      rel: "noopener noreferrer nofollow",
+      target: "_blank",
+    },
+  }),
 ];

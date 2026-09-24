@@ -1,12 +1,11 @@
 "use client";
 
-import { useEditor, EditorContent, Editor, EditorOptions } from "@tiptap/react";
+import { EditorContent, useEditor } from "@tiptap/react";
 
 import "@/components/tiptap/Tiptap.css";
-import { memo, useEffect } from "react";
-import { CustomLink, tiptapExtensions } from "./tiptap-config";
+import { memo } from "react";
+import { tiptapExtensions } from "./tiptap-config";
 
-import { EditorProps, EditorView } from "@tiptap/pm/view";
 import { useContentTiptap } from "./providers/content-provider";
 import { useCountCharacters } from "./providers/count-character-provider";
 
@@ -14,74 +13,29 @@ type TiptapProps = {
   handleValidateImageFiles: (files: File[]) => void;
 };
 
-const Tiptap = memo((props: TiptapProps) => {
-  // props passed from "ContentForm"
-  const { handleValidateImageFiles } = props;
+const Tiptap = memo((_props: TiptapProps) => {
   const { content, setContent } = useContentTiptap();
-  const { countCharacters, setCountCharacters } = useCountCharacters();
-
-
+  const { setCountCharacters } = useCountCharacters();
 
   /**
-   * tiptap config
+   * The CharacterCount extension enforces the character limit, so no manual
+   * keydown handling is needed. `onUpdate` is registered once by useEditor
+   * (no listener leak on re-render).
    */
-  let tiptapConfig: Partial<EditorOptions> = {
-    // @ts-ignore
-    extensions: [...tiptapExtensions],
+  const editor = useEditor({
+    extensions: tiptapExtensions,
     autofocus: true,
-    content: content,
-  };
-
-  /**
-   * editor props
-   */
-  const tiptapProps: EditorProps<Editor> = {
-    handleDOMEvents: {
-      keydown(this, view, event) {
-        // check ctrl + V
-        // check delete content in editor
-        // check countCharacters > 300
-        const isOk =
-          countCharacters >= 300 &&
-          event.code != "KeyV" &&
-          event.code != "Backspace" &&
-          !event.ctrlKey;
-        if (isOk) {
-          event.preventDefault();
-        }
-      },
+    content,
+    // Rendered inside a client-only modal; avoid SSR hydration mismatches.
+    immediatelyRender: false,
+    onCreate: ({ editor }) => {
+      setCountCharacters(editor.storage.characterCount.characters());
     },
-  };
-
-  /**
-   * Init editor with tiptap
-   */
-  const editor = useEditor(tiptapConfig);
-
-  // dependencies
-  const dependencies = [editor?.storage.characterCount.characters()];
-
-  /**
-   * Update countCharacters and content
-   */
-  useEffect(() => {
-    if (editor) {
-      editor.commands.focus();
-      editor.on("update", () => {
-        const href = editor.getAttributes("link").href;
-        editor.setOptions({
-          extensions: [
-            ...tiptapExtensions,
-
-            CustomLink(href),
-          ],
-          editorProps: tiptapProps,
-        });
-        setContent(editor.getHTML()); // set content in tiptap
-        setCountCharacters(editor.storage.characterCount.characters()); // count
-      });
-    }
-  }, [...dependencies]);
+    onUpdate: ({ editor }) => {
+      setContent(editor.getHTML());
+      setCountCharacters(editor.storage.characterCount.characters());
+    },
+  });
 
   if (!editor) {
     return null;
@@ -91,8 +45,11 @@ const Tiptap = memo((props: TiptapProps) => {
     <EditorContent
       editor={editor}
       className="custom-editor w-full whitespace-pre-wrap break-all"
+      data-testid="post-editor"
     />
   );
 });
+
+Tiptap.displayName = "Tiptap";
 
 export { Tiptap };

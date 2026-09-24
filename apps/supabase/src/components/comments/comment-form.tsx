@@ -80,55 +80,59 @@ function CommentForm({
     const rows = commentsResponse.data;
     const commentIds = rows.map((c: any) => c.id);
 
-    const { data: replies, count: countReplies } = await supabase
-      .from("feeds")
-      .select("*,user_id!left(*), parent_id!left(*)", { count: "exact" })
-      .eq("type", "comment")
-      .order("created_at", { ascending: false })
-      .in("parent_id", commentIds);
+    // Load every descendant (replies to replies too) and group them under
+    // their top-level comment, so deep replies are not silently hidden.
+    const viewerId = session?.user?.id;
+    const rootOf = new Map<string, string>();
+    commentIds.forEach((id: string) => rootOf.set(id, id));
+    const replies: any[] = [];
+    let frontier: string[] = commentIds;
+    for (let depth = 0; depth < 10 && frontier.length > 0; depth++) {
+      const { data: level, error: levelError } = await supabase
+        .from("feeds")
+        .select("*,user_id!left(*), parent_id!left(*)")
+        .eq("type", "comment")
+        .in("parent_id", frontier)
+        .order("created_at", { ascending: true });
+      if (levelError) throw levelError;
+      (level ?? []).forEach((reply: any) => {
+        const parentId = reply?.parent_id?.id;
+        rootOf.set(reply.id, rootOf.get(parentId) ?? parentId);
+        replies.push(reply);
+      });
+      frontier = (level ?? []).map((reply: any) => reply.id);
+    }
+    const countReplies = replies.length;
+
+    const withReactions = async (row: any) => {
+      const [{ data: reactions }, { count: totalReactions }] = await Promise.all([
+        viewerId
+          ? supabase
+              .from("feed_engagement")
+              .select("*")
+              .eq("feed_id", row.id)
+              .eq("user_id", viewerId)
+              .maybeSingle()
+          : Promise.resolve({ data: null }),
+        supabase
+          .from("feed_engagement")
+          .select("feed_id", { count: "exact", head: true })
+          .eq("feed_id", row.id),
+      ]);
+      return { ...row, reactions, totalReactions };
+    };
 
     const commentsWithRepliesPromises = rows.map(async (r: any) => {
-      const { data: reactions } = await supabase
-        .from("feed_engagement")
-        .select("*")
-        .eq("feed_id", r.id)
-        .maybeSingle();
-
-      const { count: countTotalRectionComment } = await supabase
-        .from("feed_engagement")
-        .select("feed_id", { count: "exact" })
-        .eq("feed_id", r.id);
-
-      const commentRepliesPromises = replies!
-        .filter((reply: any) => reply?.parent_id?.id === r.id)
-        .map(async (reply: any) => {
-          const { data: replyReactions } = await supabase
-            .from("feed_engagement")
-            .select("*")
-            .eq("feed_id", reply.id)
-            .maybeSingle();
-
-          const { count: countTotalRectionReplyComment } = await supabase
-            .from("feed_engagement")
-            .select("feed_id", { count: "exact" })
-            .eq("feed_id", reply.id);
-
-          return {
-            ...reply,
-            reactions: replyReactions,
-            totalReactions: countTotalRectionReplyComment,
-          };
-        });
-
-      const commentReplies = await Promise.all(commentRepliesPromises);
-      const countComment = commentReplies.length;
-
+      const commentReplies = await Promise.all(
+        replies
+          .filter((reply: any) => rootOf.get(reply.id) === r.id)
+          .map(withReactions),
+      );
+      const base = await withReactions(r);
       return {
-        ...r,
+        ...base,
         replies: commentReplies,
-        reactions: reactions,
-        countComment: countComment,
-        totalReactions: countTotalRectionComment,
+        countComment: commentReplies.length,
       };
     });
 
@@ -221,6 +225,7 @@ function CommentForm({
 
   useRealtimeTable({
     table: "feeds",
+    filter: "type=eq.comment",
     onChange: (payload: any) => {
       switch (payload?.eventType) {
         case "INSERT":
@@ -244,7 +249,6 @@ function CommentForm({
           }
           break;
         default:
-          toast.error("Có lỗi xảy ra, vui lòng thử lại sau");
           break;
       }
     },
@@ -257,7 +261,7 @@ function CommentForm({
   return (
     <div className="w-full">
       {/* Header comment */}
-      {profiles === null ? (
+      {!session?.user ? (
         <>
           <div className="flex gap-1 p-4">
             <button
@@ -265,10 +269,10 @@ function CommentForm({
               onClick={handleLogin}
               className="text-[15px] font-semibold leading-[22.5px] text-slate-900 underline"
             >
-              Tham gia
+              Join
             </button>
             <div className="text-[15px] font-normal leading-[22.5px] text-slate-500">
-              vào SuZu để thảo luận liền tay...
+              SuZu to join the discussion...
             </div>
           </div>
           <div className="my-2.5">
@@ -285,7 +289,7 @@ function CommentForm({
       )}
 
       {/* END Header comment */}
-      {/* ==========   START Component comment gốc và có thể có nhiều comment bên trong    =============*/}
+      {/* ==========   START Root comment component, may contain nested comments    =============*/}
       {CommentScroll?.length > 0 ? (
         CommentScroll?.map((comment: Comment_Detail_Full, index: number) => {
           return (
@@ -296,8 +300,8 @@ function CommentForm({
                   feed={comment}
                   session={session}
                   user={profiles}
-                  comment={true} // dùng để check hiện content dropdown comment
-                  notifications={false} // dùng để check hiện content dropdown notifications
+                  comment={true} // used to decide whether to show the comment dropdown content
+                  notifications={false} // used to decide whether to show the notifications dropdown content
                 />
                 <div className="flex flex-col items-start self-stretch pl-12 pr-4">
                   <ContentCard
@@ -325,8 +329,8 @@ function CommentForm({
                     isButton={true}
                     text={
                       toggleComments[index]
-                        ? "Xem thêm bình luận"
-                        : "Ẩn bình luận"
+                        ? "View more comments"
+                        : "Hide comments"
                     }
                     srcImgLeft="/assets/icons-24/subdirectory-arrow-right.png"
                     className={cn(
@@ -338,7 +342,7 @@ function CommentForm({
                 </div>
               ) : null}
 
-              {/* List comment - trả lời comment */}
+              {/* Comment list - comment replies */}
               <div
                 className={cn("flex-col items-start self-stretch pl-12", {
                   hidden: toggleComments[index],
@@ -361,7 +365,7 @@ function CommentForm({
                             <ContentCard feed={reply!} inFeed={inFeed} />
                             <FooterCard
                               feedId={reply?.id!}
-                              userId={reply?.user_id?.id}
+                              userId={session?.user?.id as string}
                               id={reply?.reactions?.id!}
                               inFeed={inFeed}
                               // stateProp={comment?.reactions?.state}
@@ -392,14 +396,14 @@ function CommentForm({
           />
           <BaseText
             text={
-              "Chưa có bình luận nào ở đây.Hãy trở thành người đầu tiên bình luận bài viết."
+              "No comments yet. Be the first to comment on this post."
             }
             className="sz-label-m-reg mx-auto flex w-96 px-2 text-center"
             textColor="neutral-500"
           />
         </div>
       )}
-      {/* ==========   END Component comment gốc và có thể có nhiều comment bên trong    =============*/}
+      {/* ==========   END Root comment component, may contain nested comments    =============*/}
       {isLoading ? (
         <div className="px-4">
           <button
@@ -408,7 +412,7 @@ function CommentForm({
           >
             <div className="rounded-full px-4 py-2">
               <BaseText
-                text={`Xem thêm thảo luận (${CommentScroll.length}/${totalComments} thảo luận)`}
+                text={`View more comments (${CommentScroll.length}/${totalComments} comments)`}
                 className="label-m-semi text-center"
                 textColor="slate-700"
               />

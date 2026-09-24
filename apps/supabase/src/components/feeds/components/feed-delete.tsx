@@ -17,7 +17,7 @@ function FeedDelete({ feed }: { className?: string; feed?: any }) {
       onClick={handleDeleteFeed}
       className="cursor-pointer text-[15px] text-red-500 hover:text-red-500"
     >
-      <span className="text-red-500 hover:text-red-500">Xóa bài viết</span>
+      <span className="text-red-500 hover:text-red-500">Delete post</span>
     </DropdownMenuItem>
   );
 }

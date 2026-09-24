@@ -45,12 +45,16 @@ export const FollowButton = ({
         startMutation(async () => {
           if (following) {
             const { error } = await unfollowAction(followingId);
+            if (error) {
+              toast.error(error);
+              return;
+            }
             updateOptimisticState(false);
             setFollowing(false);
             if(setFollowingState){
               setFollowingState(false);
             }
-            toast("bỏ theo dõi thành công", {
+            toast("Unfollowed successfully", {
               icon: <CheckIcon />,
               duration: 5000,
               // action: <Button className='px-2 py-1 flex-end bg-slate-200 text-foreground' onClick={() => console.log('Action!')}>Action</Button>,
@@ -65,7 +69,7 @@ export const FollowButton = ({
             if (error) {
               toast.error(error);
             } else {
-              toast("theo dõi thành công", {
+              toast("Followed successfully", {
                 icon: <CheckIcon />,
                 duration: 5000,
                 // action: <Button className='px-2 py-1 flex-end bg-slate-200 text-foreground' onClick={() => console.log('Action!')}>Action</Button>,
@@ -104,8 +108,9 @@ export const FollowButton = ({
                 "animate-pulse ": pending,
               })}
               onClick={handleFollow}
+              data-testid="follow-button"
             >
-              {following ? "Đã theo dõi" : "Theo dõi"}
+              {following ? "Following" : "Follow"}
             </Button>
             <Button
               size={"sm"}
@@ -113,9 +118,12 @@ export const FollowButton = ({
                 "w-full rounded-full border border-slate-100 bg-white text-[15px] font-semibold text-slate-900 hover:bg-white",
                 { "animate-pulse ": pending },
               )}
-              onClick={handleFollow}
+              onClick={async () => {
+                await navigator.clipboard.writeText(window.location.href);
+                toast.success("Profile link copied");
+              }}
             >
-              Nhắc đến
+              Mention
             </Button>
           </div>
         </>
@@ -128,8 +136,9 @@ export const FollowButton = ({
             "animate-pulse ": pending,
           })}
           onClick={handleFollow}
+          data-testid="follow-button"
         >
-          {following ? "Đã theo dõi" : "Theo dõi"}
+          {following ? "Following" : "Follow"}
         </Button>
       )}
     </>

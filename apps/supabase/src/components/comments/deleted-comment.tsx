@@ -28,9 +28,9 @@ function DeletedComment({
     if (!userId) {
       setShowLoginModal(true);
     }
-    if (!feedId) toast.error("Không tìm thấy bài viết");
+    if (!feedId) toast.error("Post not found");
     if (userId !== feed?.user_id?.id) {
-      toast.error("Bạn không có quyền về bài viết này");
+      toast.error("You do not have permission for this post");
     } else {
       setShowFeedDeleteModal(true);
       setFeedDelete(feed);
@@ -43,7 +43,7 @@ function DeletedComment({
       onClick={() => handleDeleteFeed(feed?.id!)}
       className="cursor-pointer text-[15px] text-[#0F172A]"
     >
-      Xóa thảo luận
+      Delete comment
     </DropdownMenuItem>
   );
 }

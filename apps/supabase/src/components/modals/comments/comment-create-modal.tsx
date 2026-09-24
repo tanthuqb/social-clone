@@ -45,7 +45,7 @@ function CommentCreateModal({
             fill="none"
           ></svg>
           <div className="flex-1 text-center text-[15px] font-semibold leading-6 text-white">
-            {comment ? "Trả lời bình luận" : "Bình luận bài viết"}
+            {comment ? "Reply to comment" : "Comment on post"}
           </div>
           <div onClick={() => setShowCommentCreateModal(false)}>
             <CloseIcon className="flex items-center justify-center text-center cursor-pointer" />

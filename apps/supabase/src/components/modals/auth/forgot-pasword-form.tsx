@@ -21,7 +21,7 @@ import { createClient } from "@/lib/supabase/client";
 
 const formSchema = z.object({
   email: z.string().email({
-    message: "Hãy nhập địa chỉ email chính xác đinh dạng admin@example.com",
+    message: "Please enter a valid email address, e.g. admin@example.com",
   }),
 });
 
@@ -40,19 +40,19 @@ export default function ForgotPassForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (values) {
-      // Xử lý khi đã gọi thành công API resend email
+      // Handle a successful resend-email API call
       const { data, error } = await supabase.auth.resetPasswordForEmail(
         email as string,
         {
-          redirectTo: `${location.origin}/update-password`,
+          redirectTo: `${location.origin}/api/auth/passwordcallback?next=/update-password`,
         },
       );
       if (error) {
-        toast.error("Có lỗi xảy ra");
+        toast.error("Something went wrong");
         return;
       }
       setShowForgotPasswordModal(false);
-      // toast.success("Kiểm tra email của bạn để xác minh")
+      // toast.success("Check your email to verify")
       setShowNoticationForgotPassModal(true);
     }
   }
@@ -67,7 +67,7 @@ export default function ForgotPassForm() {
               <FormItem>
                 <FormControl onChange={(e: any) => setEmail(e?.target?.value)}>
                   <Input
-                    placeholder="Nhập email"
+                    placeholder="Enter email"
                     type="text"
                     {...field}
                     className="border-0 ring-1 ring-neutral-100"
@@ -99,7 +99,7 @@ export default function ForgotPassForm() {
                 email ? "text-white" : "text-slate-500"
               } text-center text-[15px] font-semibold leading-6`}
             >
-              Gửi email xác minh
+              Send verification email
             </div>
             <svg
               xmlns="http://www.w3.org/2000/svg"

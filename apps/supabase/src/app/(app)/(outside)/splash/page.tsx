@@ -16,7 +16,7 @@ export default function SplashPage() {
               suzu
             </span>
             <p className="relative z-10 bg-white p-1 uppercase tracking-[5px] md:tracking-[8px]">
-              mạng xã hội
+              social network
             </p>
             <span className="absolute left-0 top-0 text-6xl font-bold uppercase tracking-[5px] text-neutral-200 md:-top-1 md:text-7xl">
               suzu

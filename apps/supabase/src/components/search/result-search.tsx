@@ -40,7 +40,7 @@ const ResultSearch = ({
                 </div>
                 <BaseText
                   text={
-                    "Nội dung bạn đang kiếm không tồn tại, hãy thử từ khoá khác nhé"
+                    "No results found. Try a different keyword"
                   }
                   className="sz-label-m-reg ml-[82px] p-3 text-center"
                   textColor="neutral-500"

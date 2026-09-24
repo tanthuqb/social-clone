@@ -18,7 +18,7 @@ function Comment({
 }) {
   return user !== null ? (
     <>
-      {/* Nếu là author của Comment */}
+      {/* If the user is the comment author */}
       {user?.id === userFeed ? (
         <>
           <EditComment userId={user?.id} feed={feed} />
@@ -26,7 +26,7 @@ function Comment({
         </>
       ) : (
         <>
-          {/* Nếu là guest */}
+          {/* If the user is a guest */}
           <ReplyComment feed={feed} userId={user?.id} />
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -38,7 +38,7 @@ function Comment({
               className,
             )}
           >
-            <span className="text-red-500 hover:text-red-500">Báo cáo</span>
+            <span className="text-red-500 hover:text-red-500">Report</span>
           </DropdownMenuItem>
         </>
       )}

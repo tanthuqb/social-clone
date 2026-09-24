@@ -43,7 +43,7 @@ export function NavbarMobile({ user, notifications, profile }: { user: Session, 
             user={user}
             routerActive={pathname === "/notifications"}
           />
-          <div className="absolute left-[34px] top-0.5 flex items-start shadow-sm">
+          <div className="absolute left-[34px] top-0.5 flex items-start shadow-xs">
             {notifications != 0 && notifications && (
               <BgdCommonBadges
                 text={notifications >= 100 ? 99 : notifications}

@@ -1,6 +1,5 @@
 import SidebarSetings from "@/components/settings/sidebar";
 import MainSidebar from "@/components/shared/sidebar/main-sidebar";
-import { Sidebar } from "lucide-react";
 
 export default function RootLayout({
   children,

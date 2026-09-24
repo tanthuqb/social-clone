@@ -6,19 +6,19 @@ function NavTitleMbSettings() {
   const arrayPathname = [
     {
       pathname: "/settings/edit-profile",
-      title: "Chỉnh sủa hồ sơ",
+      title: "Edit profile",
     },
     {
       pathname: "/settings/account-management",
-      title: "Quản lý tài khoản",
+      title: "Account management",
     },
     {
       pathname: "/settings/account-management/change-password",
-      title: "Quản lý tài khoản",
+      title: "Account management",
     },
     {
       pathname: "/settings/term-service",
-      title: "Điều khoản & dịch vụ",
+      title: "Terms & services",
     },
   ];
   const pathname = usePathname();

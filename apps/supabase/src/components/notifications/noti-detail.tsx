@@ -25,7 +25,7 @@ const NotiDetail = ({ notification, session }: NotiDetailProps) => {
 
   useEffect(() => {
     async function fetchData() {
-      //update đã vào thông báo
+      //mark notification as read
       // if (notification?.status == false) {
       //   const { data: notiUpdate } = await supabase
       //     .from("notifications")
@@ -33,7 +33,7 @@ const NotiDetail = ({ notification, session }: NotiDetailProps) => {
       //     .eq("id", notification?.id)
       //     .single();
       // }
-      //lấy thông tin người theo dõi
+      //get follower info
       const { data: following_userData } = await supabase
         .from("user_follows")
         .select("*")
@@ -41,7 +41,7 @@ const NotiDetail = ({ notification, session }: NotiDetailProps) => {
         .eq("following_id", notification?.user_id?.id as string)
         .maybeSingle();
       setFollowingUser(following_userData as any);
-      //lấy thông tin người được theo dõi
+      //get followed user info
       if (notification?.following_id) {
         const { data: rows } = await supabase
           .from("user_follows")
@@ -62,7 +62,7 @@ const NotiDetail = ({ notification, session }: NotiDetailProps) => {
       }
       switch (notification?.type) {
         case "user_follows":
-          setHref(`/u/${notification?.user_id?.full_name}`);
+          setHref(`/u/${notification?.user_id?.full_name ?? notification?.user_id?.id}`);
           break;
         case "feed_engagement":
           setHref(`/p/${notification?.feed_id?.id}`);
@@ -93,7 +93,7 @@ const NotiDetail = ({ notification, session }: NotiDetailProps) => {
     if (error) {
       toast.error(error);
     } else {
-      toast.success("Đang chuyển hướng");
+      toast.success("Redirecting");
       window.location.href = `${href}`;
     }
   }
@@ -121,22 +121,22 @@ const NotiDetail = ({ notification, session }: NotiDetailProps) => {
               <BaseText
                 text={`${
                   notification?.type == "user_follows"
-                    ? "Đã theo dõi bạn"
+                    ? "Followed you"
                     : notification?.type == "feed_engagement"
                       ? notification?.state === ReactionState.LIKE
-                        ? "Đã thích bài viết của bạn"
-                        : "Đã không thích bài viết của bạn"
+                        ? "Liked your post"
+                        : "Disliked your post"
                       : notification?.type == "comment_engagement"
                         ? notification?.state === ReactionState.LIKE
-                          ? "Đã thích thảo luận của bạn"
-                          : "Đã không thích thảo luận của bạn"
+                          ? "Liked your comment"
+                          : "Disliked your comment"
                         : notification?.type == "comments"
                           ? notification?.type == "comments" &&
                             notification?.feed_id?.parent_id
-                            ? "Đã thảo luận trong bình luận của bạn"
-                            : "Đã thảo luận trong bài viết của bạn"
+                            ? "Replied to your comment"
+                            : "Commented on your post"
                           : notification?.type == "feed"
-                            ? "Đã đăng tải bài viết mới"
+                            ? "Published a new post"
                             : ""
                 }`}
                 className="sz-parag-reg"

@@ -1,6 +1,7 @@
 {
-  "$schema": "https://turbo.build/schema.json",
+  "$schema": "https://turborepo.com/schema.json",
   "globalDependencies": ["**/.env.*local"],
+  "globalEnv": ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY", "NEXT_PUBLIC_SITE_URL", "NEXT_PUBLIC_APP_NAME", "GA_MEASUREMENT_ID"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -8,6 +9,13 @@
     },
     "lint": {
       "dependsOn": ["^lint"]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"]
+    },
+    "test:e2e": {
+      "cache": false,
+      "passThroughEnv": ["E2E_USER_EMAIL", "E2E_USER_PASSWORD", "PLAYWRIGHT_*", "CI", "PORT"]
     },
     "dev": {
       "cache": false,

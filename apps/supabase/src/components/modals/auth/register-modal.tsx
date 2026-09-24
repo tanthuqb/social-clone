@@ -30,7 +30,7 @@ function RegisterModal({
             isButton={true}
           />
           <div className="flex-1 text-center text-[15px] font-semibold leading-6 text-white">
-            Đăng ký
+            Sign up
           </div>
           <BaseCommonBTN
             isButton={true}
@@ -46,20 +46,20 @@ function RegisterModal({
         <div className="flex flex-col gap-5 px-4 md:px-0">
           <div className="flex flex-col gap-2.5 text-left">
             <div className="text-[23px] font-semibold leading-7 text-slate-700">
-              Vẫn chưa có tài khoản lun 🙄!
+              Don't have an account yet 🙄?
             </div>
 
             <div className="text-xs font-normal text-slate-500">
-              Mạng xã hội để giải trí và vui chơi thoải mái nhưng hãy
+              A social network to relax and have fun, but please
               <br />
               <span className="text-xs font-semibold text-gray-900 underline">
-                có chơi có chịu
+                be responsible
               </span>{" "}
-              khi chia sẻ những suy nghĩ của{" "}
+              when sharing your{" "}
               <span className="text-xs font-normal text-gray-700">
-                bản thân
+                own
               </span>{" "}
-              mình!
+              thoughts!
             </div>
 
             <RegisterForm />
@@ -67,11 +67,11 @@ function RegisterModal({
 
           <div className="flex items-center justify-center border-t border-slate-100 px-4 pb-10 pt-3 md:pb-6">
             <div className="text-center text-[15px] font-normal text-slate-500">
-              Bạn đã có tài khoản 😉?
+              Already have an account 😉?
             </div>
             <BaseCommonBTN
               className="p-2"
-              text="Đăng nhập nào"
+              text="Log in"
               isButton={true}
               onClick={() => {
                 setShowLoginModal(true);

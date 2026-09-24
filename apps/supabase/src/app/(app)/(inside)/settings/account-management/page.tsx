@@ -7,7 +7,7 @@ async function Home() {
   const { data: session } = await supabase.auth.getUser();
   return (
     <div className="flex h-dvh flex-col">
-      <HeaderCommonSettings text="Quản lý tài khoản" />
+      <HeaderCommonSettings text="Account management" />
       <div className="shadow-common-sm h-[calc(100dvh_-_60px)] overflow-hidden rounded-none bg-neutral-50 py-4 sm:h-[calc(100dvh_-_80px)] sm:rounded-3xl">
         <AccountManagement session={session ?? null} />;
       </div>

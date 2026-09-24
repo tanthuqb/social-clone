@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { updateUser } from "@/lib/api/user/mutations";
 import { UpdateProfileParams, updateProfileParams } from "@/lib/db/schema/profile";
 import { createClient } from "@/lib/supabase/server";
+import { searchFeeds } from "@/lib/api/search/queries";
 
 const handleErrors = (e: unknown) => {
     const errMsg = "Error, please try again.";
@@ -27,15 +28,32 @@ export const updateProfileAction = async (input: {
   const { data: session } = await supabase.auth.getUser();
   if (!session?.user) return { data: null, error: "Not authenticated" };
 
+  // Whitelist editable columns (no trial_end/email/privacy mass assignment).
+  const allowed = ["display_name", "full_name", "description", "gender", "avatar_url", "birthday", "website"] as const;
+  const patch: Record<string, string> = {};
+  for (const key of allowed) {
+    const value = input[key];
+    if (typeof value === "string") patch[key] = value.trim();
+  }
+  if (patch.avatar_url && !patch.avatar_url.startsWith(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "")) {
+    return { data: null, error: "Invalid avatar URL" };
+  }
+  if (patch.full_name !== undefined && !/^[\w.-]{5,50}$/.test(patch.full_name)) {
+    return { data: null, error: "Username must be 5-50 letters, numbers, dots, dashes or underscores" };
+  }
+
   const { data, error } = await supabase
     .from("profiles")
-    .update(input)
+    .update({ ...patch, updated_at: new Date().toISOString() })
     .eq("id", session.user.id)
     .select()
     .single();
-  if (error) return { data: null, error: error.message };
+  if (error) {
+    const message = error.code === "23505" ? "That username is already taken" : error.message;
+    return { data: null, error: message };
+  }
 
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   return { data, error: null };
 };
 
@@ -80,12 +98,11 @@ export const getFeaturedUserAction = async (userId : Profile['id'] | null , offs
     }
 }
 
-export const  fetchSearchDataAction = async (search: string | null, offset: number, limit: number) => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/search?search=${search}&offset=${offset}&limit=${limit}`, {
-    next: {
-      revalidate: 0
-    }
-  });
-  const data = await res.json();
-  return data;
+export const fetchSearchDataAction = async (search: string | null, offset: number, limit: number) => {
+  try {
+    return (await searchFeeds(search, offset, limit)) as any[];
+  } catch (error) {
+    console.error("fetchSearchDataAction", handleErrors(error));
+    return [];
+  }
 }
