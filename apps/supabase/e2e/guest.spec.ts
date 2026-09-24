@@ -86,4 +86,38 @@ test.describe("guest", () => {
     await expect(page).toHaveURL(/\/$/);
     await expect(page.getByText("For you").first()).toBeVisible();
   });
+
+  for (const path of ["/settings/privacy", "/settings/blocked-users", "/settings/policy-security"]) {
+    test(`privacy settings require login (${path})`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page).toHaveURL(/\/$/);
+      await expect(page.getByText("For you").first()).toBeVisible();
+    });
+  }
+
+  test("posts show their audience", async ({ page }) => {
+    await page.goto("/");
+    const cards = page.getByTestId("feed-card");
+    await cards.first().waitFor({ state: "visible", timeout: 10_000 }).catch(() => undefined);
+    test.skip((await cards.count()) === 0, "No posts on the home feed (empty database).");
+    await expect(cards.first().getByTestId("feed-privacy")).toHaveAttribute(
+      "aria-label",
+      /^(Public|Followers|Only me)$/,
+    );
+  });
+
+  test("hide, block and report ask guests to log in", async ({ page }) => {
+    await page.goto("/");
+    const cards = page.getByTestId("feed-card");
+    await cards.first().waitFor({ state: "visible", timeout: 10_000 }).catch(() => undefined);
+    test.skip((await cards.count()) === 0, "No posts on the home feed (empty database).");
+    for (const item of ["Hide post", "Block", "Report"]) {
+      await cards.first().getByTestId("menu-trigger-dots").first().click();
+      await page.getByRole("menuitem", { name: item }).click();
+      const dialog = page.getByRole("dialog");
+      await expect(dialog.getByText("Welcome to SuZu!")).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(dialog).toBeHidden();
+    }
+  });
 });

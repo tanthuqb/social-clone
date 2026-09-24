@@ -4,6 +4,7 @@ import { updateUser } from "@/lib/api/user/mutations";
 import { UpdateProfileParams, updateProfileParams } from "@/lib/db/schema/profile";
 import { createClient } from "@/lib/supabase/server";
 import { searchFeeds } from "@/lib/api/search/queries";
+import { getBlockedUserIds } from "@/lib/api/moderation/queries";
 
 const handleErrors = (e: unknown) => {
     const errMsg = "Error, please try again.";
@@ -76,8 +77,13 @@ export const getFeaturedUserAction = async (userId : Profile['id'] | null , offs
       if (userId) {
         query = query.neq("id", userId);
       }   
-      const { data : userFeatured, error } = await query;
-      await Promise.all(userFeatured!.map(async (user: UserFeatured) => {
+      const { data: rows, error } = await query;
+      if (error) throw error;
+      // Never suggest users the viewer blocked or was blocked by.
+      const { data: auth } = await supabase.auth.getUser();
+      const blocked = await getBlockedUserIds(auth?.user?.id, supabase);
+      const userFeatured = (rows ?? []).filter((user) => !blocked.has(user.id));
+      await Promise.all(userFeatured.map(async (user: UserFeatured) => {
         const {count, error } = await supabase
         .from("user_follows")
         .select("*", { count: "exact" })
@@ -91,7 +97,6 @@ export const getFeaturedUserAction = async (userId : Profile['id'] | null , offs
         user.countFollowing = count!;
         user.user_follower = rows ?? undefined;
       }));
-      if(error) throw error;
       return userFeatured;
     } catch (error) {
       return handleErrors(error);

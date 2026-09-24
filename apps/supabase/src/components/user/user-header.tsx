@@ -6,15 +6,20 @@ import {
 } from "@/lib/api/userFollows/queries";
 import { FollowButton } from "@/components/userFollows/follow-btn";
 import { createClient } from "@/lib/supabase/server";
+import type { BlockRelation } from "@/lib/api/moderation/queries";
+import { UnblockButton } from "@/components/moderation/unblock-button";
+import { ProfileActions } from "@/components/moderation/profile-actions";
 
 export const UserHeader = async ({
   user,
   userIdByParams,
   session,
+  relation,
 }: {
   user?: any;
   userIdByParams: string;
   session: any;
+  relation?: BlockRelation;
 }) => {
   const supbase = await createClient();
   // const { data: session } = await supbase.auth.getUser();
@@ -42,6 +47,14 @@ export const UserHeader = async ({
     followingState = !!currentState;
     userFollow = currentState ?? null;
   }
+  const displayName: string = user?.display_name ?? user?.full_name ?? "This user";
+  // Followers-only profiles: explain the empty timeline to everyone else.
+  const showFollowersOnlyNotice =
+    user?.profile_visibility === "followers" &&
+    user?.id !== session?.user?.id &&
+    !followingState &&
+    !relation?.blockedByMe &&
+    !relation?.blockedMe;
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-1 flex-col items-stretch gap-2">
@@ -89,14 +102,38 @@ export const UserHeader = async ({
         </div>
       )}
       <div className="">
-        {user?.id === session?.user?.id ? null : (
-          <FollowButton
-            userId={session?.user?.id!}
-            followingId={user?.id as string}
-            followingState={followingState}
-          />
+        {user?.id === session?.user?.id ? null : relation?.blockedByMe ? (
+          <div
+            className="flex items-center justify-between gap-2 rounded-2xl bg-slate-50 p-3"
+            data-testid="profile-blocked"
+          >
+            <span className="text-[15px] text-slate-700">You blocked this user</span>
+            <UnblockButton userId={user?.id} name={displayName} />
+          </div>
+        ) : relation?.blockedMe ? (
+          <div className="rounded-2xl bg-slate-50 p-3 text-[15px] text-slate-700">
+            You can&apos;t follow or interact with this user.
+          </div>
+        ) : (
+          <div className="flex items-start gap-2">
+            <div className="flex-1">
+              <FollowButton
+                userId={session?.user?.id!}
+                followingId={user?.id as string}
+                followingState={followingState}
+              />
+            </div>
+            {session?.user?.id && relation?.available !== false && (
+              <ProfileActions userId={user?.id} name={displayName} />
+            )}
+          </div>
         )}
       </div>
+      {showFollowersOnlyNotice && (
+        <div className="text-[15px] text-slate-500" data-testid="profile-followers-only">
+          Only followers can see posts from {displayName}.
+        </div>
+      )}
     </div>
   );
 };

@@ -6,6 +6,7 @@ import DropdownMenuComponent, {
 import { cn, timeAgo } from "@suzu/ui";
 import Link from "next/link";
 import { BaseText } from "@/components/master-layout/base-text";
+import { PrivacyIcon } from "@/components/feeds/components/privacy-icon";
 
 interface HeaderCardProps {
   feed: Feed_Detail;
@@ -64,6 +65,7 @@ const HeaderCard = ({
               : ""}
           </Link>
         </div>
+        {feed?.type === "feed" && <PrivacyIcon privacy={feed?.privacy} />}
         <div className={cn({ "hidden": !inFeed && feed?.type === "feed" })}>
           <DropdownMenuComponent
             iconTrigger={iconTrigger}

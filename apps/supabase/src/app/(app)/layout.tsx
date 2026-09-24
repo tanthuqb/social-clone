@@ -1,5 +1,6 @@
 import { Toaster } from "@suzu/ui";
 import ModalProvider from "@/components/modals/provider";
+import { ModerationProvider } from "@/components/moderation/moderation-provider";
 import type { Viewport } from "next";
 import { constructMetadata } from "@/lib/ultis";
 import Script from 'next/script';
@@ -40,7 +41,9 @@ export default function RootLayout({
           </Script>
         </>
       )}
-      <ModalProvider>{children}</ModalProvider>
+      <ModalProvider>
+        <ModerationProvider>{children}</ModerationProvider>
+      </ModalProvider>
       <Toaster richColors position="bottom-center" />
     </>
   );

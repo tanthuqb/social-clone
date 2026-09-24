@@ -13,6 +13,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { FeedPrivacy } from "@/lib/supabase/database.types";
 import { sanitizeContent, validateContentLength } from "@/lib/sanitize";
+import { isPolicyViolation } from "@/lib/supabase/schema-errors";
 
 const handleErrors = (e: unknown) => {
     const errMsg = "Error, please try again.";
@@ -102,19 +103,37 @@ export const createFeedEntryAction = async (input: {
     const lengthError = validateContentLength(content);
     if (lengthError) return { data: null, error: lengthError };
 
+    const isComment = input.type === "comment";
+    if (isComment && !input.parent_id) {
+        return { data: null, error: "Missing post to comment on" };
+    }
+    // Comments follow the visibility of the post they belong to; only posts
+    // carry their own audience.
+    const privacy =
+        !isComment && Object.values(FeedPrivacy).includes(input.privacy as FeedPrivacy)
+            ? (input.privacy as FeedPrivacy)
+            : FeedPrivacy.PUBLIC;
+
     // Whitelist the columns a client may set (no status/id/user_id spoofing).
     const { data, error } = await supabase
         .from("feeds")
         .insert({
             content,
-            type: input.type === "comment" ? "comment" : "feed",
-            parent_id: input.parent_id ?? null,
-            privacy: input.privacy ?? FeedPrivacy.PUBLIC,
+            type: isComment ? "comment" : "feed",
+            parent_id: isComment ? input.parent_id : null,
+            privacy,
             user_id: session.user.id,
         })
         .select("*")
         .single();
-    if (error) return { data: null, error: error.message };
+    if (error) {
+        // RLS rejects comments between blocked users or when the author's
+        // comment setting does not allow it.
+        if (isComment && isPolicyViolation(error)) {
+            return { data: null, error: "You can't comment on this post." };
+        }
+        return { data: null, error: error.message };
+    }
 
     revalidateFeeds();
     return { data, error: null };

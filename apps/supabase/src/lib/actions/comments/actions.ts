@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { isPolicyViolation } from "@/lib/supabase/schema-errors";
 
 export async function createCommentAction(input: {
   feed_id: string;
@@ -17,6 +18,7 @@ export async function createCommentAction(input: {
     .insert({ ...input, user_id: session.user.id })
     .select()
     .single();
+  if (isPolicyViolation(error)) return { data: null, error: "You can't comment on this post." };
   if (error) return { data: null, error: error.message };
 
   revalidatePath(`/p/${input.feed_id}`);

@@ -298,6 +298,39 @@ export type Database = {
           },
         ]
       }
+      hidden_feeds: {
+        Row: {
+          created_at: string
+          feed_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feed_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          feed_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hidden_feeds_feed_id_fkey"
+            columns: ["feed_id"]
+            isOneToOne: false
+            referencedRelation: "feeds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hidden_feeds_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           comment_id: string | null
@@ -376,6 +409,8 @@ export type Database = {
         Row: {
           avatar_url: string | null
           birthday: string | null
+          comment_permission: Database["public"]["Enums"]["comment_permission"]
+          default_post_privacy: Database["public"]["Enums"]["feed_privacy"]
           description: string | null
           display_name: string | null
           email: string | null
@@ -384,6 +419,7 @@ export type Database = {
           id: string
           phonenumber: string | null
           privacy: Database["public"]["Enums"]["user_privacy"] | null
+          profile_visibility: Database["public"]["Enums"]["profile_visibility"]
           trial_end: string | null
           types: string | null
           updated_at: string | null
@@ -392,6 +428,8 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           birthday?: string | null
+          comment_permission?: Database["public"]["Enums"]["comment_permission"]
+          default_post_privacy?: Database["public"]["Enums"]["feed_privacy"]
           description?: string | null
           display_name?: string | null
           email?: string | null
@@ -400,6 +438,7 @@ export type Database = {
           id: string
           phonenumber?: string | null
           privacy?: Database["public"]["Enums"]["user_privacy"] | null
+          profile_visibility?: Database["public"]["Enums"]["profile_visibility"]
           trial_end?: string | null
           types?: string | null
           updated_at?: string | null
@@ -408,6 +447,8 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           birthday?: string | null
+          comment_permission?: Database["public"]["Enums"]["comment_permission"]
+          default_post_privacy?: Database["public"]["Enums"]["feed_privacy"]
           description?: string | null
           display_name?: string | null
           email?: string | null
@@ -416,6 +457,7 @@ export type Database = {
           id?: string
           phonenumber?: string | null
           privacy?: Database["public"]["Enums"]["user_privacy"] | null
+          profile_visibility?: Database["public"]["Enums"]["profile_visibility"]
           trial_end?: string | null
           types?: string | null
           updated_at?: string | null
@@ -427,22 +469,86 @@ export type Database = {
         Row: {
           content: string | null
           created_at: string
+          feed_id: string | null
           id: number
+          reason: string | null
+          reported_user_id: string | null
           user_id: string | null
         }
         Insert: {
           content?: string | null
           created_at?: string
+          feed_id?: string | null
           id?: number
+          reason?: string | null
+          reported_user_id?: string | null
           user_id?: string | null
         }
         Update: {
           content?: string | null
           created_at?: string
+          feed_id?: string | null
           id?: number
+          reason?: string | null
+          reported_user_id?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "report_feed_id_fkey"
+            columns: ["feed_id"]
+            isOneToOne: false
+            referencedRelation: "feeds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_reported_user_id_fkey"
+            columns: ["reported_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_blocks: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id?: string
+          created_at?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_blocks_blocked_id_fkey"
+            columns: ["blocked_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_blocks_blocker_id_fkey"
+            columns: ["blocker_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_follows: {
         Row: {
@@ -491,6 +597,8 @@ export type Database = {
         Returns: {
           avatar_url: string | null
           birthday: string | null
+          comment_permission: Database["public"]["Enums"]["comment_permission"]
+          default_post_privacy: Database["public"]["Enums"]["feed_privacy"]
           description: string | null
           display_name: string | null
           email: string | null
@@ -499,6 +607,7 @@ export type Database = {
           id: string
           phonenumber: string | null
           privacy: Database["public"]["Enums"]["user_privacy"] | null
+          profile_visibility: Database["public"]["Enums"]["profile_visibility"]
           trial_end: string | null
           types: string | null
           updated_at: string | null
@@ -516,6 +625,8 @@ export type Database = {
         Returns: {
           avatar_url: string | null
           birthday: string | null
+          comment_permission: Database["public"]["Enums"]["comment_permission"]
+          default_post_privacy: Database["public"]["Enums"]["feed_privacy"]
           description: string | null
           display_name: string | null
           email: string | null
@@ -524,6 +635,7 @@ export type Database = {
           id: string
           phonenumber: string | null
           privacy: Database["public"]["Enums"]["user_privacy"] | null
+          profile_visibility: Database["public"]["Enums"]["profile_visibility"]
           trial_end: string | null
           types: string | null
           updated_at: string | null
@@ -541,6 +653,8 @@ export type Database = {
         Returns: {
           avatar_url: string | null
           birthday: string | null
+          comment_permission: Database["public"]["Enums"]["comment_permission"]
+          default_post_privacy: Database["public"]["Enums"]["feed_privacy"]
           description: string | null
           display_name: string | null
           email: string | null
@@ -549,6 +663,7 @@ export type Database = {
           id: string
           phonenumber: string | null
           privacy: Database["public"]["Enums"]["user_privacy"] | null
+          profile_visibility: Database["public"]["Enums"]["profile_visibility"]
           trial_end: string | null
           types: string | null
           updated_at: string | null
@@ -567,8 +682,10 @@ export type Database = {
       }
     }
     Enums: {
+      comment_permission: "everyone" | "followers" | "nobody"
       feed_privacy: "public" | "follow" | "private"
       feed_status: "active" | "hide" | "deleted" | "reported"
+      profile_visibility: "public" | "followers"
       state: "like" | "dislike" | "neutral"
       type: "feed" | "comment"
       user_privacy: "owner" | "guest"
@@ -699,8 +816,10 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      comment_permission: ["everyone", "followers", "nobody"],
       feed_privacy: ["public", "follow", "private"],
       feed_status: ["active", "hide", "deleted", "reported"],
+      profile_visibility: ["public", "followers"],
       state: ["like", "dislike", "neutral"],
       type: ["feed", "comment"],
       user_privacy: ["owner", "guest"],
@@ -725,6 +844,17 @@ export enum ReactionState {
   HOVER = "hover",
   ACTIVE = "active",
   DISABLE = "disable",
+}
+
+export enum ProfileVisibility {
+  PUBLIC = "public",
+  FOLLOWERS = "followers",
+}
+
+export enum CommentPermission {
+  EVERYONE = "everyone",
+  FOLLOWERS = "followers",
+  NOBODY = "nobody",
 }
 
 export enum UserPrivacy {

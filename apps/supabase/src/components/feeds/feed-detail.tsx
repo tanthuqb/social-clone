@@ -4,6 +4,7 @@ import { InteractiveWidget } from "./components";
 import CommentForm from "@/components/comments/comment-form";
 
 import { ContentCard, FooterCard, HeaderCard } from "@/components/master-layout";
+import { FeedCardProvider } from "./feed-card-context";
 
 type FeedDetailProps = {
   className?: string;
@@ -12,14 +13,23 @@ type FeedDetailProps = {
   userIdByParams?: string;
   profiles?: Profile;
   session: Session;
+  /** Shown instead of the comment composer when the viewer may not comment. */
+  commentRestriction?: string | null;
 };
 
-const FeedDetail = ({ inFeed, feed, profiles, session }: FeedDetailProps) => {
+const FeedDetail = ({
+  inFeed,
+  feed,
+  profiles,
+  session,
+  commentRestriction,
+}: FeedDetailProps) => {
   if (!feed?.id) return <></>;
 
   // Phase 2: Realtime - commented out for now since realtime is not handled yet
 
   return (
+    <FeedCardProvider feedId={feed.id}>
     <div
       className={`${inFeed ? "shadow-common-sm bg-white py-4" : "p-0 sm:p-4"} flex w-full flex-col sm:rounded-2xl`}
       data-testid="feed-card"
@@ -101,6 +111,7 @@ const FeedDetail = ({ inFeed, feed, profiles, session }: FeedDetailProps) => {
                 profiles={profiles!}
                 session={session}
                 inFeed={inFeed}
+                commentRestriction={commentRestriction}
               />
               {/** comment form */}
               <Divider />
@@ -115,6 +126,7 @@ const FeedDetail = ({ inFeed, feed, profiles, session }: FeedDetailProps) => {
         />
       )}
     </div>
+    </FeedCardProvider>
   );
 };
 

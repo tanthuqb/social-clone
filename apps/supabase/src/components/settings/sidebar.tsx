@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { BaseCommonBTN } from "@/components/master-layout";
 import Link from "next/link";
 import { BaseText } from "@/components/master-layout/base-text";
+import { Ban, Shield } from "lucide-react";
 
 function SidebarSetings() {
   const supabase = createClient();
@@ -62,6 +63,32 @@ function SidebarSetings() {
               text="Account management"
               className="flex gap-2 rounded-full p-2"
             />
+          </Link>
+
+          <Link
+            href="/settings/privacy"
+            className="hover:bg-trans-black-5 rounded-full transition-all duration-300 active:scale-90"
+          >
+            <div className="flex items-center gap-2 rounded-full p-2">
+              <Shield
+                aria-hidden
+                className={`h-6 w-6 ${pathname === "/settings/privacy" ? "text-neutral-900" : "text-neutral-500"}`}
+              />
+              <BaseText text="Privacy" className="sz-label-m-semi" textColor="neutral-700" />
+            </div>
+          </Link>
+
+          <Link
+            href="/settings/blocked-users"
+            className="hover:bg-trans-black-5 rounded-full transition-all duration-300 active:scale-90"
+          >
+            <div className="flex items-center gap-2 rounded-full p-2">
+              <Ban
+                aria-hidden
+                className={`h-6 w-6 ${pathname === "/settings/blocked-users" ? "text-neutral-900" : "text-neutral-500"}`}
+              />
+              <BaseText text="Blocked users" className="sz-label-m-semi" textColor="neutral-700" />
+            </div>
           </Link>
           <div className="px-4">
             <div className="h-[1px] bg-black/10"></div>

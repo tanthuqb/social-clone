@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { isPolicyViolation } from "@/lib/supabase/schema-errors";
 
 export const upsertFeedReactionAction = async (
   feedId: string,
@@ -25,6 +26,8 @@ export const upsertFeedReactionAction = async (
         { feed_id: feedId, user_id: session.user.id, state },
         { onConflict: "user_id,feed_id" },
       );
+    // RLS rejects reactions on posts the user can't see (blocked, private).
+    if (isPolicyViolation(error)) return { data: null, error: "You can't react to this post" };
     if (error) return { data: null, error: error.message };
   }
 

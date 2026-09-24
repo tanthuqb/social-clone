@@ -22,8 +22,14 @@ import {
   CarouselPrevious,
   CheckIcon,
   ScrollArea,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   toast,
 } from "@suzu/ui";
+import { POST_PRIVACY_OPTIONS } from "@/lib/moderation";
 import { useMediaQuery } from "@suzu/ui/hooks";
 import { BaseText } from "@/components/master-layout/base-text";
 import { useParams, useRouter } from "next/navigation";
@@ -74,6 +80,14 @@ const ContentForm = memo(
     );
 
     const { isMobile } = useMediaQuery();
+
+    // Audience for new posts: preselected from the privacy settings.
+    const defaultPrivacy = user?.default_post_privacy ?? FeedPrivacy.PUBLIC;
+    const [privacy, setPrivacy] = useState<FeedPrivacy>(defaultPrivacy as FeedPrivacy);
+    useEffect(() => {
+      setPrivacy(defaultPrivacy as FeedPrivacy);
+    }, [defaultPrivacy]);
+    const showPrivacyPicker = !type && !editing;
 
     useEffect(() => {
       if (editing) {
@@ -173,7 +187,7 @@ const ContentForm = memo(
           const { data, error } = await createFeedEntryAction({
             content: content,
             type: type ? "comment" : "feed",
-            privacy: FeedPrivacy.PUBLIC,
+            privacy: type ? FeedPrivacy.PUBLIC : privacy,
             parent_id: parentId,
           });
           if (error || !data) {
@@ -350,6 +364,27 @@ const ContentForm = memo(
                     text={user?.display_name!}
                     textColor="slate-900"
                   />
+                  {showPrivacyPicker && (
+                    <Select
+                      value={privacy}
+                      onValueChange={(value) => setPrivacy(value as FeedPrivacy)}
+                    >
+                      <SelectTrigger
+                        aria-label="Audience"
+                        data-testid="composer-privacy"
+                        className="mt-1 h-7 w-auto gap-1 rounded-full border-slate-200 px-3 py-0 text-[13px] font-semibold text-slate-700"
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="z-50">
+                        {POST_PRIVACY_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                   {/* <div onClick={triggerFileInput}>
                     <BaseIconBTN
                       className="absolute top-0 py-2 pr-2"

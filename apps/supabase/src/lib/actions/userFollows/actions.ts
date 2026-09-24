@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { isPolicyViolation } from "@/lib/supabase/schema-errors";
 
 export const followAction = async (followingId: string) => {
   const supabase = await createClient();
@@ -11,6 +12,8 @@ export const followAction = async (followingId: string) => {
   const { error } = await supabase
     .from("user_follows")
     .insert({ user_id: session.user.id, following_id: followingId });
+  // RLS rejects follows between blocked users.
+  if (isPolicyViolation(error)) return { data: null, error: "You can't follow this user" };
   if (error) return { data: null, error: error.message };
 
   revalidatePath("/");

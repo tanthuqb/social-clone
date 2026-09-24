@@ -22,8 +22,10 @@ function CommentForm({
   feedId,
   session,
   inFeed,
+  commentRestriction,
 }: {
   className: string;
+  commentRestriction?: string | null;
   feed: Feed_Detail;
   profiles: Profile;
   session: Session;
@@ -279,6 +281,13 @@ function CommentForm({
             <Divider />
           </div>
         </>
+      ) : commentRestriction ? (
+        <div
+          className="border-b-trans-black-10 border-b p-4 text-[15px] text-slate-500"
+          data-testid="comment-restriction"
+        >
+          {commentRestriction}
+        </div>
       ) : (
         <FeedCreateCommon
           user={profiles}

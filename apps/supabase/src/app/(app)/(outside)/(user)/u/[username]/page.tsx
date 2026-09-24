@@ -9,6 +9,7 @@ import { HeaderSectionCommon } from "@/components/shared/header/global/header-se
 import type { Metadata } from 'next'
 import { constructMetadata } from "@/lib/ultis";
 import { notFound } from "next/navigation";
+import { getBlockRelation } from "@/lib/api/moderation/queries";
 
 
 type Props = {
@@ -74,8 +75,11 @@ export default async function Page({
   const user = await getProfileByUsername(usernameByParams);
   if (!user) notFound();
 
-  // Public profiles are visible to guests too (feeds are publicly readable).
-  const { data: feeds } = await getFeedsPrepared(user.id);
+  // Feed visibility (post privacy, followers-only profiles, blocks, hidden
+  // posts) is enforced by RLS; a block also skips the timeline query.
+  const relation = await getBlockRelation(session?.user?.id, user.id, supabase);
+  const blocked = relation.blockedByMe || relation.blockedMe;
+  const { data: feeds } = blocked ? { data: [] } : await getFeedsPrepared(user.id);
 
   return (
     <div className="">
@@ -91,6 +95,7 @@ export default async function Page({
             user={user! ? user : null}
             userIdByParams={user?.id!}
             session={session}
+            relation={relation}
           />
           {session?.user?.id === user?.id && (
             <Link href="/settings">
