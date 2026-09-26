@@ -1,0 +1,18 @@
+# Not needed for the Vercel build (Root Directory: apps/supabase).
+# Without this file the CLI uploads the Turborepo cache (hundreds of MB).
+node_modules
+.git
+.turbo
+.next
+.vercel
+.superpowers
+.playwright-mcp
+docs
+supabase/.temp
+**/test-results
+**/playwright-report
+**/blob-report
+**/playwright/.auth
+.env
+.env.*
+!.env.example
