@@ -136,6 +136,8 @@ const FooterCard = ({
           toast.error(error);
         } else {
           setReactionState(params.state as ReactionState);
+          // Refetch the counts now; Realtime delivery is best-effort.
+          setRefreshTick((t) => t + 1);
         }
         router.refresh();
       } catch (error) {

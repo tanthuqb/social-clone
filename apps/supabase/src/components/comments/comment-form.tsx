@@ -5,6 +5,7 @@ import { Divider, cn, toast } from "@suzu/ui";
 import React, { memo, useContext, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRealtimeTable } from "@/hooks/useRealtimeTable";
+import { COMMENT_CHANGED_EVENT } from "@/lib/comment-events";
 import { useRouter } from "next/navigation";
 import FeedCreateCommon from "@/components/modals/feeds/feed-create-common";
 import {
@@ -43,6 +44,8 @@ function CommentForm({
   const [page, setPage] = useState(1);
   const [NewComment, setNewComment] = useState<Comment_Detail>();
   const [isDelete, setIsDelete] = useState(false);
+  // Bumped when the composer reports a comment change (see lib/comment-events).
+  const [refreshTick, setRefreshTick] = useState(0);
   const [totalComments, setTotalComments] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const supabase = createClient();
@@ -190,7 +193,18 @@ function CommentForm({
       });
     }
     CommentInit();
-  }, [NewComment, isDelete]);
+  }, [NewComment, isDelete, refreshTick]);
+
+  // Realtime delivery is best-effort; the composer also announces changes
+  // in-page so a freshly posted comment shows up without a reload.
+  useEffect(() => {
+    const onCommentChanged = () => {
+      setIsDelete(false);
+      setRefreshTick((tick) => tick + 1);
+    };
+    window.addEventListener(COMMENT_CHANGED_EVENT, onCommentChanged);
+    return () => window.removeEventListener(COMMENT_CHANGED_EVENT, onCommentChanged);
+  }, []);
 
   const LoadMoreComment = async () => {
     try {

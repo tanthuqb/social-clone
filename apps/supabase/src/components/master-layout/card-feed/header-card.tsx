@@ -59,7 +59,9 @@ const HeaderCard = ({
         <div className={cn("sz-label-m-reg text-neutral-500",
           { "pr-2": !inFeed }
         )}>
-          <Link href={`/p/${feed?.id}`}>
+          {/* Relative time can differ between the server render and hydration
+              when a minute boundary passes in between. */}
+          <Link href={`/p/${feed?.id}`} suppressHydrationWarning>
             {feed?.created_at
               ? timeAgo(new Date(feed?.created_at), { withAgo: true })
               : ""}

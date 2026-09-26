@@ -112,8 +112,13 @@ test.describe("guest", () => {
     await cards.first().waitFor({ state: "visible", timeout: 10_000 }).catch(() => undefined);
     test.skip((await cards.count()) === 0, "No posts on the home feed (empty database).");
     for (const item of ["Hide post", "Block", "Report"]) {
+      // A just-closed menu stays mounted during its exit animation and swallows
+      // the next trigger click, so wait for it to be gone before reopening.
+      await expect(page.locator('[role="menu"]')).toHaveCount(0);
       await cards.first().getByTestId("menu-trigger-dots").first().click();
-      await page.getByRole("menuitem", { name: item }).click();
+      const menu = page.getByRole("menu");
+      await expect(menu).toBeVisible();
+      await menu.getByRole("menuitem", { name: item }).click();
       const dialog = page.getByRole("dialog");
       await expect(dialog.getByText("Welcome to SuZu!")).toBeVisible();
       await page.keyboard.press("Escape");

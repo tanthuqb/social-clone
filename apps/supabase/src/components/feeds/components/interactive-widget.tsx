@@ -70,8 +70,9 @@ export const InteractiveWidget = ({
       if (setFeedReactionUser) {
         setFeedReactionUser(FeedReactionUser!);
       }
-      if (countLike) setCountLikeState(countLike);
-      if (countDisLike) setCountDisLikeState(countDisLike);
+      // 0 is a valid count (e.g. after the last reaction is removed).
+      setCountLikeState(countLike ?? 0);
+      setCountDisLikeState(countDisLike ?? 0);
     };
     fetchData();
   }, [refreshTick, feed?.id]);
@@ -109,7 +110,12 @@ export const InteractiveWidget = ({
         );
         if (error) {
           toast.error(error);
+          return;
         }
+        // Reflect the change right away; Realtime delivery is best-effort.
+        setStateReaction(params.state as ReactionState);
+        setRefreshTick((t) => t + 1);
+        router.refresh();
       } catch (error) {
         console.error("Error creating feed reaction", error);
       }
@@ -125,7 +131,13 @@ export const InteractiveWidget = ({
         <div className="flex items-center self-stretch">
           {/* Row1 */}
           <div className="flex flex-1 items-center pl-2">
-            <div className="group">
+            <div
+              className="group"
+              data-testid="widget-react-like"
+              data-state={
+                countLikeState > 0 && state === ReactionState.LIKE ? "like" : "neutral"
+              }
+            >
               <InteractiveBTN
                 className="rounded-full hover:bg-[rgba(31,31,31,0.05)] group-hover:hidden"
                 type={1}
@@ -151,7 +163,10 @@ export const InteractiveWidget = ({
               />
             </div>
 
-            <div className="font-sans text-sm font-semibold leading-6 text-black">
+            <div
+              className="font-sans text-sm font-semibold leading-6 text-black"
+              data-testid="widget-like-count"
+            >
               {countLikeState}
             </div>
           </div>

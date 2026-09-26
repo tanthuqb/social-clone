@@ -35,6 +35,7 @@ import { BaseText } from "@/components/master-layout/base-text";
 import { useParams, useRouter } from "next/navigation";
 import { ModalContext } from "@/components/modals/provider";
 import { createClient } from "@/lib/supabase/client";
+import { notifyCommentChanged } from "@/lib/comment-events";
 import {
   createFeedImageAction,
   deleteFeedImageAction,
@@ -198,17 +199,21 @@ const ContentForm = memo(
           await uploadNewImages(data.id);
 
           setShowFeedCreateModal(false);
-          type
-            ? toast("Comment posted successfully", {
+          if (type) {
+            toast("Comment posted successfully", {
               icon: <CheckIcon />,
               duration: 5000,
-            })
-            : toastFeed(
+            });
+            // Refresh the comment list even if the Realtime event never arrives.
+            notifyCommentChanged(parentId);
+          } else {
+            toastFeed(
               "Post published successfully",
               "checkIcon",
               "View",
               `/p/${data.id}`,
             );
+          }
           router.refresh();
         }
       } finally {

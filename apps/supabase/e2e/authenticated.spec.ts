@@ -14,10 +14,35 @@ test.use({ storageState: AUTH_FILE });
 const cardWithText = (page: Page, text: string) =>
   page.getByTestId("feed-card").filter({ hasText: text }).first();
 
-async function openCardMenu(page: Page, text: string) {
-  await cardWithText(page, text).getByTestId("menu-trigger-dots").first().click();
-  return page.getByRole("menu");
+/**
+ * Open a dropdown menu from its trigger. A menu that was just closed stays
+ * mounted while its exit animation runs; clicking a trigger during that window
+ * is swallowed by Radix, so wait for the previous menu to be gone first.
+ */
+async function openMenu(page: Page, trigger: Locator) {
+  await expect(page.locator('[role="menu"]')).toHaveCount(0);
+  await trigger.click();
+  const menu = page.getByRole("menu");
+  await expect(menu).toBeVisible();
+  return menu;
 }
+
+/** Close the open dropdown menu and wait until it is removed from the DOM. */
+async function closeMenu(page: Page) {
+  await page.keyboard.press("Escape");
+  await expect(page.locator('[role="menu"]')).toHaveCount(0);
+}
+
+async function openCardMenu(page: Page, text: string) {
+  return openMenu(page, cardWithText(page, text).getByTestId("menu-trigger-dots").first());
+}
+
+/**
+ * The post menu on the post page (/p/:id): the card's own trigger is hidden
+ * there and the page header ("Post details") carries the post menu instead.
+ */
+const postPageMenuTrigger = (page: Page) =>
+  page.getByTestId("menu-trigger-dots").locator("visible=true").first();
 
 async function createPost(page: Page, text: string) {
   await page.goto("/");
@@ -38,8 +63,8 @@ async function deletePostIfPresent(page: Page, feedId: string) {
   if (response?.status() === 404) return;
   const card = page.locator(`[data-testid="feed-card"][data-feed-id="${feedId}"]`);
   if ((await card.count()) === 0) return;
-  await card.getByTestId("menu-trigger-dots").first().click();
-  await page.getByRole("menuitem", { name: "Delete post" }).click();
+  const menu = await openMenu(page, postPageMenuTrigger(page));
+  await menu.getByRole("menuitem", { name: "Delete post" }).click();
   await page.getByRole("button", { name: "Delete", exact: true }).click();
   await expect(page.getByText(/deleted successfully/)).toBeVisible();
 }
@@ -81,14 +106,19 @@ test.describe.serial("authenticated feed flows", () => {
     test.skip(!feedId, "post was not created");
     await page.goto(`/p/${feedId}`);
     const card = page.locator(`[data-testid="feed-card"][data-feed-id="${feedId}"]`);
-    const like = card.getByTestId("react-like").first();
+    // The post's own reaction widget ("Reactions" section). Comments listed
+    // below it have their own like buttons inside the same card element.
+    const like = card.getByTestId("widget-react-like");
+    const likeCount = card.getByTestId("widget-like-count");
     await expect(like).toHaveAttribute("data-state", "neutral");
+    await expect(likeCount).toHaveText("0");
     await like.click();
     await expect(like).toHaveAttribute("data-state", "like");
-    await expect(card.getByText("reactions")).toBeVisible();
+    await expect(likeCount).toHaveText("1");
     // Toggle back to neutral (removes the reaction row).
     await like.click();
     await expect(like).toHaveAttribute("data-state", "neutral");
+    await expect(likeCount).toHaveText("0");
   });
 
   test("save the post to the collection and remove it", async ({ page }) => {
@@ -106,8 +136,10 @@ test.describe.serial("authenticated feed flows", () => {
   test("delete the post", async ({ page }) => {
     test.skip(!feedId, "post was not created");
     await deletePostIfPresent(page, feedId!);
-    const response = await page.goto(`/p/${feedId}`);
-    expect(response?.status()).toBe(404);
+    // /p/:id streams behind loading.tsx, so the status may already be 200 when
+    // notFound() runs; assert the rendered 404 page instead (as guest.spec does).
+    await page.goto(`/p/${feedId}`);
+    await expect(page.getByRole("heading", { name: "404 - Page not found" })).toBeVisible();
     feedId = null;
   });
 });
@@ -187,12 +219,9 @@ async function findOtherUsersCard(page: Page) {
   const count = Math.min(await cards.count(), 10);
   for (let i = 0; i < count; i++) {
     const card = cards.nth(i);
-    await card.getByTestId("menu-trigger-dots").first().click();
-    const isOther = await page
-      .getByRole("menuitem", { name: "Block" })
-      .isVisible()
-      .catch(() => false);
-    await page.keyboard.press("Escape");
+    const menu = await openMenu(page, card.getByTestId("menu-trigger-dots").first());
+    const isOther = (await menu.getByRole("menuitem", { name: "Block" }).count()) > 0;
+    await closeMenu(page);
     if (isOther) {
       const feedId = await card.getAttribute("data-feed-id");
       const profileHref = await card.locator('a[href^="/u/"]').last().getAttribute("href");
@@ -262,8 +291,8 @@ test.describe.serial("hide, report and block", () => {
     test.skip(!target, "No post by another user on the home feed.");
     const card = cardById(page, target!.feedId);
 
-    await card.getByTestId("menu-trigger-dots").first().click();
-    await page.getByRole("menuitem", { name: "Hide post" }).click();
+    let menu = await openMenu(page, card.getByTestId("menu-trigger-dots").first());
+    await menu.getByRole("menuitem", { name: "Hide post" }).click();
     await expectOrSkipUnavailable(page, page.getByTestId("feed-hidden"));
     const hidden = page.getByTestId("feed-hidden").filter({ hasText: "Post hidden" });
     await expect(hidden).toBeVisible();
@@ -271,8 +300,8 @@ test.describe.serial("hide, report and block", () => {
     await expect(card.getByTestId("feed-privacy")).toBeVisible();
 
     // Hide again: the post stays hidden after a reload.
-    await card.getByTestId("menu-trigger-dots").first().click();
-    await page.getByRole("menuitem", { name: "Hide post" }).click();
+    menu = await openMenu(page, card.getByTestId("menu-trigger-dots").first());
+    await menu.getByRole("menuitem", { name: "Hide post" }).click();
     await expect(page.getByTestId("feed-hidden")).toBeVisible();
     await page.reload();
     await expect(page.getByText("For you").first()).toBeVisible();
@@ -289,8 +318,11 @@ test.describe.serial("hide, report and block", () => {
     const target = await findOtherUsersCard(page);
     test.skip(!target, "No post by another user on the home feed.");
     const report = async () => {
-      await cardById(page, target!.feedId).getByTestId("menu-trigger-dots").first().click();
-      await page.getByRole("menuitem", { name: "Report" }).click();
+      const menu = await openMenu(
+        page,
+        cardById(page, target!.feedId).getByTestId("menu-trigger-dots").first(),
+      );
+      await menu.getByRole("menuitem", { name: "Report" }).click();
       const dialog = page.getByRole("dialog");
       await expect(dialog.getByText("Report post")).toBeVisible();
       await dialog.getByRole("radio", { name: "Spam" }).click();
@@ -321,8 +353,11 @@ test.describe.serial("hide, report and block", () => {
     const wasFollowing = (await followButton.innerText()).trim() === "Following";
 
     await page.goto("/");
-    await cardById(page, target!.feedId).getByTestId("menu-trigger-dots").first().click();
-    await page.getByRole("menuitem", { name: "Block" }).click();
+    const menu = await openMenu(
+      page,
+      cardById(page, target!.feedId).getByTestId("menu-trigger-dots").first(),
+    );
+    await menu.getByRole("menuitem", { name: "Block" }).click();
     const dialog = page.getByRole("dialog");
     await expect(dialog.getByText(/^Block .+\?$/)).toBeVisible();
     await dialog.getByRole("button", { name: "Block", exact: true }).click();

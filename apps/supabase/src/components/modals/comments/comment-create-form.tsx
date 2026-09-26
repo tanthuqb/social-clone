@@ -17,6 +17,7 @@ import { Avatar } from "@/components/shared/avatar";
 import { type Feed, insertFeedParams } from "@/lib/db/schema/feeds";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { notifyCommentChanged } from "@/lib/comment-events";
 import {
   createCommentAction,
   updateCommentAction,
@@ -69,6 +70,7 @@ export const CommentCreateForm = ({
       }
       setShowCommentCreateModal(false);
       toast.success(`Updated successfully!`);
+      notifyCommentChanged(feedId as string);
       router.refresh();
     } else {
       if (!comment) {
@@ -82,6 +84,7 @@ export const CommentCreateForm = ({
         }
         setShowCommentCreateModal(false);
         toast.success(`Comment posted successfully!`);
+        notifyCommentChanged(feedId as string);
         router.refresh();
       }
     }
@@ -98,6 +101,7 @@ export const CommentCreateForm = ({
       }
       setShowCommentCreateModal(false);
       toast.success(`Reply posted successfully!`);
+      notifyCommentChanged(feedId as string);
       router.refresh();
     } else {
       if (!!comment.id) {
@@ -111,6 +115,7 @@ export const CommentCreateForm = ({
         }
         setShowCommentCreateModal(false);
         toast.success(`Reply updated successfully!`);
+        notifyCommentChanged(feedId as string);
         router.refresh();
       }
     }

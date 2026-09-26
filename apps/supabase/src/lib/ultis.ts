@@ -9,8 +9,8 @@ const url = getSiteUrl();
 
 
 export function constructMetadata({
-  title = `${process.env.NEXT_PUBLIC_APP_NAME}`,
-  description = `${process.env.NEXT_PUBLIC_APP_NAME} is the modern social network for creators, artists, and their fans.`,
+  title = process.env.NEXT_PUBLIC_APP_NAME ?? "SuZu",
+  description = `${process.env.NEXT_PUBLIC_APP_NAME ?? "SuZu"} is the modern social network for creators, artists, and their fans.`,
   image = `${url}/thumbnail.png`,
   icons = `${url}/favicon.png`,
   noIndex = false,
