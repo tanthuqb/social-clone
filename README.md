@@ -2,6 +2,22 @@
 
 A social networking app built with **Next.js 16**, **React 19**, Supabase and Turborepo. The monorepo holds the main app, a shared UI library, transactional email templates and shared tooling configs.
 
+**Live demo:** [https://social-clone-supabase.vercel.app](https://social-clone-supabase.vercel.app)
+
+## 📸 Screenshots
+
+| Home feed | Post detail | Sign in |
+|-----------|-------------|---------|
+| ![Home feed](./screenshots/home-feed.png) | ![Post detail](./screenshots/post-detail.png) | ![Sign in](./screenshots/login-modal.png) |
+
+## 🌟 Highlights
+
+- Supabase Auth (email/password and Google OAuth) with cookie-based sessions via `@supabase/ssr`.
+- Posts, nested comments, reactions, saved posts, follows and realtime notifications, all protected by Row Level Security.
+- Moderation and privacy: hide posts, block and report users, per-user privacy settings and post audiences enforced in the database.
+- Rich text with TipTap 3, image uploads to Supabase Storage, YouTube embeds and link previews.
+- Turborepo monorepo with a shared Radix-based UI package, React Email templates and Playwright end-to-end tests.
+
 ## ✨ Features
 
 - **Feeds**: create, edit, delete and pin posts written in a TipTap 3 editor. Posts can include images (Supabase Storage), embedded YouTube videos (paste a link) and link previews (Open Graph, fetched server-side with SSRF protection). Post HTML is sanitized on write and on render.
